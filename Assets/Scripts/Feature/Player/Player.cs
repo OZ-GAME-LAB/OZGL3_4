@@ -3,8 +3,8 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private float _speed = 50f;
-    private float _jumpPower = 1f;
+    private float _speed = 75f;
+    private float _jumpPower = 100f;
 
     private Vector2 _movement = Vector2.zero;
 
@@ -19,7 +19,6 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _movement = _movement.normalized;
         float xOffset = _movement.x * _speed * Time.fixedDeltaTime;
 
         _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
@@ -28,5 +27,19 @@ public class Player : MonoBehaviour
     private void OnMove(InputValue value)
     {
         _movement = value.Get<Vector2>();
+    }
+
+
+    private void OnJump(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            Jump();
+        }
+    }
+
+    private void Jump()
+    {
+        _rigid.AddForce(Vector2.up * _jumpPower);
     }
 }
