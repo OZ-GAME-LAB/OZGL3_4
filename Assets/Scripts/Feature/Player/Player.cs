@@ -1,18 +1,37 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.Rendering.DebugUI;
+
+public enum PlayerState
+{
+    None = 0,
+    Idle,
+    Walk,
+    Jump,
+    Dash,
+}
 
 public class Player : MonoBehaviour
 {
+    [Header("State")]
+    private PlayerStateBase _currentState;
+    private PlayerState _currentStateType = PlayerState.None;
+    private Dictionary<PlayerState, PlayerStateBase> _stateList = new Dictionary<PlayerState, PlayerStateBase>();
+
+    [Header("Shadow")]
+    private ShadowBase _currentShadow;
+    public ShadowBase CurrentShadow => _currentShadow;
+    private Dictionary<ShadowType, ShadowBase> _shadowList = new Dictionary<ShadowType, ShadowBase>();
+
     [Header("Move")]
-    private float _speed = 75f;
     private Vector2 _movement = Vector2.zero;
+    public bool HasMoveInput => Mathf.Abs(_movement.x) > 0;
 
     [Header("Jump")]
-    private float _jumpPower = 100f;
-    private int _maxJumpCount = 1;
-    private int _jumpCount;
     private bool _isGrounded;
+    private int _jumpCount;
+    public bool IsGrounded => _isGrounded;
+    public int JumpCount => _jumpCount;
 
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
@@ -22,66 +41,104 @@ public class Player : MonoBehaviour
     private float _groundLockTimer;
 
     [Header("Dash")]
-    private float _dashSpeed = 20f;
-    private float _dashDuration = 0.15f;
-    private float _dashCooldown = 0.5f;
-    private bool _isDashing;
-    private float _dashTimer;
     private float _dashCooldownTimer;
-    private float _dashDirection;
     private float _defaultGravity;
     private float _facing = 1f;
-    
-    private PlayerInput _playerInput;
+    public bool CanDash => _dashCooldownTimer <= 0f;
+    public float DefaultGravity => _defaultGravity;
+    public float Facing => _facing;
+
+    [Header("Component")]
     private Rigidbody2D _rigid;
+    public Rigidbody2D Rigid => _rigid;
 
     private void Awake()
     {
-        _playerInput = GetComponent<PlayerInput>();
         _rigid = GetComponent<Rigidbody2D>();
         _defaultGravity = _rigid.gravityScale;
+
+        // 상태들 초기화
+        _stateList.Add(PlayerState.Idle, new IdleState(this));
+        _stateList.Add(PlayerState.Walk, new WalkState(this));
+        _stateList.Add(PlayerState.Jump, new JumpState(this));
+        _stateList.Add(PlayerState.Dash, new DashState(this));
+
+        // 그림자 초기화
+        _shadowList.Add(ShadowType.Default, new DefaultShadow());
+        _shadowList.Add(ShadowType.Mouse, new DefaultShadow());
+    }
+
+    private void Start()
+    {
+        // 초기 상태 설정
+        ChangeState(PlayerState.Idle);
+        // 초기 그림자 설정
+        _currentShadow = _shadowList[ShadowType.Default];
     }
 
     private void FixedUpdate()
+    {
+        UpdateTimer();
+        UpdateGround();
+        _currentState.FixedUpdate();
+    }
+
+    public void ChangeState(PlayerState next)
+    {
+        if (_currentStateType == next)
+            return;
+
+        _currentState?.Exit();
+        _currentStateType = next;
+        _currentState = _stateList[next];
+        _currentState.Enter();
+    }
+
+    public void SetVelocity(float speed)
+    {
+        float xOffset = _movement.x * speed * Time.fixedDeltaTime;
+        _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+    }
+
+    public void SetJump()
+    {
+        _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower);
+        _jumpCount++;
+        _groundLockTimer = _groundLockTime;
+    }
+
+    #region 내부 처리
+    private void UpdateTimer()
     {
         if(_dashCooldownTimer > 0f)
         {
             _dashCooldownTimer -= Time.fixedDeltaTime;
         }
 
-        if (_isDashing)
+        if(_groundLockTimer > 0f)
         {
-            _rigid.linearVelocity = new Vector2(_dashDirection * _dashSpeed, 0f);
-            _dashTimer -= Time.fixedDeltaTime;
+            _groundLockTimer -= Time.fixedDeltaTime;
+        }
+    }
 
-            if(_dashTimer <= 0)
-            {
-                EndDash();
-            }
-
+    private void UpdateGround()
+    {
+        if(_groundLockTimer > 0f)
+        {
+            _isGrounded = false;
             return;
         }
 
-        // 이동
-        Move();
+        _isGrounded = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f, _groundLayer);
 
-        // 착지 판정 & 점프 횟수 리셋
-        if (_groundLockTime > 0f)
-        {
-            _groundLockTime -= Time.fixedDeltaTime;
-            _isGrounded = false;
-        }
-        else
-        {
-            _isGrounded = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f, _groundLayer);
-        }
-        
-        if(_isGrounded && _rigid.linearVelocity.y <= 0.01f)
+        if(_isGrounded == true && Rigid.linearVelocity.y <= 0.01f)
         {
             _jumpCount = 0;
         }
     }
+    #endregion
 
+    #region Player Input
     private void OnMove(InputValue value)
     {
         _movement = value.Get<Vector2>();
@@ -91,59 +148,23 @@ public class Player : MonoBehaviour
             _facing = Mathf.Sign(_movement.x);
         }
     }
-    
-    private void Move()
-    {
-        float xOffset = _movement.x * _speed * Time.fixedDeltaTime;
-        _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
-    }
-
 
     private void OnJump(InputValue value)
     {
         if (value.isPressed)
         {
-            Jump();
+            _currentState.TryJump();
         }
-    }
-
-    private void Jump()
-    {
-        if (_jumpCount >= _maxJumpCount)
-            return;
-
-        _rigid.AddForce(Vector2.up * _jumpPower);
-        _jumpCount++;
-        _groundLockTimer = _groundLockTime;
     }
 
     private void OnDash(InputValue value)
     {
         if (value.isPressed)
         {
-            Dash();
+            _currentState.TryDash();
         }
     }
-
-    private void Dash()
-    {
-        if (_isDashing || _dashCooldownTimer > 0)
-            return;
-
-        _isDashing = true;
-        _dashTimer = _dashDuration;
-        _dashCooldownTimer = _dashCooldown;
-        _dashDirection = _facing;
-        _rigid.gravityScale = 0f;
-    }
-
-    private void EndDash()
-    {
-        _isDashing = false;
-        _rigid.gravityScale = _defaultGravity;
-        _rigid.linearVelocity = Vector2.zero;
-    }
-
+    #endregion
     private void OnDrawGizmos()
     {
         if (_groundCheck == null) return;
