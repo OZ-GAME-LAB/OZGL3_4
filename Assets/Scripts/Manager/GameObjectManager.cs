@@ -5,6 +5,9 @@ public class GameObjectManager : SingletonBase<GameObjectManager>
 {
     private static int _objectInstanceKeyGenerator = 0;
 
+    public int PlayerInstanceId { get; private set; } = -1;
+    public Player CurrentPlayer { get; private set; }
+
     private Transform _rootTransform;
     private PoolManager _poolManager;
 
@@ -40,16 +43,34 @@ public class GameObjectManager : SingletonBase<GameObjectManager>
         gameObject.transform.SetParent(_rootTransform);
         gameObject.transform.position = spawnSpot;
 
+        int instanceId = _objectInstanceKeyGenerator + 1;
+        Player player = gameObject.GetComponent<Player>();
+        if (player != null)
+        {
+            PlayerInstanceId = instanceId;
+            CurrentPlayer = player;
+        }
+
         return gameObject;
     }
 
     public void RequestDestroyObject(GameObject gameObject)
     {
-        _poolManager.Push(gameObject);
+        if (!_poolManager.Push(gameObject))
+            return;
+
+        if (CurrentPlayer != null && CurrentPlayer.gameObject == gameObject)
+        {
+            PlayerInstanceId = -1;
+            CurrentPlayer = null;
+        }
     }
 
     public void RemoveAllObject()
     {
+        PlayerInstanceId = -1;
+        CurrentPlayer = null;
+
         _poolManager.Clear();
 
         if (_rootTransform == null)
