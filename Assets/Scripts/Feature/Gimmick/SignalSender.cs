@@ -36,6 +36,15 @@ public abstract class SignalSender : MonoBehaviour
 
             receiver.ReceiveSignal(isOn);
         }
+
+        HandleSignalSent(isOn);
+    }
+
+    /// <summary>
+    /// 신호를 보낸 직후 호출됩니다. 자식 클래스에서 외형 변경 등에 사용합니다. (시작 상태를 맞출 때도 호출됩니다.)
+    /// </summary>
+    protected virtual void HandleSignalSent(bool isOn)
+    {
     }
 
     /// <summary>
