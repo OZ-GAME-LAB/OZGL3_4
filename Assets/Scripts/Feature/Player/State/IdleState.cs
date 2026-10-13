@@ -7,6 +7,7 @@ public class IdleState : PlayerStateBase
     public override void Enter()
     {
         // 애니메이션 실행
+        _player.Animator.SetFloat("Speed", 0f);
     }
 
     public override void FixedUpdate()

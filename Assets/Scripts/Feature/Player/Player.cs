@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +13,13 @@ public enum PlayerState
     Dash,
 }
 
+[Serializable]
+public struct ShadowAnimEntry
+{
+    public ShadowType Type;
+    public AnimatorOverrideController Controller;
+}
+
 public class Player : MonoBehaviour
 {
     [Header("State")]
@@ -20,8 +29,12 @@ public class Player : MonoBehaviour
 
     [Header("Shadow")]
     private ShadowBase _currentShadow;
+    private ShadowType _currentShadowType;
     public ShadowBase CurrentShadow => _currentShadow;
+    public ShadowType CurrentShadowType => _currentShadowType;
     private Dictionary<ShadowType, ShadowBase> _shadowList = new Dictionary<ShadowType, ShadowBase>();
+    [SerializeField] List<ShadowAnimEntry> _shadowAnimators;
+    public Dictionary<ShadowType, AnimatorOverrideController> ShadowAnimatorList = new Dictionary<ShadowType, AnimatorOverrideController>();
 
     [Header("Move")]
     private Vector2 _movement = Vector2.zero;
@@ -51,10 +64,14 @@ public class Player : MonoBehaviour
     [Header("Component")]
     private Rigidbody2D _rigid;
     public Rigidbody2D Rigid => _rigid;
+    private Animator _anim;
+    public Animator Animator => _anim;
 
+    #region Unity LifeCycle
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<Animator>();
         _defaultGravity = _rigid.gravityScale;
 
         // 상태들 초기화
@@ -64,8 +81,18 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Dash, new DashState(this));
 
         // 그림자 초기화
-        _shadowList.Add(ShadowType.Default, new DefaultShadow());
-        _shadowList.Add(ShadowType.Mouse, new DefaultShadow());
+        _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
+        _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
+        _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));
+
+        // 그림자 애니메이션
+        foreach(var entry in _shadowAnimators)
+        {
+            if(ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
+            {
+                Debug.LogWarning("애니메이션 중복");
+            }
+        }
     }
 
     private void Start()
@@ -73,7 +100,7 @@ public class Player : MonoBehaviour
         // 초기 상태 설정
         ChangeState(PlayerState.Idle);
         // 초기 그림자 설정
-        _currentShadow = _shadowList[ShadowType.Default];
+        ChangeShadow(ShadowType.Default);
     }
 
     private void FixedUpdate()
@@ -82,7 +109,9 @@ public class Player : MonoBehaviour
         UpdateGround();
         _currentState.FixedUpdate();
     }
+    #endregion
 
+    #region 플레이어 설정
     public void ChangeState(PlayerState next)
     {
         if (_currentStateType == next)
@@ -92,6 +121,19 @@ public class Player : MonoBehaviour
         _currentStateType = next;
         _currentState = _stateList[next];
         _currentState.Enter();
+    }
+
+    public void ChangeShadow(ShadowType next)
+    {
+        if (next == _currentShadowType)
+            return;
+        if (_shadowList.ContainsKey(next) == false)
+            return;
+
+        _currentShadow?.Exit();
+        _currentShadow = _shadowList[next];
+        _currentShadowType = next;
+        _currentShadow.Enter();
     }
 
     public void SetVelocity(float speed)
@@ -106,6 +148,7 @@ public class Player : MonoBehaviour
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
     }
+    #endregion
 
     #region 내부 처리
     private void UpdateTimer()
@@ -164,7 +207,24 @@ public class Player : MonoBehaviour
             _currentState.TryDash();
         }
     }
+
+    private void OnAbility(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            _currentShadow.UseAbility();
+        }
+    }
+
+    private void OnNext(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            ChangeShadow(ShadowType.Mouse);
+        }
+    }
     #endregion
+
     private void OnDrawGizmos()
     {
         if (_groundCheck == null) return;

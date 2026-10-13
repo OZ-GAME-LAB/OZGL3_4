@@ -7,6 +7,7 @@ public class JumpState : PlayerStateBase
     public override void Enter()
     {
         // 애니메이션 실행
+        _player.Animator.SetTrigger("Jump");
     }
 
     public override void FixedUpdate()

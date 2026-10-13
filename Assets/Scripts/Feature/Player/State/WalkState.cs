@@ -7,6 +7,7 @@ public class WalkState : PlayerStateBase
     public override void Enter()
     {
         // 애니메이션 실행
+        _player.Animator.SetFloat("Speed", 1f);
     }
 
     public override void FixedUpdate()
