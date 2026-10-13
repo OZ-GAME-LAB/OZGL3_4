@@ -1,16 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class MouseShadow : MonoBehaviour
+public class MouseShadow : ShadowBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public MouseShadow(Player player) : base(player) { }
 
-    // Update is called once per frame
-    void Update()
+    public override void UseAbility()
     {
-        
+        base.UseAbility();
+
+        Debug.Log("쥐 그림자 능력!");
     }
 }

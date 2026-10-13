@@ -10,6 +10,8 @@ public enum ShadowType
 
 public abstract class ShadowBase : MonoBehaviour
 {
+    protected Player _player;
+
     [Header("Move")]
     protected float _speed = 75f;
     public float Speed => _speed;
@@ -28,5 +30,22 @@ public abstract class ShadowBase : MonoBehaviour
     public float DashDuration => _dashDuration;
     public float DashCooldown => _dashCooldown;
 
+    public ShadowBase(Player player)
+    {
+        _player = player;
+    }
+
     public virtual void UseAbility() { }
+
+    public void Enter()
+    {
+        _player.Animator.SetTrigger("Absorb");
+        _player.Animator.runtimeAnimatorController = _player.ShadowAnimatorList[_player.CurrentShadowType];
+        _player.Animator.SetTrigger("Appear");
+    }
+
+    public void Exit()
+    {
+
+    }
 }

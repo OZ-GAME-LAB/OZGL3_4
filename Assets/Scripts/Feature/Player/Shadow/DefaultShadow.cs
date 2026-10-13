@@ -2,15 +2,12 @@
 
 public class DefaultShadow : ShadowBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public DefaultShadow(Player player) : base(player) { }
 
-    // Update is called once per frame
-    void Update()
+    public override void UseAbility()
     {
-        
+        base.UseAbility();
+
+        Debug.Log("기본 그림자는 능력이 없습니다!");
     }
 }

@@ -1,16 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class RabbitShadow : MonoBehaviour
+public class RabbitShadow : ShadowBase
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public RabbitShadow(Player player) : base(player) { }
 
-    // Update is called once per frame
-    void Update()
+    public override void UseAbility()
     {
-        
+        base.UseAbility();
+
+        Debug.Log("토끼 그림자 능력!");
     }
 }
