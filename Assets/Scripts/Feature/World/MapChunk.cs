@@ -20,15 +20,9 @@ public class MapChunk : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (MapManager.Instance == null)
-        {
-            Debug.LogError($"[MapChunk] (OnDestroy) {name} 등록 실패: MapManager 없음");
-
-            return;
-        }
+        if (MapManager.Instance == null) return;
 
         MapManager.Instance.UnregisterChunk(this);
-
     }
 
 
