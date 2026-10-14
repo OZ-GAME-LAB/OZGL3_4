@@ -1,0 +1,42 @@
+[
+  {
+    "Id": "Forest_Entrance",
+    "Name": "숲 입구",
+    "MapId": "Forest",
+    "RewardIds": [
+      "Forest_Entrance_Reward_01",
+      "Forest_Entrance_Reward_02",
+      "Forest_Entrance_Reward_03"
+    ],
+    "HiddenIds": [
+      "Forest_Entrance_Hidden_01",
+      "Forest_Entrance_Hidden_02"
+    ],
+    "Exits": [
+      {
+        "Id": "Forest_Entrance_Exit_01",
+        "TargetRoomId": "Forest_Path"
+      }
+    ],
+    "HasTeleport": true,
+    "TeleportRevealRoomIds": [
+      "Forest_Entrance",
+      "Forest_Path"
+    ]
+  },
+  {
+    "Id": "Forest_Path",
+    "Name": "숲길",
+    "MapId": "Forest",
+    "RewardIds": [],
+    "HiddenIds": [],
+    "Exits": [
+      {
+        "Id": "Forest_Path_Exit_01",
+        "TargetRoomId": "Forest_Entrance"
+      }
+    ],
+    "HasTeleport": false,
+    "TeleportRevealRoomIds": []
+  }
+]
