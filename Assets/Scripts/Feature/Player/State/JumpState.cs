@@ -14,7 +14,13 @@ public class JumpState : PlayerStateBase
     {
         if(_player.IsGrounded == true && _player.Rigid.linearVelocity.y < 0.01f)
         {
+            _player.Animator.SetTrigger("Land");
             ChangeToLocomotion();
+        }
+
+        if(_player.Rigid.linearVelocity.y < 0)
+        {
+            _player.Animator.SetTrigger("Fall");
         }
 
         float moveSpeed = _player.CurrentShadow.Speed;
