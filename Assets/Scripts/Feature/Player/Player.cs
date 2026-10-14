@@ -63,8 +63,9 @@ public class Player : MonoBehaviour
 
     [Header("Component")]
     private Rigidbody2D _rigid;
-    public Rigidbody2D Rigid => _rigid;
     private Animator _anim;
+    private SpriteRenderer _sprite;
+    public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
 
     #region Unity LifeCycle
@@ -72,6 +73,7 @@ public class Player : MonoBehaviour
     {
         _rigid = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
+        _sprite = GetComponent<SpriteRenderer>();
         _defaultGravity = _rigid.gravityScale;
 
         // 상태들 초기화
@@ -140,6 +142,7 @@ public class Player : MonoBehaviour
     {
         float xOffset = _movement.x * speed * Time.fixedDeltaTime;
         _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+        _sprite.flipX = xOffset < 0;
     }
 
     public void SetJump()
