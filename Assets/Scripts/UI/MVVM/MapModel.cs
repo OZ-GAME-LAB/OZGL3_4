@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +24,6 @@ public class MapRoomModel
     [SerializeField] private bool _isVisited;
     [SerializeField] private bool _isRevealed;
     [SerializeField] private bool _isRewardInfoRevealed;
-    [SerializeField] private bool _isTeleportActivated;
     [SerializeField] private List<string> _collectedRewardIds = new List<string>();
     [SerializeField] private List<string> _discoveredHiddenIds = new List<string>();
     [SerializeField] private List<string> _unlockedExitIds = new List<string>();
@@ -77,18 +76,6 @@ public class MapRoomModel
         }
     }
 
-    public bool IsTeleportActivated
-    {
-        get
-        {
-            return _isTeleportActivated;
-        }
-        set
-        {
-            _isTeleportActivated = value;
-        }
-    }
-
     public List<string> CollectedRewardIds
     {
         get
@@ -113,3 +100,4 @@ public class MapRoomModel
         }
     }
 }
+

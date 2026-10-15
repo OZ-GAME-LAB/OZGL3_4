@@ -17,11 +17,6 @@
         "Id": "Forest_Entrance_Exit_01",
         "TargetRoomId": "Forest_Path"
       }
-    ],
-    "HasTeleport": true,
-    "TeleportRevealRoomIds": [
-      "Forest_Entrance",
-      "Forest_Path"
     ]
   },
   {
@@ -35,8 +30,14 @@
         "Id": "Forest_Path_Exit_01",
         "TargetRoomId": "Forest_Entrance"
       }
-    ],
-    "HasTeleport": false,
-    "TeleportRevealRoomIds": []
+    ]
+  },
+  {
+    "Id": "Cave_Entrance",
+    "Name": "동굴 입구",
+    "MapId": "Cave",
+    "RewardIds": [],
+    "HiddenIds": [],
+    "Exits": []
   }
 ]

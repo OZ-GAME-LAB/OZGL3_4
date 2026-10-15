@@ -1,0 +1,17 @@
+[
+  {
+    "Id": "Teleport_1_1",
+    "MapId": "Forest",
+    "RevealRoomIds": "Forest_Entrance"
+  },
+  {
+    "Id": "Teleport_1_2",
+    "MapId": "Forest",
+    "RevealRoomIds": "Forest_Entrance, Forest_Path"
+  },
+  {
+    "Id": "Teleport_2_1",
+    "MapId": "Cave",
+    "RevealRoomIds": "Cave_Entrance"
+  }
+]
