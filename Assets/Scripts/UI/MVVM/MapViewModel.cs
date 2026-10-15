@@ -1,14 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 public class MapViewModel : ViewModelBase, IDisposable
 {
     private readonly List<MapRoomViewModel> _rooms = new List<MapRoomViewModel>();
+    private TeleportViewModel _teleportViewModel;
     private string _currentMapId;
 
     public IReadOnlyList<MapRoomViewModel> Rooms { get; }
-    // 화면에서 선택한 테마다. 실제 플레이어의 위치나 저장 복귀 지점이 아니다.
+
     public string CurrentMapId
     {
         get
@@ -33,17 +34,16 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
     }
 
-    // 0~1. 실제 보상 강화 수치/지급 방식은 추후 Service가 결정한다.
     public float TeleportActivationRate
     {
         get
         {
-            if (TotalTeleportCount == 0)
+            if (_teleportViewModel == null)
             {
                 return 0f;
             }
 
-            return (float)ActivatedTeleportCount / TotalTeleportCount;
+            return _teleportViewModel.GetTeleportActivationRate(CurrentMapId);
         }
     }
 
@@ -68,7 +68,6 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
     }
 
-    // JSON 조회와 Model 생성/소유는 호출 측에서 담당한다.
     public MapViewModel(MapModel mapModel, IReadOnlyList<MapRoomData> roomDataList)
     {
         if (mapModel == null)
@@ -111,17 +110,6 @@ public class MapViewModel : ViewModelBase, IDisposable
             _rooms.Add(new MapRoomViewModel(roomModel, roomData));
         }
 
-        foreach (MapRoomViewModel room in _rooms)
-        {
-            foreach (string targetId in room.TeleportRevealRoomIds)
-            {
-                MapRoomViewModel target = GetRoomViewModel(targetId);
-                if (!room.HasTeleport || target == null || target.MapId != room.MapId)
-                {
-                    throw new ArgumentException("텔레포트 공개 대상은 같은 테마의 유효한 방이어야 합니다: " + targetId);
-                }
-            }
-        }
         if (_rooms.Count > 0)
         {
             _currentMapId = _rooms[0].MapId;
@@ -178,25 +166,20 @@ public class MapViewModel : ViewModelBase, IDisposable
 
     private int GetTeleportCount(string mapId, bool activatedOnly)
     {
-        int count = 0;
-        foreach (MapRoomViewModel room in _rooms)
+        if (_teleportViewModel == null)
         {
-            if (room.MapId != mapId || !room.HasTeleport)
-            {
-                continue;
-            }
-            if (!activatedOnly || room.IsTeleportActivated)
-            {
-                count = count + 1;
-            }
+            return 0;
         }
-        return count;
+        if (activatedOnly)
+        {
+            return _teleportViewModel.GetActivatedTeleportCount(mapId);
+        }
+        return _teleportViewModel.GetTotalTeleportCount(mapId);
     }
 
     private bool GetCanShowExplorationRate(string mapId)
     {
         int total = GetTeleportCount(mapId, false);
-        // 텔레포트 없는 테마를 자동으로 전부 활성화한 것으로 처리하지 않는다.
         return total > 0 && GetTeleportCount(mapId, true) == total;
     }
 
@@ -235,22 +218,6 @@ public class MapViewModel : ViewModelBase, IDisposable
     private void OnChangeRoomProperty(object sender, PropertyChangedEventArgs args)
     {
         MapRoomViewModel changedRoom = (MapRoomViewModel)sender;
-        if (args.PropertyName == nameof(MapRoomViewModel.IsTeleportActivated))
-        {
-            bool canShow = GetCanShowExplorationRate(changedRoom.MapId);
-            foreach (MapRoomViewModel room in _rooms)
-            {
-                if (room.MapId == changedRoom.MapId)
-                {
-                    room.SetExplorationRateVisible(canShow);
-                }
-            }
-            if (changedRoom.MapId == CurrentMapId)
-            {
-                UpdateThemeProgress();
-            }
-            return;
-        }
         if (changedRoom.MapId != CurrentMapId)
         {
             return;
@@ -263,6 +230,41 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public void BindTeleportViewModel(TeleportViewModel teleportViewModel)
+    {
+        if (_teleportViewModel == teleportViewModel)
+        {
+            return;
+        }
+        if (_teleportViewModel != null)
+        {
+            _teleportViewModel.PropertyChanged -= OnChangeTeleportProperty;
+        }
+        _teleportViewModel = teleportViewModel;
+        if (_teleportViewModel != null)
+        {
+            _teleportViewModel.PropertyChanged += OnChangeTeleportProperty;
+        }
+        UpdateTeleportProgress();
+    }
+
+    private void OnChangeTeleportProperty(object sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(TeleportViewModel.ActivatedTeleportIds))
+        {
+            UpdateTeleportProgress();
+        }
+    }
+
+    private void UpdateTeleportProgress()
+    {
+        foreach (MapRoomViewModel room in _rooms)
+        {
+            room.SetExplorationRateVisible(GetCanShowExplorationRate(room.MapId));
+        }
+        UpdateThemeProgress();
+    }
+
     private void UpdateThemeProgress()
     {
         OnPropertyChanged(nameof(TotalTeleportCount));
@@ -272,12 +274,16 @@ public class MapViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(DisplayedExplorationRate));
     }
 
-    // 화면 닫힘이 아닌, 이 ViewModel을 소유한 기능이 종료될 때 호출한다.
     public void Dispose()
     {
+        if (_teleportViewModel != null)
+        {
+            _teleportViewModel.PropertyChanged -= OnChangeTeleportProperty;
+        }
         foreach (MapRoomViewModel room in _rooms)
         {
             room.PropertyChanged -= OnChangeRoomProperty;
         }
     }
 }
+

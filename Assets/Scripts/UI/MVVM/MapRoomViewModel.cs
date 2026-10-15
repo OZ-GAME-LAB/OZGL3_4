@@ -12,8 +12,6 @@ public class MapRoomViewModel : ViewModelBase
     public string RoomId { get; }
     public string RoomName { get; }
     public string MapId { get; }
-    public bool HasTeleport { get; }
-    public IReadOnlyList<string> TeleportRevealRoomIds { get; }
     public bool IsTerrainRevealed
     {
         get
@@ -157,23 +155,6 @@ public class MapRoomViewModel : ViewModelBase
         }
     }
 
-    public bool IsTeleportActivated
-    {
-        get
-        {
-            return _roomModel.IsTeleportActivated;
-        }
-        private set
-        {
-            if (_roomModel.IsTeleportActivated == value)
-            {
-                return;
-            }
-            _roomModel.IsTeleportActivated = value;
-            OnPropertyChanged(nameof(IsTeleportActivated));
-        }
-    }
-
     public MapRoomViewModel(MapRoomModel roomModel, MapRoomData roomData)
     {
         if (roomModel == null)
@@ -193,8 +174,6 @@ public class MapRoomViewModel : ViewModelBase
         RoomId = roomData.Id;
         RoomName = roomData.Name;
         MapId = roomData.MapId;
-        HasTeleport = roomData.HasTeleport;
-        TeleportRevealRoomIds = GetUniqueIds(roomData.TeleportRevealRoomIds).AsReadOnly();
         _rewardIds = GetUniqueIds(roomData.RewardIds);
         _hiddenIds = GetUniqueIds(roomData.HiddenIds);
         foreach (string hiddenId in _hiddenIds)
@@ -277,16 +256,6 @@ public class MapRoomViewModel : ViewModelBase
         OnPropertyChanged(nameof(DisplayedExplorationRate));
     }
 
-    public bool TrySetTeleportActivated(bool isActivated)
-    {
-        if (!HasTeleport || IsTeleportActivated == isActivated)
-        {
-            return false;
-        }
-        IsTeleportActivated = isActivated;
-        return true;
-    }
-
     public bool TryCollectReward(string rewardId)
     {
         if (!_rewardIds.Contains(rewardId) || _roomModel.CollectedRewardIds.Contains(rewardId))
@@ -347,7 +316,6 @@ public class MapRoomViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsTerrainRevealed));
         OnPropertyChanged(nameof(IsRewardInfoRevealed));
         OnPropertyChanged(nameof(HasUncollectedReward));
-        OnPropertyChanged(nameof(IsTeleportActivated));
         OnPropertyChanged(nameof(CollectedRewardIds));
         OnPropertyChanged(nameof(DiscoveredHiddenIds));
         OnPropertyChanged(nameof(UnlockedExitIds));
