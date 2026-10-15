@@ -34,7 +34,11 @@ public abstract class PlayerStateBase : IState
 
     public void ChangeToLocomotion()
     {
-        if (_player.HasMoveInput)
+        if (_player.IsGrounded == false)
+        {
+            _player.ChangeState(PlayerState.Jump);
+        }
+        else if (_player.HasMoveInput)
         {
             _player.ChangeState(PlayerState.Walk);
         }

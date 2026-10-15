@@ -85,7 +85,8 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Dash, new DashState(this));
 
         // 그림자 초기화
-        AddShadow(ShadowType.Default);
+        
+        //AddShadow(ShadowType.Default);
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
@@ -107,6 +108,7 @@ public class Player : MonoBehaviour
         // 초기 상태 설정
         ChangeState(PlayerState.Idle);
         // 초기 그림자 설정
+        _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
     }
 

@@ -20,7 +20,7 @@ public class PlayerViewModel : ViewModelBase, IContainerPropertyChanged<ShadowTy
         }
     }
 
-    private HashSet<ShadowType> _owenrShadowType;
+    private HashSet<ShadowType> _owenrShadowType = new HashSet<ShadowType>();
     public HashSet<ShadowType> OwnerShadowType
     {
         get { return _owenrShadowType; }
@@ -44,7 +44,7 @@ public static class PlayerViewModelExtention
 {
     public static void ChangeShadow(this PlayerViewModel playerViewModel, ShadowType type)
     {
-        if (playerViewModel.OwnerShadowType.Contains(type) == true)
+        if (playerViewModel.OwnerShadowType.Contains(type) == false)
             return;
         if (playerViewModel.CurrentShadowType == type)
             return;
