@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -22,6 +23,9 @@ public struct ShadowAnimEntry
 
 public class Player : MonoBehaviour
 {
+    private PlayerViewModel _viewModel;
+    public PlayerViewModel PlayerViewModel => _viewModel;
+
     [Header("State")]
     private PlayerStateBase _currentState;
     private PlayerState _currentStateType = PlayerState.None;
@@ -29,9 +33,7 @@ public class Player : MonoBehaviour
 
     [Header("Shadow")]
     private ShadowBase _currentShadow;
-    private ShadowType _currentShadowType;
     public ShadowBase CurrentShadow => _currentShadow;
-    public ShadowType CurrentShadowType => _currentShadowType;
     private Dictionary<ShadowType, ShadowBase> _shadowList = new Dictionary<ShadowType, ShadowBase>();
     [SerializeField] List<ShadowAnimEntry> _shadowAnimators;
     public Dictionary<ShadowType, AnimatorOverrideController> ShadowAnimatorList = new Dictionary<ShadowType, AnimatorOverrideController>();
@@ -83,12 +85,10 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Dash, new DashState(this));
 
         // 그림자 초기화
-        _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
-        _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
-        _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));
+        AddShadow(ShadowType.Default);
 
         // 그림자 애니메이션
-        foreach(var entry in _shadowAnimators)
+        foreach (var entry in _shadowAnimators)
         {
             if(ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
             {
@@ -99,10 +99,15 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        _viewModel = NetworkManager.Instance.PlayerService.GetPlayerViewModel();
+
+        _viewModel.PropertyChanged += OnPropertyChanged;
+        _viewModel.ContainerPropertyChanged += OnContainerPropChanged;
+
         // 초기 상태 설정
         ChangeState(PlayerState.Idle);
         // 초기 그림자 설정
-        ChangeShadow(ShadowType.Default);
+        _viewModel.CurrentShadowType = ShadowType.Default;
     }
 
     private void FixedUpdate()
@@ -114,6 +119,29 @@ public class Player : MonoBehaviour
     #endregion
 
     #region 플레이어 설정
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(PlayerViewModel.CurrentShadowType):
+                ChangeShadow();
+                break;
+        }
+    }
+
+    private void OnContainerPropChanged(string propertyName, ContainerEventType eventType, ShadowType type)
+    {
+        if (propertyName == nameof(_viewModel.OwnerShadowType) == true)
+        {
+            switch (eventType)
+            {
+                case ContainerEventType.Add:
+                    AddShadow(type);
+                    break;
+            }
+        }
+    }
+
     public void ChangeState(PlayerState next)
     {
         if (_currentStateType == next)
@@ -125,17 +153,32 @@ public class Player : MonoBehaviour
         _currentState.Enter();
     }
 
-    public void ChangeShadow(ShadowType next)
+    public void ChangeShadow()
     {
-        if (next == _currentShadowType)
-            return;
-        if (_shadowList.ContainsKey(next) == false)
-            return;
+        ShadowBase nextShadow = _shadowList[_viewModel.CurrentShadowType];
 
         _currentShadow?.Exit();
-        _currentShadow = _shadowList[next];
-        _currentShadowType = next;
+        _currentShadow = nextShadow;
         _currentShadow.Enter();
+    }
+
+    public void AddShadow(ShadowType type)
+    {
+        ShadowBase newShadow = null;
+
+        switch (type)
+        {
+            case ShadowType.Default:
+                newShadow = new DefaultShadow(this);
+                break;
+            case ShadowType.Mouse:
+                newShadow = new MouseShadow(this);
+                break;
+            case ShadowType.Rabbit:
+                newShadow = new RabbitShadow(this);
+                break;
+        }
+        _shadowList.Add(type, newShadow);
     }
 
     public void SetVelocity(float speed)
@@ -223,7 +266,7 @@ public class Player : MonoBehaviour
     {
         if (value.isPressed)
         {
-            ChangeShadow(ShadowType.Mouse);
+            //ChangeShadow(ShadowType.Mouse);
         }
     }
     #endregion

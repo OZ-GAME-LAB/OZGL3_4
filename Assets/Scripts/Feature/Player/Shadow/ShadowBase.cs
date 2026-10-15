@@ -40,7 +40,7 @@ public abstract class ShadowBase : MonoBehaviour
     public void Enter()
     {
         _player.Animator.SetTrigger("Absorb");
-        _player.Animator.runtimeAnimatorController = _player.ShadowAnimatorList[_player.CurrentShadowType];
+        _player.Animator.runtimeAnimatorController = _player.ShadowAnimatorList[_player.PlayerViewModel.CurrentShadowType];
         _player.Animator.SetTrigger("Appear");
     }
 
