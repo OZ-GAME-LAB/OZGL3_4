@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 public class MapService
 {
     private readonly MapViewModel _mapViewModel;
@@ -11,6 +13,36 @@ public class MapService
         }
 
         _mapViewModel = mapViewModel;
+    }
+
+    // 모든 대상이 유효한지 먼저 확인한 뒤, 방문 기록 없이 지도 정보만 공개한다.
+    public bool RequestRevealRooms(IReadOnlyList<string> roomIds)
+    {
+        if (roomIds == null)
+        {
+            return false;
+        }
+        MapViewModel viewModel = GetMapViewModel();
+        foreach (string roomId in roomIds)
+        {
+            if (viewModel.GetRoomViewModel(roomId) == null)
+            {
+                return false;
+            }
+        }
+
+        bool changed = false;
+        foreach (string roomId in roomIds)
+        {
+            MapRoomViewModel roomViewModel = viewModel.GetRoomViewModel(roomId);
+            bool terrainChanged = roomViewModel.TrySetTerrainRevealed(true);
+            bool rewardInfoChanged = roomViewModel.TrySetRewardInfoRevealed(true);
+            if (terrainChanged || rewardInfoChanged)
+            {
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     public MapViewModel GetMapViewModel()
@@ -35,7 +67,6 @@ public class MapService
             return false;
         }
 
-        // 두 요청을 모두 실행한다. 이미 지형이 공개된 방도 첫 방문은 기록해야 한다.
         bool visitedChanged = roomViewModel.TrySetVisited(true);
         bool terrainChanged = roomViewModel.TrySetTerrainRevealed(true);
 
@@ -47,3 +78,4 @@ public class MapService
         return false;
     }
 }
+
