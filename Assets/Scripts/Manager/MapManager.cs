@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,22 @@ public class MapManager : SingletonBase<MapManager>
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
 
+    // 현재 청크는 HasCurrentChunk가 true일 때만 유효하다.
+    public Vector2Int CurrentChunkIndex
+    {
+        get { return _currentChunkIndex; }
+    }
+
+    public bool HasCurrentChunk
+    {
+        get { return isActiveAndEnabled && _hasCurrentChunk && Transform_Target != null; }
+    }
+
+
+    // 수정됨: 알림을 위한 이벤트
+    public event Action<Vector2Int> OnChangePlayerChunk;
+    public event Action OnClearPlayerChunk;
+
 
     private void Start()
     {
@@ -23,7 +40,22 @@ public class MapManager : SingletonBase<MapManager>
 
     private void Update()
     {
-        if (Transform_Target == null) return;
+        //수정됨
+        UpdatePlayerChunk();
+    }
+
+    //수정됨: 청크가 업데이트 될 때마다 이벤트를 통해 알리기 위함
+    public void UpdatePlayerChunk()
+    {
+        if (!isActiveAndEnabled)
+        {
+            return;
+        }
+        if (Transform_Target == null)
+        {
+            ClearPlayerChunk();
+            return;
+        }
 
         Vector2Int index = GetChunkIndex(Transform_Target.position);
 
@@ -35,6 +67,23 @@ public class MapManager : SingletonBase<MapManager>
         Debug.Log($"[MapManager] (Update) 청크 이동: {index}"); //청크 이동시 알림 테스트 코드
 
         RefreshActiveChunks(index);
+        OnChangePlayerChunk?.Invoke(index);
+    }
+
+    private void OnDisable()
+    {
+        ClearPlayerChunk();
+    }
+
+    //수정됨: 현재 청크를 비우기 위한
+    private void ClearPlayerChunk()
+    {
+        if (!_hasCurrentChunk)
+        {
+            return;
+        }
+        _hasCurrentChunk = false;
+        OnClearPlayerChunk?.Invoke();
     }
 
 
@@ -106,14 +155,15 @@ public class MapManager : SingletonBase<MapManager>
     public void SetTarget(Transform target) //플레이어의 위치를 보고 다른 청크로 넘어간 순간을 감지
     {
         Transform_Target = target;
-        _hasCurrentChunk = false;
         
         if (target == null)
         {
+            ClearPlayerChunk();
             Debug.LogWarning($"[MapManager] (SetTarget) target == null. 확인 필요.");
 
             return;
         }
+        _hasCurrentChunk = false;
     }
 
     private bool IsInActiveRange(Vector2Int chunkIndex, Vector2Int center) //사거리 내의 청크들의 On/Off를 지시
