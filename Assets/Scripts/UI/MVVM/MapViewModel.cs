@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -7,6 +7,21 @@ public class MapViewModel : ViewModelBase, IDisposable
     private readonly List<MapRoomViewModel> _rooms = new List<MapRoomViewModel>();
     private TeleportViewModel _teleportViewModel;
     private string _currentMapId;
+    private string _currentRoomId = string.Empty;
+
+    public string CurrentRoomId
+    {
+        get { return _currentRoomId; }
+    }
+
+    public string CurrentRoomName
+    {
+        get
+        {
+            MapRoomViewModel room = GetRoomViewModel(CurrentRoomId);
+            return room == null ? string.Empty : room.RoomName;
+        }
+    }
 
     public IReadOnlyList<MapRoomViewModel> Rooms { get; }
 
@@ -137,6 +152,8 @@ public class MapViewModel : ViewModelBase, IDisposable
     {
         OnPropertyChanged(nameof(Rooms));
         OnPropertyChanged(nameof(CurrentMapId));
+        OnPropertyChanged(nameof(CurrentRoomId));
+        OnPropertyChanged(nameof(CurrentRoomName));
         UpdateThemeProgress();
         foreach (MapRoomViewModel room in _rooms)
         {
@@ -157,11 +174,57 @@ public class MapViewModel : ViewModelBase, IDisposable
                 continue;
             }
             _currentMapId = mapId;
+            bool hadRoom = !string.IsNullOrEmpty(CurrentRoomId);
+            _currentRoomId = string.Empty;
             OnPropertyChanged(nameof(CurrentMapId));
+            if (hadRoom)
+            {
+                OnPropertyChanged(nameof(CurrentRoomId));
+                OnPropertyChanged(nameof(CurrentRoomName));
+            }
             UpdateThemeProgress();
             return true;
         }
         return false;
+    }
+
+    public bool TrySetCurrentRoom(string roomId)
+    {
+        if (CurrentRoomId == roomId)
+        {
+            return false;
+        }
+        MapRoomViewModel room = GetRoomViewModel(roomId);
+        if (room == null)
+        {
+            return false;
+        }
+        bool mapChanged = CurrentMapId != room.MapId;
+        _currentMapId = room.MapId;
+        _currentRoomId = roomId;
+        if (mapChanged)
+        {
+            OnPropertyChanged(nameof(CurrentMapId));
+        }
+        OnPropertyChanged(nameof(CurrentRoomId));
+        OnPropertyChanged(nameof(CurrentRoomName));
+        if (mapChanged)
+        {
+            UpdateThemeProgress();
+        }
+        return true;
+    }
+
+    public bool TryClearCurrentRoom()
+    {
+        if (string.IsNullOrEmpty(CurrentRoomId))
+        {
+            return false;
+        }
+        _currentRoomId = string.Empty;
+        OnPropertyChanged(nameof(CurrentRoomId));
+        OnPropertyChanged(nameof(CurrentRoomName));
+        return true;
     }
 
     private int GetTeleportCount(string mapId, bool activatedOnly)

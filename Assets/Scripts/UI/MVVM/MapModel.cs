@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// GameManager가 소유할 저장 원본. 변경은 ViewModel을 통해 요청한다.
 [Serializable]
 public class MapModel
 {
