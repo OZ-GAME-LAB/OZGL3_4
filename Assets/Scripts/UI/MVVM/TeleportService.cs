@@ -38,7 +38,6 @@ public class TeleportService
         return _teleportRevealRooms[teleportId];
     }
 
-    // 상호작용 성공 후 활성화를 요청하고, 성공했을 때 지도 공개를 요청한다.
     public bool RequestActivateTeleport(string teleportId)
     {
         IReadOnlyList<string> roomIds = GetTeleportRevealRoomIds(teleportId);

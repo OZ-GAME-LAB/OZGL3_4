@@ -12,6 +12,10 @@ public class MapRoomViewModel : ViewModelBase
     public string RoomId { get; }
     public string RoomName { get; }
     public string MapId { get; }
+    public int CellX { get; }
+    public int CellY { get; }
+    public int CellWidth { get; }
+    public int CellHeight { get; }
     public bool IsTerrainRevealed
     {
         get
@@ -174,6 +178,14 @@ public class MapRoomViewModel : ViewModelBase
         RoomId = roomData.Id;
         RoomName = roomData.Name;
         MapId = roomData.MapId;
+        if (roomData.CellWidth <= 0 || roomData.CellHeight <= 0)
+        {
+            throw new ArgumentException("방의 슬롯 크기는 양수여야 합니다: " + roomData.Id);
+        }
+        CellX = roomData.CellX;
+        CellY = roomData.CellY;
+        CellWidth = roomData.CellWidth;
+        CellHeight = roomData.CellHeight;
         _rewardIds = GetUniqueIds(roomData.RewardIds);
         _hiddenIds = GetUniqueIds(roomData.HiddenIds);
         foreach (string hiddenId in _hiddenIds)
@@ -206,7 +218,6 @@ public class MapRoomViewModel : ViewModelBase
         UnlockedExitIds = _roomModel.UnlockedExitIds.AsReadOnly();
     }
 
-    // 방문 시 지도 공개, 반대편 출입구 해금 등의 조건은 Service에서 결정한다.
     public bool TrySetVisited(bool isVisited)
     {
         if (IsVisited == isVisited)
@@ -302,7 +313,6 @@ public class MapRoomViewModel : ViewModelBase
         }
         else
         {
-            // 로드 데이터에 중복이 있어도 모두 제거한다.
             while (_roomModel.UnlockedExitIds.Remove(exitId)) { }
         }
         OnPropertyChanged(nameof(UnlockedExitIds));
