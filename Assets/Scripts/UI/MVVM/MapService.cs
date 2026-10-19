@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class MapService
 {
@@ -15,7 +16,6 @@ public class MapService
         _mapViewModel = mapViewModel;
     }
 
-    // 모든 대상이 유효한지 먼저 확인한 뒤, 방문 기록 없이 지도 정보만 공개한다.
     public bool RequestRevealRooms(IReadOnlyList<string> roomIds)
     {
         if (roomIds == null)
@@ -50,8 +50,65 @@ public class MapService
         return _mapViewModel;
     }
 
-    // 실제 방 진입이 확인된 뒤 호출한다. 시작 위치나 이동으로 진입한 경우에도 사용한다.
-    // 방문/지형 공개 중 하나라도 새로 변경되면 true, 유효하지 않거나 변경이 없으면 false다.
+    public bool RequestEnterRoom(string roomId)
+    {
+        MapViewModel viewModel = GetMapViewModel();
+        if (string.IsNullOrWhiteSpace(roomId) || viewModel.GetRoomViewModel(roomId) == null)
+        {
+            return false;
+        }
+        bool roomChanged = viewModel.TrySetCurrentRoom(roomId);
+        bool progressChanged = RequestUnlockRoomByExploration(roomId);
+        return roomChanged || progressChanged;
+    }
+
+    // 이전 방에서 늦게 도착한 이탈 요청이 새 방 상태를 지우지 않도록 ID를 확인한다.
+    public bool RequestExitRoom(string roomId)
+    {
+        MapViewModel viewModel = GetMapViewModel();
+        if (string.IsNullOrWhiteSpace(roomId) || viewModel.CurrentRoomId != roomId)
+        {
+            return false;
+        }
+        return viewModel.TryClearCurrentRoom();
+    }
+
+    public bool RequestUpdateChunk(string mapId, Vector2Int chunkIndex)
+    {
+        MapViewModel viewModel = GetMapViewModel();
+        MapRoomViewModel targetRoom = null;
+        bool hasMap = false;
+        foreach (MapRoomViewModel room in viewModel.Rooms)
+        {
+            if (room.MapId != mapId)
+            {
+                continue;
+            }
+            hasMap = true;
+            if (chunkIndex.x >= room.CellX && (long)chunkIndex.x < (long)room.CellX + room.CellWidth
+                && chunkIndex.y >= room.CellY && (long)chunkIndex.y < (long)room.CellY + room.CellHeight)
+            {
+                if (targetRoom != null)
+                {
+                    Debug.LogError("[MapService] 방 슬롯 중복: " + targetRoom.RoomId + ", " + room.RoomId);
+                    return false;
+                }
+                targetRoom = room;
+            }
+        }
+        if (!hasMap)
+        {
+            return false;
+        }
+        if (targetRoom != null)
+        {
+            return RequestEnterRoom(targetRoom.RoomId);
+        }
+        bool mapChanged = viewModel.TrySetCurrentMap(mapId);
+        bool roomExited = RequestExitRoom(viewModel.CurrentRoomId);
+        return mapChanged || roomExited;
+    }
+
     public bool RequestUnlockRoomByExploration(string roomId)
     {
         if (string.IsNullOrWhiteSpace(roomId))
