@@ -13,7 +13,7 @@ public abstract class ShadowBase : MonoBehaviour
     protected Player _player;
 
     [Header("Move")]
-    protected float _speed = 75f;
+    protected float _speed = 5f;
     public float Speed => _speed;
 
     [Header("Jump")]
@@ -37,14 +37,16 @@ public abstract class ShadowBase : MonoBehaviour
 
     public virtual void UseAbility() { }
 
-    public void Enter()
+    public virtual void ReleaseAbility() { }
+
+    public virtual void Enter()
     {
         _player.Animator.SetTrigger("Absorb");
         _player.Animator.runtimeAnimatorController = _player.ShadowAnimatorList[_player.PlayerViewModel.CurrentShadowType];
         _player.Animator.SetTrigger("Appear");
     }
 
-    public void Exit()
+    public virtual void Exit()
     {
 
     }

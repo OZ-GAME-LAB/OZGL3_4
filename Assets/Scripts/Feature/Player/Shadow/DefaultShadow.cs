@@ -8,6 +8,21 @@ public class DefaultShadow : ShadowBase
     {
         base.UseAbility();
 
-        Debug.Log("기본 그림자는 능력이 없습니다!");
+        Debug.Log("잡기");
+        _player.TryStartGrab(); 
+    }
+
+    public override void ReleaseAbility()
+    {
+        base.ReleaseAbility();
+
+        _player.EndGrab();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        //_player.
     }
 }

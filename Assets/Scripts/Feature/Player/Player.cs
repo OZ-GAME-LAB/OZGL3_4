@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +11,7 @@ public enum PlayerState
     Walk,
     Jump,
     Dash,
+    Grab,
 }
 
 [Serializable]
@@ -63,7 +63,11 @@ public class Player : MonoBehaviour
     public float DefaultGravity => _defaultGravity;
     public float Facing => _facing;
 
+    [Header("Grab")]
+    public Grabbable GrabTarget { get; private set; }
+
     [Header("Component")]
+    private Collider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
@@ -73,6 +77,7 @@ public class Player : MonoBehaviour
     #region Unity LifeCycle
     private void Awake()
     {
+        _collider = GetComponent<Collider2D>();
         _rigid = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _sprite = GetComponent<SpriteRenderer>();
@@ -83,10 +88,7 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Walk, new WalkState(this));
         _stateList.Add(PlayerState.Jump, new JumpState(this));
         _stateList.Add(PlayerState.Dash, new DashState(this));
-
-        // 그림자 초기화
-        
-        //AddShadow(ShadowType.Default);
+        _stateList.Add(PlayerState.Grab, new GrabState(this));
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
@@ -185,16 +187,57 @@ public class Player : MonoBehaviour
 
     public void SetVelocity(float speed)
     {
-        float xOffset = _movement.x * speed * Time.fixedDeltaTime;
+        float xOffset = _movement.x * speed;
         _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
         _sprite.flipX = xOffset < 0;
     }
 
     public void SetJump()
     {
-        _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower);
+        _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower, ForceMode2D.Impulse);
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
+    }
+
+    public void TryStartGrab()
+    {
+        if (IsGrounded == false)
+            return;
+
+        Grabbable target = FindGrabbalbe();
+        if (target == null)
+            return;
+
+        GrabTarget = target;
+        ChangeState(PlayerState.Grab);
+    }
+
+    public void EndGrab()
+    {
+        if (_currentStateType != PlayerState.Grab)
+            return;
+
+        ChangeState(PlayerState.Idle);
+    }
+
+    private Grabbable FindGrabbalbe()
+    {
+        Grabbable front = FindGrabbableAt(Facing);
+        return front != null ? front : FindGrabbableAt(-Facing);
+    }
+
+    private Grabbable FindGrabbableAt(float dir)
+    {
+        Bounds b = _collider.bounds;
+
+        Vector2 center = new Vector2(b.center.x + dir * (b.extents.x + 0.2f * 0.5f), b.center.y);
+        Vector2 size = new Vector2(0.2f, b.size.y + 0.8f);
+
+        Collider2D hit = Physics2D.OverlapBox(center, size, 0f, LayerMask.GetMask("Grabbable"));
+        if (hit == null)
+            return null;
+
+        return hit.GetComponent<Grabbable>();
     }
     #endregion
 
@@ -262,13 +305,9 @@ public class Player : MonoBehaviour
         {
             _currentShadow.UseAbility();
         }
-    }
-
-    private void OnNext(InputValue value)
-    {
-        if (value.isPressed)
+        else
         {
-            //ChangeShadow(ShadowType.Mouse);
+            _currentShadow.ReleaseAbility();
         }
     }
     #endregion
@@ -278,5 +317,22 @@ public class Player : MonoBehaviour
         if (_groundCheck == null) return;
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_groundCheck.position, _groundCheckSize);
+
+        if (_collider == null) _collider = GetComponent<Collider2D>();
+        if (_collider == null) return;
+
+
+
+        Gizmos.color = Color.cyan;
+
+        Bounds b = _collider.bounds;
+
+        Vector2 center = new Vector2(b.center.x + Facing * (b.extents.x + 0.2f * 0.5f), b.center.y);
+        Vector2 size = new Vector2(0.2f, b.size.y + 0.8f);
+        Gizmos.DrawWireCube(center, size);
+
+        center = new Vector2(b.center.x + -Facing * (b.extents.x + 0.2f * 0.5f), b.center.y);
+        size = new Vector2(0.2f, b.size.y + 0.8f);
+        Gizmos.DrawWireCube(center, size);
     }
 }
