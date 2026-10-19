@@ -12,10 +12,20 @@ public class DialogData : GameDataBase
 }
 
 [System.Serializable]
+public class MapData : GameDataBase
+{
+    public string Name;
+}
+
+[System.Serializable]
 public class MapRoomData : GameDataBase
 {
     public string Name;
     public string MapId;
+    public int CellX;
+    public int CellY;
+    public int CellWidth = 1;
+    public int CellHeight = 1;
     public System.Collections.Generic.List<string> RewardIds = new System.Collections.Generic.List<string>();
     public System.Collections.Generic.List<string> HiddenIds = new System.Collections.Generic.List<string>();
     public System.Collections.Generic.List<MapRoomExitData> Exits = new System.Collections.Generic.List<MapRoomExitData>();

@@ -1,41 +1,53 @@
 [
   {
-    "Id": "Forest_Entrance",
+    "Id": "Room_1_1",
     "Name": "숲 입구",
-    "MapId": "Forest",
+    "MapId": "Level_1",
+    "CellX": 0,
+    "CellY": 0,
+    "CellWidth": 2,
+    "CellHeight": 1,
     "RewardIds": [
-      "Forest_Entrance_Reward_01",
-      "Forest_Entrance_Reward_02",
-      "Forest_Entrance_Reward_03"
+      "Room_1_1_Reward_01",
+      "Room_1_1_Reward_02",
+      "Room_1_1_Reward_03"
     ],
     "HiddenIds": [
-      "Forest_Entrance_Hidden_01",
-      "Forest_Entrance_Hidden_02"
+      "Room_1_1_Hidden_01",
+      "Room_1_1_Hidden_02"
     ],
     "Exits": [
       {
-        "Id": "Forest_Entrance_Exit_01",
-        "TargetRoomId": "Forest_Path"
+        "Id": "Room_1_1_Exit_01",
+        "TargetRoomId": "Room_1_2"
       }
     ]
   },
   {
-    "Id": "Forest_Path",
+    "Id": "Room_1_2",
     "Name": "숲길",
-    "MapId": "Forest",
+    "MapId": "Level_1",
+    "CellX": 2,
+    "CellY": 0,
+    "CellWidth": 1,
+    "CellHeight": 2,
     "RewardIds": [],
     "HiddenIds": [],
     "Exits": [
       {
-        "Id": "Forest_Path_Exit_01",
-        "TargetRoomId": "Forest_Entrance"
+        "Id": "Room_1_2_Exit_01",
+        "TargetRoomId": "Room_1_1"
       }
     ]
   },
   {
-    "Id": "Cave_Entrance",
+    "Id": "Room_2_1",
     "Name": "동굴 입구",
-    "MapId": "Cave",
+    "MapId": "Level_2",
+    "CellX": 0,
+    "CellY": 0,
+    "CellWidth": 1,
+    "CellHeight": 1,
     "RewardIds": [],
     "HiddenIds": [],
     "Exits": []
