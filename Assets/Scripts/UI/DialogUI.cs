@@ -58,7 +58,6 @@ public class DialogUI : UIBase
             return false;
         }
 
-        // 루트를 숨기면 DialogUI도 꺼지므로, 표시 패널은 자식으로 연결한다.
         if (GameObject_DialogPanel == gameObject || GameObject_DialogPanel.transform.IsChildOf(transform) == false)
         {
             Debug.LogError("[DialogUI] 패널은 DialogUI 오브젝트의 자식이어야 합니다.");

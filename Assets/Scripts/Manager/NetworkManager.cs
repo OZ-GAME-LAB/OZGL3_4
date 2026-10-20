@@ -1,21 +1,11 @@
 ﻿using UnityEngine;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : SingletonBase<NetworkManager>
 {
-    public static NetworkManager Instance {  get; private set; }
+    public NetworkPlayerService PlayerService;
 
-    
-
-    private void Awake()
+    private void OnEnable()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-            
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        PlayerService = new NetworkPlayerService();
     }
 }
