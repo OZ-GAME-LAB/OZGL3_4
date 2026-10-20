@@ -579,7 +579,7 @@ MonoBehaviour:
   _canvasBgRoot: {fileID: 0}
   _canvasMainRoot: {fileID: 0}
   _canvasContentRoot: {fileID: 0}
-  _canvasPopupRoot: {fileID: 0}
+  _canvasPopupRoot: {fileID: 239820217}
   _canvasVeryFrontRoot: {fileID: 0}
 --- !u!1 &974985354
 GameObject:
@@ -1065,6 +1065,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &2100000000
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7bf7f4a8125a42f2b2206fcae087720d, type: 3}
+--- !u!4 &2100000001 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 100001, guid: 7bf7f4a8125a42f2b2206fcae087720d, type: 3}
+  m_PrefabInstance: {fileID: 2100000000}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1073,3 +1091,4 @@ SceneRoots:
   - {fileID: 974985355}
   - {fileID: 239820218}
   - {fileID: 1934993568}
+  - {fileID: 2100000001}

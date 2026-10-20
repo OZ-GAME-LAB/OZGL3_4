@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public enum UIRootType 
@@ -13,7 +13,7 @@ public enum UIRootType
 
 public enum UIType
 {
-
+    Map,
 }
 
 public static class UIManagerExtension
