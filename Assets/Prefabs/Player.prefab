@@ -140,6 +140,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d87031f4c2c37a4b964aa11891d7e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  _shadowAnimators:
+  - Type: 1
+    Controller: {fileID: 22100000, guid: 86bd31de78ad4db4db797d8ab80fa533, type: 2}
+  - Type: 2
+    Controller: {fileID: 22100000, guid: 1fc0c24f69956b440976c2baf69bde39, type: 2}
+  - Type: 3
+    Controller: {fileID: 22100000, guid: d0e5b781db866914395b01d1d3a4cefe, type: 2}
   _groundCheck: {fileID: 589328654951346915}
   _groundLayer:
     serializedVersion: 2
