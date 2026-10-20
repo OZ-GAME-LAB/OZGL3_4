@@ -4,7 +4,7 @@ public class NetworkManager : SingletonBase<NetworkManager>
 {
     public NetworkPlayerService PlayerService;
 
-    private void Awake()
+    private void OnEnable()
     {
         PlayerService = new NetworkPlayerService();
     }
