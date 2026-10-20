@@ -1,16 +1,27 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Region : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("지역 정보")]
+    [SerializeField] private string _regionId;
+
+    [Header("인접 지역")]
+    [SerializeField] private List<string> _neighborRegionIds = new List<string>();
+
+
+    public string RegionId => _regionId;
+    public IReadOnlyList<string> NeiborRegionIds => _neighborRegionIds;
+
+
+    private void Start()
     {
-        
+        if (string.IsNullOrEmpty(_regionId))
+        {
+            Debug.LogWarning($"[Region] (Start) {name}: RegionId가 비어 있음");
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }

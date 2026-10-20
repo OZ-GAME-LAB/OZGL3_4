@@ -15,8 +15,13 @@ public class MapManager : SingletonBase<MapManager>
     private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
+
     private HashSet<Room> _activeRooms = new HashSet<Room>();
     private bool _isChunkDirty = false;
+
+    private Region _currentRegion;
+    public event Action<string> OnChangeRegion;
+    public string CurrentRegionId;
 
 
     // 현재 청크는 HasCurrentChunk가 true일 때만 유효하다.
@@ -72,6 +77,8 @@ public class MapManager : SingletonBase<MapManager>
         _hasCurrentChunk = true;
 
         Debug.Log($"[MapManager] (Update) 청크 이동: {index}"); //청크 이동시 알림 테스트 코드
+
+        CheckRegionChange(index); // 수정된 부분 - 김동혁 (지역 변경 메서드 추가)
 
         RefreshActiveChunks(index);
         OnChangePlayerChunk?.Invoke(index);
@@ -197,6 +204,7 @@ public class MapManager : SingletonBase<MapManager>
         _isChunkDirty = false;
     }
 
+
     private bool IsGroupChunk(MapChunk chunk)
     {
         return chunk.Room != null && chunk.Room.ActivationMode == RoomActivationMode.Group;
@@ -224,4 +232,24 @@ public class MapManager : SingletonBase<MapManager>
         return IsInActiveRange(key, center);
     }
 
+
+    private void CheckRegionChange(Vector2Int index)
+    {
+        if (!_chunks.TryGetValue(index, out MapChunk chunk)) return;
+        if (chunk.Region == null) return;
+        if (chunk.Region == _currentRegion) return;
+
+        SetCurrentRegion(chunk.Region);
+    }
+
+    private void SetCurrentRegion(Region region)
+    {
+        string previousId = CurrentRegionId;
+
+        _currentRegion = region;
+
+        Debug.Log($"[MapManager] (SetCurrentRegion) 지역 변경: {previousId} → {region.RegionId}");
+
+        OnChangeRegion?.Invoke(region.RegionId);
+    }
 }

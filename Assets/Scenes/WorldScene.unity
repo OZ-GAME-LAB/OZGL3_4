@@ -1200,6 +1200,11 @@ Transform:
   - {fileID: 1974215330}
   m_Father: {fileID: 3259024635685154688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1890961882 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3603175352798333329, guid: b699e4445c17b774894b5a19d4ad8c5f, type: 3}
+  m_PrefabInstance: {fileID: 3777037412550509198}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1974215329
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1937,6 +1942,9 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1731796975}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3603175352798333329, guid: b699e4445c17b774894b5a19d4ad8c5f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4585261959107481147}
     - targetCorrespondingSourceObject: {fileID: 6257500254380072339, guid: b699e4445c17b774894b5a19d4ad8c5f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 270110521}
@@ -1979,6 +1987,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8587184087728839031, guid: b699e4445c17b774894b5a19d4ad8c5f, type: 3}
   m_PrefabInstance: {fileID: 3777037412550509198}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4585261959107481147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890961882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2a51f6d5eb5d2429f7e53769742c5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Region
 --- !u!1001 &4915626992152096806
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2073,6 +2093,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 354293318765757178, guid: 9e0d32e467622c24589a8073a55cfd95, type: 3}
   m_PrefabInstance: {fileID: 1551913114859161517}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7788043615477979381 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1629522842917423152, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
+  m_PrefabInstance: {fileID: 8805545438284832351}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7788043615477979382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7788043615477979381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2a51f6d5eb5d2429f7e53769742c5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Region
 --- !u!1001 &8805545438284832351
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2087,15 +2124,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1629522842917423152, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2220386885943866757, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_ColliderPaths.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4253688913452459807, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 192
       objectReference: {fileID: 0}
     - target: {fileID: 4253688913452459807, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2135,16 +2172,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5685217863122150339, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_ColliderPaths.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8593867915304083586, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       propertyPath: m_ColliderPaths.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1629522842917423152, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7788043615477979382}
     - targetCorrespondingSourceObject: {fileID: 5961082728141874090, guid: 73ad445bd5fe5e64b838bc85cb4d746a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6730639941552875813}
