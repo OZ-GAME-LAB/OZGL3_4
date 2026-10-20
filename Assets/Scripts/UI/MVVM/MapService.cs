@@ -85,8 +85,7 @@ public class MapService
                 continue;
             }
             hasMap = true;
-            if (chunkIndex.x >= room.CellX && (long)chunkIndex.x < (long)room.CellX + room.CellWidth
-                && chunkIndex.y >= room.CellY && (long)chunkIndex.y < (long)room.CellY + room.CellHeight)
+            if (room.ContainsSlot(chunkIndex))
             {
                 if (targetRoom != null)
                 {
