@@ -43,12 +43,16 @@ public class MapManager : SingletonBase<MapManager>
 
     private void Update()
     {
-        //수정됨
-        UpdatePlayerChunk();
+        UpdatePlayerChunk(); // 수정된 부분 - 재욱님 추가
+
+        if (_isChunkDirty && _hasCurrentChunk)
+        {
+            RefreshActiveChunks(_currentChunkIndex);
+        }
     }
 
-    //수정됨: 청크가 업데이트 될 때마다 이벤트를 통해 알리기 위함
-    public void UpdatePlayerChunk()
+
+    public void UpdatePlayerChunk() // 수정된 부분 - 재욱님 추가 (청크가 업데이트 될 때마다 이벤트를 통해 알리기 위함)
     {
         if (!isActiveAndEnabled)
         {
@@ -78,8 +82,8 @@ public class MapManager : SingletonBase<MapManager>
         ClearPlayerChunk();
     }
 
-    //수정됨: 현재 청크를 비우기 위한
-    private void ClearPlayerChunk()
+
+    private void ClearPlayerChunk() // 수정된 부분 - 재욱님 추가 (현재 청크를 비우기 위한 코드)
     {
         if (!_hasCurrentChunk)
         {
@@ -135,6 +139,8 @@ public class MapManager : SingletonBase<MapManager>
 
         _chunks.Add(key, chunk);
 
+        _isChunkDirty = true;
+
         //Debug.Log($"[MapManager] (RegisterChunk) 등록: {key} / {chunk.name} / 총 {_chunks.Count}개"); //등록된 청크들 체크하는 테스트 코드
     }
 
@@ -152,6 +158,8 @@ public class MapManager : SingletonBase<MapManager>
         if (_chunks.TryGetValue(key, out MapChunk saved) && saved == chunk)
         {
             _chunks.Remove(key);
+
+            _isChunkDirty = true;
         }
     }
 
