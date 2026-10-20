@@ -3,10 +3,6 @@
     "Id": "Room_1_1",
     "Name": "숲 입구",
     "MapId": "Level_1",
-    "CellX": 0,
-    "CellY": 0,
-    "CellWidth": 2,
-    "CellHeight": 1,
     "RewardIds": [
       "Room_1_1_Reward_01",
       "Room_1_1_Reward_02",
@@ -21,16 +17,26 @@
         "Id": "Room_1_1_Exit_01",
         "TargetRoomId": "Room_1_2"
       }
+    ],
+    "OccupiedSlots": [
+      {
+        "Y": 0,
+        "X": -1
+      },
+      {
+        "Y": -1,
+        "X": -1
+      },
+      {
+        "Y": -1,
+        "X": 0
+      }
     ]
   },
   {
     "Id": "Room_1_2",
     "Name": "숲길",
     "MapId": "Level_1",
-    "CellX": 2,
-    "CellY": 0,
-    "CellWidth": 1,
-    "CellHeight": 2,
     "RewardIds": [],
     "HiddenIds": [],
     "Exits": [
@@ -38,18 +44,26 @@
         "Id": "Room_1_2_Exit_01",
         "TargetRoomId": "Room_1_1"
       }
+    ],
+    "OccupiedSlots": [
+      {
+        "Y": 0,
+        "X": 0
+      }
     ]
   },
   {
     "Id": "Room_2_1",
     "Name": "동굴 입구",
     "MapId": "Level_2",
-    "CellX": 0,
-    "CellY": 0,
-    "CellWidth": 1,
-    "CellHeight": 1,
     "RewardIds": [],
     "HiddenIds": [],
-    "Exits": []
+    "Exits": [],
+    "OccupiedSlots": [
+      {
+        "Y": 0,
+        "X": 0
+      }
+    ]
   }
 ]
