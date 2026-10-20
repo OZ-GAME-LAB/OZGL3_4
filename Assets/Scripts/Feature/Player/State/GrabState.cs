@@ -24,10 +24,12 @@ public class GrabState : PlayerStateBase
     {
         // 1. 플레이어 이동 (물체 무게만큼 느리게)
         float speed = _player.CurrentShadow.Speed * _target.SpeedMultiplier;
-        _player.SetVelocity(speed);
+        _player.SetVelocity(speed, true);
 
-        // 2. 물체도 같은 속도로 + 간격이 벌어진 만큼 보정
-        _target.SetVelocity(speed);
+        // 2. 물체도 같은 속도로
+        float playerVx = _player.Rigid.linearVelocity.x;
+        _target.OnGrabbed();
+        _target.SetVelocity(playerVx);
 
         // 3. 애니메이션
         float movement = Mathf.Abs(_player.Rigid.linearVelocity.x);
@@ -37,5 +39,6 @@ public class GrabState : PlayerStateBase
     public override void Exit()
     {
         _player.Animator.SetBool(GrabHash, false);
+        _target.OnReleased();
     }
 }

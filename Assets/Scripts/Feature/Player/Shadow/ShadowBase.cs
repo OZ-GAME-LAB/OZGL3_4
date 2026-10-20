@@ -8,7 +8,7 @@ public enum ShadowType
     Rabbit,
 }
 
-public abstract class ShadowBase : MonoBehaviour
+public abstract class ShadowBase
 {
     protected Player _player;
 
@@ -17,7 +17,7 @@ public abstract class ShadowBase : MonoBehaviour
     public float Speed => _speed;
 
     [Header("Jump")]
-    protected float _jumpPower = 100f;
+    protected float _jumpPower = 3f;
     protected int _maxJumpCount = 2;
     public float JumpPower => _jumpPower;
     public int MaxJumpCount => _maxJumpCount;

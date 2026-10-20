@@ -185,11 +185,16 @@ public class Player : MonoBehaviour
         _shadowList.Add(type, newShadow);
     }
 
-    public void SetVelocity(float speed)
+    public void SetVelocity(float speed, bool isFixed = false)
     {
         float xOffset = _movement.x * speed;
         _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
-        _sprite.flipX = xOffset < 0;
+
+        if (isFixed == false)
+        {
+            _sprite.flipX = xOffset < 0;
+        }
+        
     }
 
     public void SetJump()

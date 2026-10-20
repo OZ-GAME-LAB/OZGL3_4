@@ -7,14 +7,29 @@ public class Grabbable : MonoBehaviour
 
     private Rigidbody2D _rigid;
 
+    private const RigidbodyConstraints2D _lockedConstraints = RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+    private const RigidbodyConstraints2D _grabbedConstraints = RigidbodyConstraints2D.FreezeRotation;
+
+
     private void Awake()
     {
         _rigid = GetComponent<Rigidbody2D>();
+        _rigid.constraints = _lockedConstraints;
+    }
+
+    public void OnGrabbed()
+    {
+        _rigid.constraints = _grabbedConstraints;
+    }
+
+    public void OnReleased()
+    {
+        SetVelocity(0);
+        _rigid.constraints = _lockedConstraints;
     }
 
     public void SetVelocity(float speed)
     {
-        float xOffset = 1 * speed;
-        _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+        _rigid.linearVelocity = new Vector2(speed, _rigid.linearVelocity.y);
     }
 }
