@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +15,9 @@ public class MapManager : SingletonBase<MapManager>
     private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
+    private HashSet<Room> _activeRooms = new HashSet<Room>();
+    private bool _isChunkDirty = false;
+
 
     // 현재 청크는 HasCurrentChunk가 true일 때만 유효하다.
     public Vector2Int CurrentChunkIndex
@@ -33,10 +36,10 @@ public class MapManager : SingletonBase<MapManager>
     public event Action OnClearPlayerChunk;
 
 
-    private void Start()
-    {
+    //private void Start()
+    //{
 
-    }
+    //}
 
     private void Update()
     {
@@ -155,7 +158,7 @@ public class MapManager : SingletonBase<MapManager>
     public void SetTarget(Transform target) //플레이어의 위치를 보고 다른 청크로 넘어간 순간을 감지
     {
         Transform_Target = target;
-        
+
         if (target == null)
         {
             ClearPlayerChunk();
@@ -176,11 +179,41 @@ public class MapManager : SingletonBase<MapManager>
 
     private void RefreshActiveChunks(Vector2Int center)
     {
+        CollectActiveRooms(center);
+
         foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
         {
-            bool isActive = IsInActiveRange(pair.Key, center);
-            pair.Value.SetObjectActive(isActive);
+            pair.Value.SetObjectActive(ShouldBeActive(pair.Key, pair.Value, center));
         }
+
+        _isChunkDirty = false;
+    }
+
+    private bool IsGroupChunk(MapChunk chunk)
+    {
+        return chunk.Room != null && chunk.Room.ActivationMode == RoomActivationMode.Group;
+    }
+
+    private void CollectActiveRooms(Vector2Int center)
+    {
+        _activeRooms.Clear();
+        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
+        {
+            if (IsGroupChunk(pair.Value) && IsInActiveRange(pair.Key, center))
+            {
+                _activeRooms.Add(pair.Value.Room);
+            }
+        }
+    }
+
+    private bool ShouldBeActive(Vector2Int key, MapChunk chunk, Vector2Int center)
+    {
+        if (IsGroupChunk(chunk))
+        {
+            return _activeRooms.Contains(chunk.Room);
+        }
+
+        return IsInActiveRange(key, center);
     }
 
 }

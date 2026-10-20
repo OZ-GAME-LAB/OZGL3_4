@@ -5,9 +5,12 @@ public class MapChunk : MonoBehaviour
     [SerializeField] private Transform Transform_Object;
 
 
+    public Room Room { get; private set; }
 
     private void Start()
     {
+        Room = GetComponentInParent<Room>();
+
         if (MapManager.Instance == null)
         {
             Debug.LogError($"[MapChunk] (Start) {name} 등록 실패: MapManager 없음");
