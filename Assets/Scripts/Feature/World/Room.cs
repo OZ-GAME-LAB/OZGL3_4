@@ -11,7 +11,7 @@ public class Room : MonoBehaviour
     public string RoomId => _roomId;
     public RoomActivationMode ActivationMode => _activationMode;
 
-    public void Start()
+    private void Start()
     {
         if (string.IsNullOrEmpty(_roomId))
         {

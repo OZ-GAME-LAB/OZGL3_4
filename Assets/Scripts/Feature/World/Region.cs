@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ public class Region : MonoBehaviour
 
 
     public string RegionId => _regionId;
-    public IReadOnlyList<string> NeiborRegionIds => _neighborRegionIds;
+    public IReadOnlyList<string> NeighborRegionIds => _neighborRegionIds;
 
 
     private void Start()

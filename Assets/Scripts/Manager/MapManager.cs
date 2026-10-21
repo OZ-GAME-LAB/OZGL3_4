@@ -21,7 +21,9 @@ public class MapManager : SingletonBase<MapManager>
 
     private Region _currentRegion;
     public event Action<string> OnChangeRegion;
-    public string CurrentRegionId;
+
+
+    public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
 
 
     // 현재 청크는 HasCurrentChunk가 true일 때만 유효하다.
