@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class MapManager : SingletonBase<MapManager>
 {
@@ -10,6 +11,9 @@ public class MapManager : SingletonBase<MapManager>
 
     [Header("추적 대상")]
     [SerializeField] private Transform Transform_Target;
+
+    [Header("지역 설정")]
+    [SerializeField] private Transform Transform_RegionRoot;
 
 
     private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
@@ -21,6 +25,7 @@ public class MapManager : SingletonBase<MapManager>
 
     private Region _currentRegion;
     public event Action<string> OnChangeRegion;
+    private RegionLoader _regionLoader;
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -43,10 +48,11 @@ public class MapManager : SingletonBase<MapManager>
     public event Action OnClearPlayerChunk;
 
 
-    //private void Start()
-    //{
-
-    //}
+    private void Start()
+    {
+        Transform root = Transform_RegionRoot != null ? Transform_RegionRoot : transform;
+        _regionLoader = new RegionLoader(root);
+    }
 
     private void Update()
     {
@@ -56,6 +62,19 @@ public class MapManager : SingletonBase<MapManager>
         {
             RefreshActiveChunks(_currentChunkIndex);
         }
+    }
+
+
+    [ContextMenu("테스트: T1 불러오기")]
+    private void TestLoadRegionT1()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestLoadRegionT1) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.LoadRegionAsync("Region_T1").Forget();
     }
 
 
