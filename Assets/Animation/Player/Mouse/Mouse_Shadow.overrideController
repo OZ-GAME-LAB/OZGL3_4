@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Mouse_Shadow
+  m_Controller: {fileID: 9100000, guid: 1913448d537dd49408b653e7258a066c, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 751d9e44987bc0043a9bb81094280de8, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: e5d52bf5dca423b42ac9d6db21e77682, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 69f69e650a3e4e1429c9fd130dd3f8ac, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 3716c7a8dd4eaf04aaa8d7b596b361e1, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 5d1666294dac21248a5536d5bef91d8f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: c94d8a92c5938e14a9f48fde3bb0c28e, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: c5c7ccf231f4ebf498a4b9bc76ceaeea, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f575e4f1ccaba6a4ea401d140013927e, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 8a63250d583952c40b3bb0881ebf239c, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 79f2e9edba9d4b64c94a2667ca6d38ca, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 973f2d4384e9cc9428035019b6127c39, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 8b8eb2b213b2dd54d87bef5d7a0455f6, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 9a969ae81f65e294a8ffb267b2481732, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f5be1b2e521e2c04d916bb145d90a77e, type: 2}

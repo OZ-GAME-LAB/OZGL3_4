@@ -1,0 +1,17 @@
+[
+  {
+    "Id": "Teleport_1_1",
+    "MapId": "Level_1",
+    "RevealRoomIds": "Room_1_1"
+  },
+  {
+    "Id": "Teleport_1_2",
+    "MapId": "Level_1",
+    "RevealRoomIds": "Room_1_1, Room_1_2"
+  },
+  {
+    "Id": "Teleport_2_1",
+    "MapId": "Level_2",
+    "RevealRoomIds": "Room_2_1"
+  }
+]
