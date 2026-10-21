@@ -86,15 +86,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Ability",
-                    "type": "Button",
-                    "id": "9c70a261-9c0e-4c07-a704-e3d92f6fa025",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "Press(behavior=2)",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -458,17 +449,6 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0e59cbfe-e4c3-40d1-9b3d-ddd6d39830a7",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Ability",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
