@@ -2,16 +2,22 @@ using UnityEngine;
 
 public class MapPlayerTracker : MonoBehaviour
 {
-    [SerializeField] private MapManager Manager_Map;
+    private MapManager Manager_Map;
     [SerializeField] private string _mapId = "Level_1";
 
     private MapService _mapService;
 
     public bool Init(MapService mapService)
     {
-        if (mapService == null || Manager_Map == null)
+        if (mapService == null)
         {
-            Debug.LogError("[MapPlayerTracker] MapService와 MapManager 연결이 필요합니다.");
+            Debug.LogError("[MapPlayerTracker] MapService가 필요합니다.");
+            return false;
+        }
+        MapManager mapManager = MapManager.Instance;
+        if (mapManager == null)
+        {
+            Debug.LogError("[MapPlayerTracker] MapManager.Instance가 없습니다. 매니저 초기화 후 Init을 호출하세요.");
             return false;
         }
         UnBind();
@@ -19,6 +25,7 @@ public class MapPlayerTracker : MonoBehaviour
         {
             ClearCurrentRoom();
         }
+        Manager_Map = mapManager;
         _mapService = mapService;
         if (isActiveAndEnabled)
         {

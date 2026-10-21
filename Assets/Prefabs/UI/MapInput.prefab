@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 100001}
   - component: {fileID: 100002}
+  - component: {fileID: 1235694761172084463}
+  - component: {fileID: 6952292292757436456}
   m_Layer: 0
   m_Name: MapInput
   m_TagString: Untagged
@@ -45,3 +47,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapUIInput
   InputActionAsset_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+--- !u!114 &1235694761172084463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93fc725cc8a64a5f90ac113be5bbb4eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapSceneSetup
+  Input_Map: {fileID: 100002}
+  Tracker_Player: {fileID: 6952292292757436456}
+--- !u!114 &6952292292757436456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e91fef4bc9d34c4e8c1c87fe281aee12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapPlayerTracker
+  _mapId: Level_1
