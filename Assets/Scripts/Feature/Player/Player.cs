@@ -67,6 +67,7 @@ public class Player : MonoBehaviour
     public Grabbable GrabTarget { get; private set; }
 
     [Header("Component")]
+    private PlayerInteractor _playerInteractor;
     private Collider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
@@ -78,6 +79,7 @@ public class Player : MonoBehaviour
     #region Unity LifeCycle
     private void Awake()
     {
+        _playerInteractor = GetComponent<PlayerInteractor>();
         _collider = GetComponent<Collider2D>();
         _rigid = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
@@ -324,6 +326,14 @@ public class Player : MonoBehaviour
         else
         {
             _currentShadow.ReleaseAbility();
+        }
+    }
+
+    private void OnInteraction(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            _playerInteractor.TryInteract();
         }
     }
     #endregion
