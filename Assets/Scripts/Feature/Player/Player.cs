@@ -71,6 +71,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
+    public Collider2D Collider => _collider;
     public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
 
@@ -192,7 +193,7 @@ public class Player : MonoBehaviour
 
         if (isFixed == false)
         {
-            _sprite.flipX = xOffset < 0;
+            _sprite.flipX = _facing < 0;
         }
         
     }
@@ -209,10 +210,12 @@ public class Player : MonoBehaviour
         if (IsGrounded == false)
             return;
 
-        Grabbable target = FindGrabbalbe();
-        if (target == null)
+        Grabbable target = null;
+        float dir = 0;
+        if (FindGrabbalbe(out target, out dir) == false)
             return;
 
+        _sprite.flipX = dir < 0;
         GrabTarget = target;
         ChangeState(PlayerState.Grab);
     }
@@ -225,10 +228,18 @@ public class Player : MonoBehaviour
         ChangeState(PlayerState.Idle);
     }
 
-    private Grabbable FindGrabbalbe()
+    private bool FindGrabbalbe(out Grabbable target, out float dir)
     {
-        Grabbable front = FindGrabbableAt(Facing);
-        return front != null ? front : FindGrabbableAt(-Facing);
+        // 바라보는 방향 체크
+        dir = _facing;
+        target = FindGrabbableAt(dir);
+        if (target != null)
+            return true;
+
+        // 없으면 반대쪽
+        dir = -_facing;
+        target = FindGrabbableAt(dir);
+        return target != null;
     }
 
     private Grabbable FindGrabbableAt(float dir)
