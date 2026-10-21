@@ -8,6 +8,9 @@ public class MapView : UIBase
     [SerializeField] private Vector2 _slotSize = new Vector2(64f, 64f);
     [SerializeField] private List<RoomShapeBinding> _roomShapes = new List<RoomShapeBinding>();
 
+    private MapViewModel _mapViewModel;
+    private readonly List<MapRoomView> _roomViews = new List<MapRoomView>();
+
     [Serializable]
     private class RoomShapeBinding
     {
@@ -25,24 +28,20 @@ public class MapView : UIBase
         }
     }
 
-    private void Start()
+    public void Init(MapViewModel mapViewModel)
     {
-        Init();
-    }
-
-    private void Init()
-    {
-        if (Transform_MapContent == null || _slotSize.x <= 0f || _slotSize.y <= 0f)
+        if (mapViewModel == null || Transform_MapContent == null || _slotSize.x <= 0f || _slotSize.y <= 0f)
         {
-            Debug.LogError("[MapView] MapContent와 양수 슬롯 크기를 설정하세요.");
+            Debug.LogError("[MapView] ViewModel, MapContent와 양수 슬롯 크기를 설정하세요.");
             return;
         }
-        if (GameDataManager.Instance == null)
+        if (_mapViewModel == mapViewModel)
         {
-            Debug.LogError("[MapView] GameDataManager가 없습니다.");
             return;
         }
 
+        ClearRoomViews();
+        _mapViewModel = mapViewModel;
         HashSet<string> createdRoomIds = new HashSet<string>();
         foreach (RoomShapeBinding roomShape in _roomShapes)
         {
@@ -56,52 +55,55 @@ public class MapView : UIBase
                 Debug.LogError("[MapView] 중복된 방 연결입니다: " + roomShape.RoomId);
                 continue;
             }
-
-            MapRoomData roomData = GameDataManager.Instance.GetData<MapRoomData>(roomShape.RoomId);
-            if (roomData == null || roomData.OccupiedSlots == null || roomData.OccupiedSlots.Count == 0)
+            MapRoomViewModel roomViewModel = _mapViewModel.GetRoomViewModel(roomShape.RoomId);
+            if (roomViewModel == null)
             {
-                Debug.LogError("[MapView] 방 데이터 또는 점유 슬롯이 없습니다: " + roomShape.RoomId);
+                Debug.LogError("[MapView] 방 ViewModel이 없습니다: " + roomShape.RoomId);
                 continue;
             }
-
-            bool hasNullSlot = false;
-            foreach (MapSlotData slot in roomData.OccupiedSlots)
-            {
-                if (slot == null)
-                {
-                    hasNullSlot = true;
-                    break;
-                }
-            }
-            if (hasNullSlot)
-            {
-                Debug.LogError("[MapView] 점유 슬롯에 null이 있습니다: " + roomShape.RoomId);
-                continue;
-            }
-
-            CreateRoomView(roomData, roomShape.RoomShapePrefab);
+            CreateRoomView(roomViewModel, roomShape.RoomShapePrefab);
             createdRoomIds.Add(roomShape.RoomId);
         }
     }
 
-    private void CreateRoomView(MapRoomData roomData, RectTransform roomShapePrefab)
+    private void CreateRoomView(MapRoomViewModel roomViewModel, RectTransform roomShapePrefab)
     {
-        int minX = roomData.OccupiedSlots[0].X;
-        int minY = roomData.OccupiedSlots[0].Y;
-        foreach (MapSlotData slot in roomData.OccupiedSlots)
+        int minX = roomViewModel.OccupiedSlots[0].x;
+        int minY = roomViewModel.OccupiedSlots[0].y;
+        foreach (Vector2Int slot in roomViewModel.OccupiedSlots)
         {
-            if (slot.X < minX)
+            if (slot.x < minX)
             {
-                minX = slot.X;
+                minX = slot.x;
             }
-            if (slot.Y < minY)
+            if (slot.y < minY)
             {
-                minY = slot.Y;
+                minY = slot.y;
             }
         }
 
-        RectTransform roomView = Instantiate(roomShapePrefab, Transform_MapContent, false);
-        roomView.name = roomData.Id;
-        roomView.anchoredPosition = new Vector2(minX * _slotSize.x, minY * _slotSize.y);
+        RectTransform roomTransform = Instantiate(roomShapePrefab, Transform_MapContent, false);
+        roomTransform.name = roomViewModel.RoomId;
+        roomTransform.anchoredPosition = new Vector2(minX * _slotSize.x, minY * _slotSize.y);
+        MapRoomView roomView = roomTransform.GetComponent<MapRoomView>();
+        if (roomView == null)
+        {
+            roomView = roomTransform.gameObject.AddComponent<MapRoomView>();
+        }
+        roomView.Init(_mapViewModel, roomViewModel);
+        _roomViews.Add(roomView);
+    }
+
+    private void ClearRoomViews()
+    {
+        foreach (MapRoomView roomView in _roomViews)
+        {
+            if (roomView != null)
+            {
+                roomView.gameObject.SetActive(false);
+                Destroy(roomView.gameObject);
+            }
+        }
+        _roomViews.Clear();
     }
 }

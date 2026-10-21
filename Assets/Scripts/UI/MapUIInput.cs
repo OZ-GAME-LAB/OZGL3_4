@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class MapUIInput : MonoBehaviour
@@ -6,6 +6,12 @@ public class MapUIInput : MonoBehaviour
     [SerializeField] private InputActionAsset InputActionAsset_Actions;
 
     private InputAction _mapAction;
+    private MapViewModel _mapViewModel;
+
+    public void Init(MapViewModel mapViewModel)
+    {
+        _mapViewModel = mapViewModel;
+    }
 
     private void Awake()
     {
@@ -86,6 +92,19 @@ public class MapUIInput : MonoBehaviour
             return;
         }
 
-        uiManager.OpenUI(UIRootType.PopupUI, UIType.Map);
+        if (_mapViewModel == null)
+        {
+            Debug.LogError("[MapUIInput] MapSceneSetup에서 공용 ViewModel을 연결하세요.");
+            return;
+        }
+        UIBase openedUI = uiManager.OpenUI(UIRootType.PopupUI, UIType.Map);
+        MapView mapView = openedUI.GetComponent<MapView>();
+        if (mapView == null)
+        {
+            Debug.LogError("[MapUIInput] 지도 프리팹에 MapView가 없습니다.");
+            uiManager.CloseUI(UIRootType.PopupUI, UIType.Map);
+            return;
+        }
+        mapView.Init(_mapViewModel);
     }
 }
