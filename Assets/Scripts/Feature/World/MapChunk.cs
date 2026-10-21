@@ -6,16 +6,24 @@ public class MapChunk : MonoBehaviour
 
 
     public Room Room { get; private set; }
+    public Region Region { get; private set; }
+
 
     private void Start()
     {
         Room = GetComponentInParent<Room>();
+        Region = GetComponentInParent<Region>();
 
         if (MapManager.Instance == null)
         {
             Debug.LogError($"[MapChunk] (Start) {name} 등록 실패: MapManager 없음");
 
             return;
+        }
+
+        if (Region == null)
+        {
+            Debug.LogWarning($"[MapChunk] (Start) {name}: 소속 Region 없음");
         }
 
         MapManager.Instance.RegisterChunk(this);
