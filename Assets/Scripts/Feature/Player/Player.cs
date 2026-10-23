@@ -12,6 +12,7 @@ public enum PlayerState
     Jump,
     Dash,
     Grab,
+    Change,
 }
 
 [Serializable]
@@ -33,6 +34,7 @@ public class Player : MonoBehaviour
 
     [Header("Shadow")]
     private ShadowBase _currentShadow;
+    private ShadowBase _pendingShadow;
     public ShadowBase CurrentShadow => _currentShadow;
     private Dictionary<ShadowType, ShadowBase> _shadowList = new Dictionary<ShadowType, ShadowBase>();
     [SerializeField] List<ShadowAnimEntry> _shadowAnimators;
@@ -90,6 +92,7 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Jump, new JumpState(this));
         _stateList.Add(PlayerState.Dash, new DashState(this));
         _stateList.Add(PlayerState.Grab, new GrabState(this));
+        _stateList.Add(PlayerState.Change, new ChangeState(this));
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
@@ -113,6 +116,11 @@ public class Player : MonoBehaviour
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+    }
+
+    private void Update()
+    {
+        _currentState.Update();
     }
 
     private void FixedUpdate()
@@ -162,8 +170,26 @@ public class Player : MonoBehaviour
     {
         ShadowBase nextShadow = _shadowList[_viewModel.CurrentShadowType];
 
-        _currentShadow?.Exit();
-        _currentShadow = nextShadow;
+
+        if (_currentShadow == null)
+        {
+            _currentShadow = nextShadow;
+            _currentShadow.Enter();
+            return;
+        }
+
+        _pendingShadow = nextShadow;
+        ChangeState(PlayerState.Change);
+    }
+
+    public void ApplyPendingShadow()
+    {
+        if (_pendingShadow == null)
+            return;
+
+        _currentShadow.Exit();
+        _currentShadow = _pendingShadow;
+        _pendingShadow = null;
         _currentShadow.Enter();
     }
 
