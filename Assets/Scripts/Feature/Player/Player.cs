@@ -53,9 +53,11 @@ public class Player : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
-    private Vector2 _groundCheckSize = new Vector2(0.5f, 0.1f);
+    private RaycastHit2D _groundHit;
+    private Vector2 _groundCheckSize = new Vector2(0.8f, 0.1f);
     private float _groundLockTime = 0.1f;
     private float _groundLockTimer;
+    public LayerMask GroundLayer => _groundLayer;
 
     [Header("Dash")]
     private float _dashCooldownTimer;
@@ -69,10 +71,12 @@ public class Player : MonoBehaviour
     public Grabbable GrabTarget { get; private set; }
 
     [Header("Component")]
+    [SerializeField] private GameObject _visual;
     private Collider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
+    public GameObject Visual => _visual;
     public Collider2D Collider => _collider;
     public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
@@ -82,8 +86,8 @@ public class Player : MonoBehaviour
     {
         _collider = GetComponent<Collider2D>();
         _rigid = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
-        _sprite = GetComponent<SpriteRenderer>();
+        _anim = GetComponentInChildren<Animator>();
+        _sprite = GetComponentInChildren<SpriteRenderer>();
         _defaultGravity = _rigid.gravityScale;
 
         // 상태들 초기화
@@ -215,13 +219,21 @@ public class Player : MonoBehaviour
     public void SetVelocity(float speed, bool isFixed = false)
     {
         float xOffset = _movement.x * speed;
-        _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+
+        if (_currentState is not JumpState)
+        {
+            Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
+            _rigid.linearVelocity = slopeDir * xOffset;
+        }
+        else 
+        {
+            _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+        }
 
         if (isFixed == false)
         {
             _sprite.flipX = _facing < 0;
         }
-        
     }
 
     public void SetJump()
@@ -305,6 +317,7 @@ public class Player : MonoBehaviour
             return;
         }
 
+        _groundHit = Physics2D.Raycast(transform.position, Vector2.down, 1, _groundLayer);
         _isGrounded = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f, _groundLayer);
 
         if(_isGrounded == true && Rigid.linearVelocity.y <= 0.01f)
