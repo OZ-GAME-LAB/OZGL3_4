@@ -41,13 +41,15 @@ public abstract class ShadowBase
 
     public virtual void Enter()
     {
-        _player.Animator.SetTrigger("Absorb");
         _player.Animator.runtimeAnimatorController = _player.ShadowAnimatorList[_player.PlayerViewModel.CurrentShadowType];
-        _player.Animator.SetTrigger("Appear");
+        //_player.Animator.SetTrigger("Appear");
+
+        //_player.ChangeState(PlayerState.Change);
     }
 
     public virtual void Exit()
     {
-
+        //_player.Animator.SetTrigger("Absorb");
+        //_player.Animator.
     }
 }
