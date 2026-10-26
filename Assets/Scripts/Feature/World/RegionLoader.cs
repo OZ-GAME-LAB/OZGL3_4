@@ -7,6 +7,8 @@ public class RegionLoader
     private Dictionary<string, GameObject> _loadedRegions = new Dictionary<string, GameObject>();
     private HashSet<string> _loadingRegions = new HashSet<string>();
     private Transform _root;
+    private HashSet<string> _pendingUnloads = new HashSet<string>();
+
 
     public RegionLoader(Transform root)
     {
@@ -16,8 +18,6 @@ public class RegionLoader
 
     public bool IsRegionLoaded(string regionId)
     {
-        _loadedRegions.ContainsKey(regionId);
-
         return _loadedRegions.ContainsKey(regionId);
     }
 
@@ -29,6 +29,8 @@ public class RegionLoader
 
             return;
         }
+
+        _pendingUnloads.Remove(regionId);
 
         if (IsRegionLoaded(regionId) || _loadingRegions.Contains(regionId)) return;
 
@@ -60,10 +62,98 @@ public class RegionLoader
 
         GameObject instance = operation.Result[0];
 
-        _loadedRegions.Add(regionId, instance);
-
         _loadingRegions.Remove(regionId);
 
+        if (_pendingUnloads.Remove(regionId))
+        {
+            Object.Destroy(instance);
+
+            ReleaseAsset(regionId);
+
+            Debug.Log($"[RegionLoader] 예약된 내리기 처리: {regionId}");
+
+            return;
+        }
+
+        _loadedRegions.Add(regionId, instance);
+
         Debug.Log($"[RegionLoader] 불러오기 완료: {regionId}");
+    }
+
+    public void UnloadRegion(string regionId)
+    {
+        if (string.IsNullOrEmpty(regionId))
+        {
+            Debug.LogWarning("[RegionLoader] (UnloadRegion): regionId가 비어있습니다.");
+
+            return;
+        }
+
+        if (_loadingRegions.Contains(regionId))
+        {
+            _pendingUnloads.Add(regionId);
+
+            Debug.Log($"[RegionLoader] (UnloadRegion) 불러오는 중이라 내리기 예약: {regionId}");
+
+            return;
+        }
+
+        if (!_loadedRegions.TryGetValue(regionId, out GameObject instance)) return;
+
+        _loadedRegions.Remove(regionId);
+
+        if (instance != null)
+        {
+            Object.Destroy(instance);
+        }
+
+        ReleaseAsset(regionId);
+
+        Debug.Log($"[RegionLoader] 내리기 완료: {regionId}");
+    }
+
+    private void ReleaseAsset(string regionId)
+    {
+        if (ResourceManager.Instance == null)
+        {
+            Debug.LogWarning($"[RegionLoader] (ReleaseAsset) ResourceManager가 없어 에셋 해제 실패: {regionId}");
+            return;
+        }
+
+        ResourceManager.Instance.Release(regionId);
+    }
+
+    public bool IsRegionLoading(string regionId) //EnterRegionAsync의 타이밍 조절용
+    {
+        return _loadingRegions.Contains(regionId);
+    }
+
+    public Region GetRegion(string regionId)
+    {
+        if (!_loadedRegions.TryGetValue(regionId, out GameObject instance))
+        {
+            return null;
+        }
+
+        if (instance == null)
+        {
+            return null;
+        }
+
+        return instance.GetComponent<Region>();
+    }
+
+    public void CollectActiveRegionIds(List<string> result) // 올라와있거나, 올라올 지역의 목록을 얻고, 내릴 지역을 고르기 위한 용도
+    {
+        result.Clear();
+        foreach (string regionId in _loadedRegions.Keys)
+        {
+            result.Add(regionId);
+        }
+
+        foreach (string regionId in _loadingRegions)
+        {
+            result.Add(regionId);
+        }
     }
 }

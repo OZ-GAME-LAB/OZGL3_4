@@ -14,6 +14,7 @@ public class MapManager : SingletonBase<MapManager>
 
     [Header("지역 설정")]
     [SerializeField] private Transform Transform_RegionRoot;
+    [SerializeField] private string _startRegionId;
 
 
     private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
@@ -26,6 +27,10 @@ public class MapManager : SingletonBase<MapManager>
     private Region _currentRegion;
     public event Action<string> OnChangeRegion;
     private RegionLoader _regionLoader;
+
+    private string _targetRegionId;
+    private List<string> _keepRegionIds = new List<string>();
+    private List<string> _activeRegionIdBuffer = new List<string>();
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -50,8 +55,12 @@ public class MapManager : SingletonBase<MapManager>
 
     private void Start()
     {
-        Transform root = Transform_RegionRoot != null ? Transform_RegionRoot : transform;
-        _regionLoader = new RegionLoader(root);
+        EnsureRegionLoader();
+
+        if (!string.IsNullOrEmpty(_startRegionId))
+        {
+            EnterRegionAsync(_startRegionId).Forget();
+        }
     }
 
     private void Update()
@@ -60,21 +69,48 @@ public class MapManager : SingletonBase<MapManager>
 
         if (_isChunkDirty && _hasCurrentChunk)
         {
+            CheckRegionChange(_currentChunkIndex);
             RefreshActiveChunks(_currentChunkIndex);
         }
     }
 
 
-    [ContextMenu("테스트: T1 불러오기")]
-    private void TestLoadRegionT1()
+    [ContextMenu("테스트: Region_Test01 불러오기")]
+    private void TestLoadRegionTest01()
     {
         if (_regionLoader == null)
         {
-            Debug.LogWarning("[MapManager] (TestLoadRegionT1) 플레이 모드에서만 사용 가능");
+            Debug.LogWarning("[MapManager] (TestLoadRegion_Test01) 플레이 모드에서만 사용 가능");
+
             return;
         }
 
-        _regionLoader.LoadRegionAsync("Region_T1").Forget();
+        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+    }
+
+    [ContextMenu("테스트: Region_Test01 내리기")]
+    private void TestUnloadRegionTest01()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.UnloadRegion("Region_Test01");
+    }
+
+    [ContextMenu("테스트: 불러오고 바로 내리기")]
+    private void TestLoadAndUnloadRegionTest01()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestLoadAndUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+        _regionLoader.UnloadRegion("Region_Test01");
     }
 
 
@@ -272,5 +308,74 @@ public class MapManager : SingletonBase<MapManager>
         Debug.Log($"[MapManager] (SetCurrentRegion) 지역 변경: {previousId} → {region.RegionId}");
 
         OnChangeRegion?.Invoke(region.RegionId);
+
+        EnterRegionAsync(region.RegionId).Forget();
+    }
+
+    private void EnsureRegionLoader()
+    {
+        if (_regionLoader != null) return;
+
+        Transform root = Transform_RegionRoot != null ? Transform_RegionRoot : transform;
+        _regionLoader = new RegionLoader(root);
+    }
+
+    public async UniTask EnterRegionAsync(string regionId)
+    {
+        if (string.IsNullOrEmpty(regionId))
+        {
+            Debug.LogWarning("[MapManager] (EnterRegionAsync): regionId가 비어 있음");
+
+            return;
+        }
+
+        EnsureRegionLoader();
+
+        if (regionId == _targetRegionId && _regionLoader.IsRegionLoaded(regionId)) return;
+
+        _targetRegionId = regionId;
+
+        await _regionLoader.LoadRegionAsync(regionId);
+
+        while (_regionLoader.IsRegionLoading(regionId))
+        {
+            await UniTask.Yield();
+        }
+
+        if (_targetRegionId != regionId) return;
+
+        Region region = _regionLoader.GetRegion(regionId);
+
+        if (region == null)
+        {
+            Debug.LogError($"[MapManager] (EnterRegionAsync) 지역 불러오기 실패 또는 Region 컴포넌트 없음: {regionId}");
+
+            return;
+        }
+
+        _keepRegionIds.Clear();
+        _keepRegionIds.Add(regionId);
+
+        foreach (string neighborId in region.NeighborRegionIds)
+        {
+            _keepRegionIds.Add(neighborId);
+        }
+
+        foreach (string neighborId in region.NeighborRegionIds)
+        {
+            _regionLoader.LoadRegionAsync(neighborId).Forget();
+        }
+
+        _regionLoader.CollectActiveRegionIds(_activeRegionIdBuffer);
+
+        foreach (string activeId in _activeRegionIdBuffer)
+        {
+            if (!_keepRegionIds.Contains(activeId))
+            {
+                _regionLoader.UnloadRegion(activeId);
+            }
+        }
+
+        Debug.Log($"[MapManager] (EnterRegionAsync) 지역 진입 완료: {regionId}");
     }
 }
