@@ -15,6 +15,7 @@ public class MapManager : SingletonBase<MapManager>
     [Header("지역 설정")]
     [SerializeField] private Transform Transform_RegionRoot;
     [SerializeField] private string _startRegionId;
+    [SerializeField] private int _keepRegionDistance = 2;
 
 
     private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
@@ -29,8 +30,9 @@ public class MapManager : SingletonBase<MapManager>
     private RegionLoader _regionLoader;
 
     private string _targetRegionId;
-    private List<string> _keepRegionIds = new List<string>();
     private List<string> _activeRegionIdBuffer = new List<string>();
+    private Dictionary<string, int> _regionDistances = new Dictionary<string, int>();
+    private Queue<string> _regionQueue = new Queue<string>();
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -55,6 +57,13 @@ public class MapManager : SingletonBase<MapManager>
 
     private void Start()
     {
+        if (_keepRegionDistance < 1)
+        {
+            Debug.LogWarning($"[MapManager] (EnsureRegionLoader) _keepRegionDistance가 1 미만({_keepRegionDistance}). 1로 보정");
+
+            _keepRegionDistance = 1;
+        }
+
         EnsureRegionLoader();
 
         if (!string.IsNullOrEmpty(_startRegionId))
@@ -111,6 +120,30 @@ public class MapManager : SingletonBase<MapManager>
 
         _regionLoader.LoadRegionAsync("Region_Test01").Forget();
         _regionLoader.UnloadRegion("Region_Test01");
+    }
+
+    [ContextMenu("테스트: Region_Test02 숨기기")]
+    private void TestHideRegionTest02()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestHideRegionTest02) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.SetRegionVisible("Region_Test02", false);
+    }
+
+    [ContextMenu("테스트: Region_Test02 보이기")]
+    private void TestVisibleRegionTest02()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestVisibleRegionTest02) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.SetRegionVisible("Region_Test02", true);
     }
 
 
@@ -205,7 +238,7 @@ public class MapManager : SingletonBase<MapManager>
 
         _isChunkDirty = true;
 
-        //Debug.Log($"[MapManager] (RegisterChunk) 등록: {key} / {chunk.name} / 총 {_chunks.Count}개"); //등록된 청크들 체크하는 테스트 코드
+        Debug.Log($"[MapManager] (RegisterChunk) 등록: {key} / {chunk.name} / 총 {_chunks.Count}개"); //등록된 청크들 체크하는 테스트 코드
     }
 
     public void UnregisterChunk(MapChunk chunk)
@@ -224,6 +257,8 @@ public class MapManager : SingletonBase<MapManager>
             _chunks.Remove(key);
 
             _isChunkDirty = true;
+
+            Debug.Log($"[MapManager] (UnregisterChunk) 해제: {key} / {chunk.name} / 총 {_chunks.Count}개");
         }
     }
 
@@ -322,6 +357,7 @@ public class MapManager : SingletonBase<MapManager>
 
     public async UniTask EnterRegionAsync(string regionId)
     {
+        // 1. 중복 검사
         if (string.IsNullOrEmpty(regionId))
         {
             Debug.LogWarning("[MapManager] (EnterRegionAsync): regionId가 비어 있음");
@@ -335,6 +371,8 @@ public class MapManager : SingletonBase<MapManager>
 
         _targetRegionId = regionId;
 
+
+        // 2. 현재 지역 로드
         await _regionLoader.LoadRegionAsync(regionId);
 
         while (_regionLoader.IsRegionLoading(regionId))
@@ -342,8 +380,12 @@ public class MapManager : SingletonBase<MapManager>
             await UniTask.Yield();
         }
 
+
+        // 3. 목표가 변경되었는지 확인
         if (_targetRegionId != regionId) return;
 
+
+        // 4. Region 컴포넌트 가져오기
         Region region = _regionLoader.GetRegion(regionId);
 
         if (region == null)
@@ -353,29 +395,87 @@ public class MapManager : SingletonBase<MapManager>
             return;
         }
 
-        _keepRegionIds.Clear();
-        _keepRegionIds.Add(regionId);
 
-        foreach (string neighborId in region.NeighborRegionIds)
-        {
-            _keepRegionIds.Add(neighborId);
-        }
-
+        // 5. 이웃 지역 로드
         foreach (string neighborId in region.NeighborRegionIds)
         {
             _regionLoader.LoadRegionAsync(neighborId).Forget();
         }
 
+
+        // 6. 모든 로드 이전까지 대기
+        while (_regionLoader.HasLoadingRegion())
+        {
+            await UniTask.Yield();
+        }
+
+
+        // 7. 기다리는 동안 목표 변경되었는지 재확인
+        if (_targetRegionId != regionId) return;
+
+
+        //8. 거리 계산
+        CalculateRegionDistances(regionId);
+        ApplyRegionStates();
+
+        Debug.Log($"[MapManager] (EnterRegionAsync) 지역 진입 완료: {regionId}");
+    }
+
+    private void CalculateRegionDistances(string startRegionId)
+    {
+        _regionDistances.Clear();
+        _regionQueue.Clear();
+
+        _regionDistances.Add(startRegionId, 0);
+
+        _regionQueue.Enqueue(startRegionId);
+
+        while (_regionQueue.Count > 0)
+        {
+            string id = _regionQueue.Dequeue();
+
+            int distance = _regionDistances[id];
+
+            if (distance >= _keepRegionDistance) continue;
+
+            Region region = _regionLoader.GetRegion(id);
+
+            if (region == null) continue;
+
+            foreach (string neighborId in region.NeighborRegionIds)
+            {
+                if (string.IsNullOrEmpty(neighborId)) continue;
+                if (_regionDistances.ContainsKey(neighborId)) continue;
+
+                _regionDistances.Add(neighborId, distance + 1);
+                _regionQueue.Enqueue(neighborId);
+            }
+        }
+    }
+
+    private void ApplyRegionStates()
+    {
         _regionLoader.CollectActiveRegionIds(_activeRegionIdBuffer);
 
-        foreach (string activeId in _activeRegionIdBuffer)
+        foreach (string id in _activeRegionIdBuffer)
         {
-            if (!_keepRegionIds.Contains(activeId))
+            if (!_regionDistances.TryGetValue(id, out int distance) || distance > _keepRegionDistance)
             {
-                _regionLoader.UnloadRegion(activeId);
+                _regionLoader.UnloadRegion(id);
+
+                continue;
+            }
+
+            if (distance > 1)
+            {
+                _regionLoader.SetRegionVisible(id, false);
+            }
+            else
+            {
+                _regionLoader.SetRegionVisible(id, true);
             }
         }
 
-        Debug.Log($"[MapManager] (EnterRegionAsync) 지역 진입 완료: {regionId}");
+        Debug.Log($"[MapManager] (ApplyRegionStates) 기준: {_targetRegionId} / 대상 {_activeRegionIdBuffer.Count}개");
     }
 }

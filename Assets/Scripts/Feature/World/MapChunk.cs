@@ -9,6 +9,9 @@ public class MapChunk : MonoBehaviour
     public Region Region { get; private set; }
 
 
+    private bool _isStarted = false;
+
+
     private void Start()
     {
         Room = GetComponentInParent<Room>();
@@ -27,10 +30,28 @@ public class MapChunk : MonoBehaviour
         }
 
         MapManager.Instance.RegisterChunk(this);
+
+        _isStarted = true;
     }
 
-    private void OnDestroy()
+    private void OnEnable()
     {
+        if (!_isStarted) return;
+
+        if (MapManager.Instance == null)
+        {
+            Debug.LogWarning($"[MapChunk] (OnEnable) {name} 재등록 실패: MapManager 없음");
+
+            return;
+        }
+
+        MapManager.Instance.RegisterChunk(this);
+    }
+
+    private void OnDisable()
+    {
+        if (!_isStarted) return;
+
         if (MapManager.Instance == null) return;
 
         MapManager.Instance.UnregisterChunk(this);

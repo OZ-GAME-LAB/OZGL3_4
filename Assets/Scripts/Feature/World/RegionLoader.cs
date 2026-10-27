@@ -30,11 +30,22 @@ public class RegionLoader
             return;
         }
 
+
         _pendingUnloads.Remove(regionId);
 
-        if (IsRegionLoaded(regionId) || _loadingRegions.Contains(regionId)) return;
+
+        if (IsRegionLoaded(regionId))
+        {
+            SetRegionVisible(regionId, true);
+
+            return;
+        }
+
+        if (_loadingRegions.Contains(regionId)) return;
+
 
         _loadingRegions.Add(regionId);
+
 
         if (ResourceManager.Instance == null)
         {
@@ -45,7 +56,9 @@ public class RegionLoader
             return;
         }
 
+
         GameObject prefab = await ResourceManager.Instance.LoadAsset<GameObject>(regionId);
+
 
         if (prefab == null)
         {
@@ -56,6 +69,7 @@ public class RegionLoader
             return;
         }
 
+
         AsyncInstantiateOperation<GameObject> operation = Object.InstantiateAsync(prefab, _root);
 
         await operation;
@@ -63,6 +77,7 @@ public class RegionLoader
         GameObject instance = operation.Result[0];
 
         _loadingRegions.Remove(regionId);
+
 
         if (_pendingUnloads.Remove(regionId))
         {
@@ -74,6 +89,7 @@ public class RegionLoader
 
             return;
         }
+
 
         _loadedRegions.Add(regionId, instance);
 
@@ -112,6 +128,33 @@ public class RegionLoader
         Debug.Log($"[RegionLoader] 내리기 완료: {regionId}");
     }
 
+    public void SetRegionVisible(string regionId, bool isVisible)
+    {
+        if (!_loadedRegions.TryGetValue((regionId), out GameObject instance) || instance == null)
+        {
+            Debug.LogWarning($"[RegionLoader] (SetRegionVisible) 불러오지 않은 지역: {regionId}");
+
+            return;
+        }
+
+        if (instance.activeSelf == isVisible) return;
+
+        instance.SetActive(isVisible);
+
+        Debug.Log($"[RegionLoader] (SetRegionVisible) {regionId}: {(isVisible ? "보이기" : "숨기기")}");
+    }
+
+    public bool IsRegionVisible(string regionId)
+    {
+        if (!_loadedRegions.TryGetValue(regionId, out GameObject instance) || instance == null)
+        {
+            return false;
+        }
+
+        return instance.activeSelf;
+    }
+
+
     private void ReleaseAsset(string regionId)
     {
         if (ResourceManager.Instance == null)
@@ -126,6 +169,11 @@ public class RegionLoader
     public bool IsRegionLoading(string regionId) //EnterRegionAsync의 타이밍 조절용
     {
         return _loadingRegions.Contains(regionId);
+    }
+
+    public bool HasLoadingRegion()
+    {
+        return _loadingRegions.Count > 0;
     }
 
     public Region GetRegion(string regionId)
