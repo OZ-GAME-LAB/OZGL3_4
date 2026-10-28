@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
-/// 누름 발판 기믹입니다. 플레이어나 밀 수 있는 오브젝트(PushableObject)가 올라가 있는 동안 신호를 보냅니다.
+/// 누름 발판 기믹입니다. 플레이어나 잡을 수 있는 오브젝트(Grabbable)가 올라가 있는 동안 신호를 보냅니다.
 ///
 /// 구조
 /// Gimmick_PressurePlate        ← PressurePlate, BoxCollider2D(Is Trigger, 발판 위 감지 범위)
@@ -14,14 +15,13 @@ using UnityEngine;
 /// </summary>
 public class PressurePlate : SignalSender
 {
-    private const string PlayerTag = "Player";
-
     [Header("Reference")]
     [SerializeField] private Transform Transform_Visual;
 
     [Header("Press")]
     [SerializeField] private bool _isPressedByPlayer = true;
-    [SerializeField] private bool _isGrabbable = true;
+    [FormerlySerializedAs("_isGrabbable")]
+    [SerializeField] private bool _isPressedByGrabbable = true;
     [SerializeField] private bool _isLatched = false;
     [SerializeField] private float _pressDepth = 0.1f;
 
@@ -84,10 +84,11 @@ public class PressurePlate : SignalSender
 
     private bool CanPress(Collider2D other)
     {
-        if (_isPressedByPlayer && other.CompareTag(PlayerTag))
+        Player player;
+        if (_isPressedByPlayer && GimmickUtil.TryGetFromPlayerCollider(other, out player))
             return true;
 
-        if (_isGrabbable && other.GetComponentInParent<Grabbable>() != null)
+        if (_isPressedByGrabbable && other.GetComponentInParent<Grabbable>() != null)
             return true;
 
         return false;

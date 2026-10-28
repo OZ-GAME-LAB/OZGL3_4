@@ -237,9 +237,8 @@ MonoBehaviour:
   Pipe_Exit: {fileID: 0}
   Transform_ExitPoint: {fileID: 8792109561941286381}
   Transform_Blip: {fileID: 582069328065178078}
-  GameObject_Prompt: {fileID: 9123031626008539306}
   List_PathPoint: []
-  _enterKey: 19
+  _requiredShadowType: 2
   _reenterDelay: 0.3
   _travelSpeed: 8
   _enterDelay: 0.15
@@ -389,7 +388,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: E
+  m_text: F
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
