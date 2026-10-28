@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class TeleportMenuUI : MonoBehaviour
 {
-    [SerializeField] private GameObject teleportSlotPrefab;
+    [SerializeField] private GameObject _teleportSlotPrefab;
+    [SerializeField] private Transform _slotContent;
 
     private Queue<TeleportSlot> _createdSlotList = new();
     private List<TeleportSlot> _activeSlotList = new();
@@ -20,11 +21,22 @@ public class TeleportMenuUI : MonoBehaviour
 
     private void UpdateSlot()
     {
-        TeleportSlot slot = null;
-        if (_createdSlotList.Count < 0)
+        TeleportService teleportService = NetworkManager.Instance.TeleportService;
+        IReadOnlyList<TeleportInfo> infos = teleportService.GetTeleportInfos(true);
+        foreach (TeleportInfo info in infos)
         {
-            //slot.
+            TeleportSlot slot = GetSlot();
+            slot.Bind(info, OnClickSlot);
+            _activeSlotList.Add(slot);
         }
+    }
+
+    private TeleportSlot GetSlot()
+    {
+        TeleportSlot slot = _createdSlotList.Count > 0 ? _createdSlotList.Dequeue() : Instantiate(_teleportSlotPrefab, _slotContent).GetComponent<TeleportSlot>();
+        slot.transform.SetAsLastSibling();   // 재사용 슬롯도 순서대로 정렬
+        slot.gameObject.SetActive(true);
+        return slot;
     }
 
     private void ClearSlot()
@@ -32,8 +44,17 @@ public class TeleportMenuUI : MonoBehaviour
         foreach(var slot in _activeSlotList)
         {
             slot.gameObject.SetActive(false);
-            _activeSlotList.Remove(slot);
             _createdSlotList.Enqueue(slot);
         }
+        _activeSlotList.Clear();
+    }
+
+    private void OnClickSlot(TeleportInfo info)
+    {
+        Debug.Log($"{info.ThemeNumber} - {info.TeleportNumber}로 텔레포트");
+        Player player = FindAnyObjectByType<Player>();
+
+        Vector2 position = new Vector2(0, -2.3f);
+        player.TeleportTo(position);
     }
 }

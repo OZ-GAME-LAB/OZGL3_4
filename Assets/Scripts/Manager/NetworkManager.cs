@@ -10,6 +10,11 @@ public class NetworkManager : SingletonBase<NetworkManager>
     {
         PlayerService = new NetworkPlayerService();
 
+        
+    }
+
+    private void Start()
+    {
         InitMapService();
         InitTeleportService();
     }

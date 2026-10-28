@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3179451570836815548}
   - component: {fileID: 7252573722283165346}
   - component: {fileID: 3375287962459076207}
+  - component: {fileID: 4745276851762821167}
   m_Layer: 0
   m_Name: Teleport Info
   m_TagString: Untagged
@@ -120,6 +121,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4745276851762821167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006828744173325860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfddd2ddf0153e345b0526c4032f3618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButton
+  Button_Base: {fileID: 3375287962459076207}
+  Image_Base: {fileID: 0}
+  Text_Base: {fileID: 0}
 --- !u!1 &6977948105147567852
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,8 +145,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6975220207426135512}
+  - component: {fileID: 7135815009398621592}
   m_Layer: 0
-  m_Name: Teleport Info
+  m_Name: TeleportSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,6 +174,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7135815009398621592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6977948105147567852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ab4ddc179629934f9dc709e9b1a3171, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeleportSlot
+  _teleportButton: {fileID: 4745276851762821167}
+  _teleportName: {fileID: 1747636549820777086}
 --- !u!1 &8550983979721262670
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,7 +247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

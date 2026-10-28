@@ -1,5 +1,24 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
+
+public readonly struct TeleportInfo
+{
+    public readonly string Id;
+    public readonly string MapId;
+    public readonly int ThemeNumber;
+    public readonly int TeleportNumber;
+    public readonly bool IsActivated;
+
+    public TeleportInfo(string id, string mapId, int themeNumber, int teleportNumber, bool isActivated)
+    {
+        Id = id;
+        MapId = mapId;
+        ThemeNumber = themeNumber;
+        TeleportNumber = teleportNumber;
+        IsActivated = isActivated;
+    }
+}
 
 public class TeleportService
 {
@@ -7,6 +26,9 @@ public class TeleportService
     private readonly TeleportViewModel _teleportViewModel;
     private readonly Dictionary<string, string> _teleportMapIds = new Dictionary<string, string>();
     private readonly Dictionary<string, IReadOnlyList<string>> _teleportRevealRooms = new Dictionary<string, IReadOnlyList<string>>();
+
+    private readonly List<string> _teleportIds = new List<string>();   // 정렬된 순서 유지
+    private readonly Dictionary<string, (int theme, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
 
     public TeleportService(TeleportModel teleportModel, IReadOnlyList<MapTeleportData> teleportDataList, MapService mapService)
     {
@@ -118,8 +140,32 @@ public class TeleportService
 
             _teleportMapIds.Add(data.Id, data.MapId);
             _teleportRevealRooms.Add(data.Id, roomIds.AsReadOnly());
+            _teleportIds.Add(data.Id);                                    
+            _teleportNumbers.Add(data.Id, (themeNumber, teleportNumber));
         }
+
+        _teleportIds.Sort((a, b) =>
+        {
+            var x = _teleportNumbers[a];
+            var y = _teleportNumbers[b];
+            return x.theme != y.theme ? x.theme.CompareTo(y.theme) : x.number.CompareTo(y.number);
+        });
     }
 
+    public IReadOnlyList<TeleportInfo> GetTeleportInfos(bool activatedOnly)
+    {
+        List<TeleportInfo> result = new List<TeleportInfo>(_teleportIds.Count);
+        foreach (string teleportId in _teleportIds)
+        {
+            bool isActivated = _teleportViewModel.GetTeleportActivated(teleportId);   // ← 실제 메서드명으로 교체
+            if (activatedOnly && !isActivated)
+            {
+                continue;
+            }
+            var numbers = _teleportNumbers[teleportId];
+            result.Add(new TeleportInfo(teleportId, _teleportMapIds[teleportId], numbers.theme, numbers.number, isActivated));
+        }
+        return result;
+    }
 }
 
