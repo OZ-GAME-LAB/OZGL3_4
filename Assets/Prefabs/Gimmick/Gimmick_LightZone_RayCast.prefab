@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7420395454955464418}
   - component: {fileID: 4112808661142884037}
   m_Layer: 7
-  m_Name: Gimmick_LightZone(beam, cone)
+  m_Name: Gimmick_LightZone_RayCast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

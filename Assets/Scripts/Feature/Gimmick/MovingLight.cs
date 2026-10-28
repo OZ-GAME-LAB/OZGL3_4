@@ -1,30 +1,28 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// 이동 광원 기믹입니다. 램프(Carriage)가 레일을 따라 움직이고, 그 아래에 붙은 빛 영역이 함께 이동합니다.
-/// 플레이어가 잡는 범위 안에서 E 키를 누르고 있으면 램프를 잡고 밀거나 당길 수 있습니다.
+/// 플레이어가 잡는 범위 안에서 상호작용 키를 누르면 램프를 잡고, 다시 누르거나 범위를 벗어나면 놓습니다.
 ///
 /// 구조
 /// Gimmick_MovingLight          ← MovingLight, 스케일 (1, 1, 1)
 /// └─ Carriage                  ← 레일 위를 움직이는 부분
 ///     ├─ Visual                ← 램프 그림
-///     ├─ Prompt                ← 'E' 말주머니 (선택)
+///     ├─ GrabArea              ← MovingLightHandle, InteractionPrompt, BoxCollider2D(Is Trigger, 잡는 범위), 레이어 Default
+///     │   └─ Prompt            ← 말주머니 (InteractionPrompt의 GameObject_Prompt에 연결)
 ///     └─ Gimmick_LightZone     ← 빛 영역 프리팹 (함께 이동)
 ///
-/// - 레일과 잡는 범위는 오브젝트를 선택하면 씬 뷰에 표시됩니다. (노랑: 레일, 초록: 잡는 범위)
-/// - 플레이어가 잡는 위치가 빛 안에 들어가지 않도록 _grabAreaOffset으로 잡는 범위를 빛 반대쪽에 두세요.
+/// - 플레이어의 PlayerInteractor는 트리거 콜라이더와 같은 오브젝트에서 IInteractable을 찾으므로,
+///   잡는 범위(GrabArea)에는 이 컴포넌트로 전달해 주는 MovingLightHandle을 붙입니다.
+/// - 레일은 오브젝트를 선택하면 씬 뷰에 노란 선으로 표시됩니다.
+/// - 잡는 범위(GrabArea)는 빛이 비추지 않는 쪽에 두세요. (잡는 순간 빛에 닿지 않도록)
 /// - 신호를 받으면 켜짐 → 레일 끝(End), 꺼짐 → 레일 시작(Start)으로 스스로 이동합니다.
-/// - 현재는 임시로 E 키를 직접 감지합니다. 플레이어 상호작용 시스템이 완성되면 교체합니다.
 /// </summary>
 public class MovingLight : MonoBehaviour, ISignalReceiver
 {
-    private const string PlayerTag = "Player";
-
     [Header("Reference")]
     [SerializeField] private Transform Transform_Carriage;
-    [SerializeField] private GameObject GameObject_Prompt;
+    [SerializeField] private Collider2D Collider2D_GrabArea;
 
     [Header("Rail (부모 기준 좌표)")]
     [SerializeField] private Vector2 _railStart = new Vector2(-3f, 0f);
@@ -34,12 +32,7 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
 
     [Header("Grab")]
     [SerializeField] private bool _isGrabbable = true;
-    [SerializeField] private Key _grabKey = Key.E;
-    [SerializeField] private Vector2 _grabAreaSize = new Vector2(1.5f, 2f);
-    [SerializeField] private Vector2 _grabAreaOffset = Vector2.zero;
 
-    private readonly List<Collider2D> _overlapResults = new List<Collider2D>();
-    private ContactFilter2D _contactFilter;
     private Transform _grabbingPlayer;
     private float _grabOffsetRatio;
     private float _currentRatio;
@@ -64,12 +57,12 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         {
             Transform_Carriage = transform.GetChild(0);
         }
-    }
 
-    private void Awake()
-    {
-        _contactFilter = new ContactFilter2D();
-        _contactFilter.NoFilter();
+        MovingLightHandle handle = GetComponentInChildren<MovingLightHandle>();
+        if (handle != null)
+        {
+            Collider2D_GrabArea = handle.GetComponent<Collider2D>();
+        }
     }
 
     private void OnEnable()
@@ -79,7 +72,6 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         _currentRatio = _startRatio;
         _targetRatio = _startRatio;
         ApplyCarriagePosition();
-        SetPromptVisible(false);
     }
 
     private void Update()
@@ -87,10 +79,39 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         if (Transform_Carriage == null)
             return;
 
-        Transform playerInArea = FindPlayerInGrabArea();
-        UpdateGrab(playerInArea);
-        SetPromptVisible(_isGrabbable && playerInArea != null && IsGrabbed == false);
+        if (IsGrabbed)
+        {
+            // 잡은 채로 잡는 범위를 벗어나면 놓습니다.
+            if (IsPlayerInGrabArea(_grabbingPlayer) == false)
+            {
+                ReleaseGrab();
+            }
+            else
+            {
+                // 잡은 순간의 간격을 유지하면서 플레이어를 따라갑니다.
+                _targetRatio = Mathf.Clamp01(GetRatioOnRail(_grabbingPlayer.position) + _grabOffsetRatio);
+            }
+        }
+
         MoveCarriage();
+    }
+
+    /// <summary>
+    /// 상호작용 키를 눌렀을 때 호출됩니다. 잡고 있지 않으면 잡고, 잡고 있으면 놓습니다.
+    /// </summary>
+    public void ToggleGrab(Player player)
+    {
+        if (IsGrabbed)
+        {
+            ReleaseGrab();
+            return;
+        }
+
+        if (_isGrabbable == false || player == null)
+            return;
+
+        _grabbingPlayer = player.transform;
+        _grabOffsetRatio = _currentRatio - GetRatioOnRail(_grabbingPlayer.position);
     }
 
     /// <summary>
@@ -111,37 +132,6 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         _targetRatio = Mathf.Clamp01(ratio);
     }
 
-    private void UpdateGrab(Transform playerInArea)
-    {
-        if (_isGrabbable == false || Keyboard.current == null)
-        {
-            ReleaseGrab();
-            return;
-        }
-
-        bool isKeyHeld = Keyboard.current[_grabKey].isPressed;
-
-        if (IsGrabbed)
-        {
-            // 키를 떼거나 범위를 벗어나면 놓습니다.
-            if (isKeyHeld == false || playerInArea == null)
-            {
-                ReleaseGrab();
-                return;
-            }
-
-            // 잡은 순간의 간격을 유지하면서 플레이어를 따라갑니다.
-            _targetRatio = Mathf.Clamp01(GetRatioOnRail(_grabbingPlayer.position) + _grabOffsetRatio);
-            return;
-        }
-
-        if (playerInArea != null && Keyboard.current[_grabKey].wasPressedThisFrame)
-        {
-            _grabbingPlayer = playerInArea;
-            _grabOffsetRatio = _currentRatio - GetRatioOnRail(playerInArea.position);
-        }
-    }
-
     private void ReleaseGrab()
     {
         if (IsGrabbed == false)
@@ -151,6 +141,18 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
 
         // 놓은 자리에서 멈춥니다.
         _targetRatio = _currentRatio;
+    }
+
+    private bool IsPlayerInGrabArea(Transform player)
+    {
+        if (player == null)
+            return false;
+
+        // 잡는 범위 콜라이더가 없으면 범위 검사를 하지 않습니다.
+        if (Collider2D_GrabArea == null)
+            return true;
+
+        return Collider2D_GrabArea.OverlapPoint(player.position);
     }
 
     private void MoveCarriage()
@@ -187,30 +189,6 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         return Vector2.Dot(localPosition - _railStart, railDirection) / railLengthSquared;
     }
 
-    private Transform FindPlayerInGrabArea()
-    {
-        Vector2 areaCenter = (Vector2)Transform_Carriage.position + _grabAreaOffset;
-        int count = Physics2D.OverlapBox(areaCenter, _grabAreaSize, 0f, _contactFilter, _overlapResults);
-
-        for (int i = 0; i < count; i++)
-        {
-            if (_overlapResults[i].CompareTag(PlayerTag))
-            {
-                return _overlapResults[i].transform;
-            }
-        }
-
-        return null;
-    }
-
-    private void SetPromptVisible(bool isVisible)
-    {
-        if (GameObject_Prompt != null && GameObject_Prompt.activeSelf != isVisible)
-        {
-            GameObject_Prompt.SetActive(isVisible);
-        }
-    }
-
     private void OnDrawGizmosSelected()
     {
         Vector3 railStartWorld = transform.TransformPoint(_railStart);
@@ -220,12 +198,5 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
         Gizmos.DrawLine(railStartWorld, railEndWorld);
         Gizmos.DrawWireSphere(railStartWorld, 0.15f);
         Gizmos.DrawWireSphere(railEndWorld, 0.15f);
-
-        if (Transform_Carriage == null)
-            return;
-
-        Gizmos.color = Color.green;
-        Vector3 areaCenter = Transform_Carriage.position + (Vector3)_grabAreaOffset;
-        Gizmos.DrawWireCube(areaCenter, _grabAreaSize);
     }
 }

@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 2478926253444227877}
   - component: {fileID: 7624741131718525978}
   - component: {fileID: 8197974569528405177}
+  - component: {fileID: 273602959759250423}
   m_Layer: 0
   m_Name: Gimmick_Switch
   m_TagString: Untagged
@@ -199,15 +200,26 @@ MonoBehaviour:
   - {fileID: 0}
   _isStartOn: 1
   SpriteRenderer_Switch: {fileID: 3911263552764962330}
-  GameObject_Prompt: {fileID: 1264557238479197076}
   _switchMode: 0
-  _interactKey: 19
   Sprite_On: {fileID: 0}
   Sprite_Off: {fileID: 0}
   _onColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _offColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   _pressDepth: 0.3
   _pressDuration: 0.06
+--- !u!114 &273602959759250423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935268616225183036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 177bf36f68c3ce145baec56cc4130719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionPrompt
+  GameObject_Prompt: {fileID: 1264557238479197076}
 --- !u!1 &4863053137012396337
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,7 +376,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: E
+  m_text: F
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
