@@ -43,11 +43,19 @@ public class ChunkTool : EditorWindow
         }
         EditorGUI.EndDisabledGroup();
 
+        EditorGUI.BeginDisabledGroup(chunks.Count == 0 || _chunkSize <= 0);
+        if (GUILayout.Button("Hierarchy 정렬 (X → Y 오름차순)"))
+        {
+            ConfirmAndSort(chunks);
+        }
+        EditorGUI.EndDisabledGroup();
+
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox(
             "프리팹은 Prefab Mode로 열어 루트를 선택한 뒤 실행하세요.\n" +
             "청크 크기는 MapManager의 _chunkSize와 같아야 합니다.\n" +
             "좌표 중복, 격자 어긋남은 Console에 경고로 표시됩니다.\n" +
+            "정렬은 부모(Room)별로 X → Y 오름차순입니다.\n" +
             "Ctrl+Z로 되돌릴 수 있습니다.",
             MessageType.Info);
     }
@@ -199,6 +207,122 @@ public class ChunkTool : EditorWindow
         MarkDirty(target);
 
         return true;
+    }
+
+    private void ConfirmAndSort(List<MapChunk> chunks)
+    {
+        if (_chunkSize <= 0)
+        {
+            Debug.LogError($"[ChunkTool] (ConfirmAndSort) 청크 크기가 0 이하. (_chunkSize: {_chunkSize})");
+            return;
+        }
+
+        Dictionary<Transform, List<MapChunk>> groups = GroupByParent(chunks);
+
+        string message = $"부모 {groups.Count}개 하위의 청크 {chunks.Count}개를 X → Y 오름차순으로 정렬합니다.\n계속할까요?";
+        if (EditorUtility.DisplayDialog("Chunk Tool", message, "정렬", "취소") == false)
+        {
+            return;
+        }
+
+        int undoGroup = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Chunk Sort");
+
+        int sortedParentCount = 0;
+        int movedCount = 0;
+
+        foreach (KeyValuePair<Transform, List<MapChunk>> pair in groups)
+        {
+            int moved = SortChildren(pair.Key, pair.Value);
+            if (moved > 0)
+            {
+                sortedParentCount++;
+                movedCount += moved;
+            }
+        }
+
+        Undo.CollapseUndoOperations(undoGroup);
+
+        Debug.Log($"[ChunkTool] 부모 {groups.Count}개 중 {sortedParentCount}개 정렬, 이동한 청크 {movedCount}개");
+    }
+
+    private Dictionary<Transform, List<MapChunk>> GroupByParent(List<MapChunk> chunks)
+    {
+        Dictionary<Transform, List<MapChunk>> result = new Dictionary<Transform, List<MapChunk>>();
+
+        foreach (MapChunk chunk in chunks)
+        {
+            Transform parent = chunk.transform.parent;
+            if (parent == null)
+            {
+                Debug.LogWarning($"[ChunkTool] (GroupByParent) 부모가 없는 청크는 정렬하지 않음: {chunk.name}", chunk);
+                continue;
+            }
+
+            if (result.TryGetValue(parent, out List<MapChunk> list) == false)
+            {
+                list = new List<MapChunk>();
+                result.Add(parent, list);
+            }
+
+            list.Add(chunk);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 부모 하위의 청크들을 X → Y 오름차순으로 정렬한다. 가장 앞에 있던 청크 자리부터 연속으로 배치한다.
+    /// 반환값: 이동한 청크 수 (건너뛰면 0)
+    /// </summary>
+    private int SortChildren(Transform parent, List<MapChunk> chunks)
+    {
+        int startIndex = int.MaxValue;
+
+        foreach (MapChunk chunk in chunks)
+        {
+            if (PrefabUtility.IsPartOfPrefabInstance(chunk.gameObject))
+            {
+                Debug.LogWarning($"[ChunkTool] (SortChildren) 프리팹 인스턴스 하위는 순서 변경 불가. Prefab Mode에서 실행하세요: {parent.name}", parent);
+                return 0;
+            }
+
+            startIndex = Mathf.Min(startIndex, chunk.transform.GetSiblingIndex());
+        }
+
+        chunks.Sort(CompareChunkIndex);
+
+        int movedCount = 0;
+
+        for (int i = 0; i < chunks.Count; i++)
+        {
+            Transform target = chunks[i].transform;
+            int targetIndex = startIndex + i;
+
+            if (target.GetSiblingIndex() == targetIndex)
+            {
+                continue;
+            }
+
+            Undo.SetSiblingIndex(target, targetIndex, "Chunk Sort");
+            MarkDirty(target.gameObject);
+            movedCount++;
+        }
+
+        return movedCount;
+    }
+
+    private int CompareChunkIndex(MapChunk a, MapChunk b)
+    {
+        Vector2Int indexA = GetChunkIndex(a.transform.position);
+        Vector2Int indexB = GetChunkIndex(b.transform.position);
+
+        if (indexA.x != indexB.x)
+        {
+            return indexA.x.CompareTo(indexB.x);
+        }
+
+        return indexA.y.CompareTo(indexB.y);
     }
 
     private void MarkDirty(GameObject target)
