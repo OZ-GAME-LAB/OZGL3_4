@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -292,6 +293,15 @@ public class Player : MonoBehaviour
             return null;
 
         return hit.GetComponent<Grabbable>();
+    }
+
+    public void TeleportTo(Vector2 dest)
+    {
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.position = dest;
+        transform.position = dest;
+        _rigid.rotation = 0f;
+        ChangeState(PlayerState.Idle);
     }
     #endregion
 

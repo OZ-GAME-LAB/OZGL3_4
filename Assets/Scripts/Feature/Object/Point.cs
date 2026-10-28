@@ -16,8 +16,11 @@ public class Point : MonoBehaviour, IInteractable
             var playerViewModel = NetworkManager.Instance.PlayerService.GetPlayerViewModel();
             playerViewModel.AddShadow(_acquireShadow);
             Debug.Log($"{_acquireShadow.ToString()} 획득");
+
+            NetworkManager.Instance.TeleportService.RequestActivateTeleport(_pointId);
         }
 
         Debug.Log("포인트 접촉");
+        UIManager.Instance.OpenUI(UIRootType.PopupUI, UIType.PointUI);
     }
 }
