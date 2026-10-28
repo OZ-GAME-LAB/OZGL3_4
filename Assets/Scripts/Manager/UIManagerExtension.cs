@@ -13,7 +13,7 @@ public enum UIRootType
 
 public enum UIType
 {
-
+    PointUI,
 }
 
 public static class UIManagerExtension

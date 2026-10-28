@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 /// - 판정 콜라이더는 BoxCollider2D 대신 PolygonCollider2D(Is Trigger)를 사용하고 LightZone의 Collider2D_Zone에도 연결합니다.
 /// - LightZone의 Is Sync Shape With Collider는 꺼 주세요. (이 컴포넌트가 모양을 직접 정합니다)
 /// - 이 오브젝트의 위치가 광원 위치입니다. 장애물 콜라이더 안에 두지 마세요.
-/// - _obstacleLayer에 빛을 막을 레이어(예: Ground)를 지정합니다. 플레이어 레이어는 넣지 마세요.
+/// - _obstacleLayer에 빛을 막을 레이어(예: Ground, Grabbable)를 지정합니다. 플레이어 레이어는 넣지 마세요.
 /// - 오브젝트를 선택하면 씬 뷰에 빛이 닿을 수 있는 최대 범위가 노란 선으로 표시됩니다.
 /// </summary>
 [DefaultExecutionOrder(10)]
@@ -66,7 +66,7 @@ public class LightRayCaster : MonoBehaviour
         LightZone_Target = GetComponent<LightZone>();
         PolygonCollider2D_Zone = GetComponent<PolygonCollider2D>();
         Light2D_Zone = GetComponentInChildren<Light2D>();
-        _obstacleLayer = LayerMask.GetMask("Ground");
+        _obstacleLayer = LayerMask.GetMask("Ground", "Grabbable");
     }
 
     private void FixedUpdate()
