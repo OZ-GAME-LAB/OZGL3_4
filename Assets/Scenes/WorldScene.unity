@@ -409,6 +409,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -534,6 +535,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1741715079}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88b00af466901c428406718042192d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraRotationLock
+  _isLockPosition: 1
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,6 +761,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3615513238548633115, guid: c7b6d997a920a4142bed0bf191c592f7, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 5900668671511899935, guid: c7b6d997a920a4142bed0bf191c592f7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -186390,9 +186408,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1939257852}
     m_Modifications:
-    - target: {fileID: 6923169123557192669, guid: 175ca83c9b8e1204696af56fab9df5c3, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 528764269300874580, guid: 175ca83c9b8e1204696af56fab9df5c3, type: 3}
+      propertyPath: m_SortingOrder
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 7075255052176577245, guid: 175ca83c9b8e1204696af56fab9df5c3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -925020,7 +925038,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 619394802}
   - {fileID: 2086882239}
-  - {fileID: 1474280318}
-  - {fileID: 5504391685311225113}
   - {fileID: 1898455106}
   - {fileID: 963602288}
+  - {fileID: 1474280318}
+  - {fileID: 5504391685311225113}
