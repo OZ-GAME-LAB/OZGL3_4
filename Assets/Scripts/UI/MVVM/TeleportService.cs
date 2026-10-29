@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using UnityEngine;
 
 public readonly struct TeleportInfo
 {
@@ -26,9 +26,12 @@ public class TeleportService
     private readonly TeleportViewModel _teleportViewModel;
     private readonly Dictionary<string, string> _teleportMapIds = new Dictionary<string, string>();
     private readonly Dictionary<string, IReadOnlyList<string>> _teleportRevealRooms = new Dictionary<string, IReadOnlyList<string>>();
+    private readonly Dictionary<string, Vector2> _teleportPositions = new Dictionary<string, Vector2>();
 
     private readonly List<string> _teleportIds = new List<string>();   // 정렬된 순서 유지
     private readonly Dictionary<string, (int theme, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
+
+    public event Action<Vector2> OnTeleportRequested;
 
     public TeleportService(TeleportModel teleportModel, IReadOnlyList<MapTeleportData> teleportDataList, MapService mapService)
     {
@@ -166,6 +169,31 @@ public class TeleportService
             result.Add(new TeleportInfo(teleportId, _teleportMapIds[teleportId], numbers.theme, numbers.number, isActivated));
         }
         return result;
+    }
+
+    public bool RegisterTeleportPosition(string teleportId, Vector2 position)
+    {
+        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportMapIds.ContainsKey(teleportId))
+        {
+            return false;
+        }
+        _teleportPositions[teleportId] = position;
+        return true;
+    }
+
+    public bool RequestTeleport(string teleportId)
+    {
+        if (!_teleportViewModel.GetTeleportActivated(teleportId))
+        {
+            return false;
+        }
+        if (!_teleportPositions.TryGetValue(teleportId, out Vector2 position))
+        {
+            //Debug.LogError("[TeleportService] 좌표가 등록되지 않은 텔레포트: " + teleportId);
+            return false;
+        }
+        OnTeleportRequested?.Invoke(position);
+        return true;
     }
 }
 

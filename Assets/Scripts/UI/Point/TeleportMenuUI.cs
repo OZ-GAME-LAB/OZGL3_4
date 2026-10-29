@@ -52,9 +52,6 @@ public class TeleportMenuUI : MonoBehaviour
     private void OnClickSlot(TeleportInfo info)
     {
         Debug.Log($"{info.ThemeNumber} - {info.TeleportNumber}로 텔레포트");
-        Player player = FindAnyObjectByType<Player>();
-
-        Vector2 position = new Vector2(0, -2.3f);
-        player.TeleportTo(position);
+        NetworkManager.Instance.TeleportService.RequestTeleport(info.Id);
     }
 }
