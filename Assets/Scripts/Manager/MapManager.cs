@@ -18,12 +18,8 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private int _keepRegionDistance = 2;
 
 
-    private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>(); // ChunkActivator로 이동 예정
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
-
-    private HashSet<Room> _activeRooms = new HashSet<Room>(); // ChunkActivator로 이동 예정
-    private bool _isChunkDirty = false; // ChunkActivator로 이동 예정
 
     private Region _currentRegion;
     public event Action<string> OnChangeRegion;
@@ -33,6 +29,8 @@ public class MapManager : SingletonBase<MapManager>
     private List<string> _activeRegionIdBuffer = new List<string>();
     private Dictionary<string, int> _regionDistances = new Dictionary<string, int>();
     private Queue<string> _regionQueue = new Queue<string>();
+
+    private ChunkActivator _chunkActivator = new ChunkActivator();
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -59,7 +57,7 @@ public class MapManager : SingletonBase<MapManager>
     {
         if (_keepRegionDistance < 1)
         {
-            Debug.LogWarning($"[MapManager] (EnsureRegionLoader) _keepRegionDistance가 1 미만({_keepRegionDistance}). 1로 보정");
+            Debug.LogWarning($"[MapManager] (Start) _keepRegionDistance가 1 미만({_keepRegionDistance}). 1로 보정");
 
             _keepRegionDistance = 1;
         }
@@ -76,7 +74,7 @@ public class MapManager : SingletonBase<MapManager>
     {
         UpdatePlayerChunk(); // 수정된 부분 - 재욱님 추가
 
-        if (_isChunkDirty && _hasCurrentChunk)
+        if (_chunkActivator.IsDirty && _hasCurrentChunk)
         {
             CheckRegionChange(_currentChunkIndex);
             RefreshActiveChunks(_currentChunkIndex);
@@ -216,7 +214,7 @@ public class MapManager : SingletonBase<MapManager>
         return new Vector2Int(x, y);
     }
 
-    public void RegisterChunk(MapChunk chunk) // ChunkActivator로 이동 예정
+    public void RegisterChunk(MapChunk chunk)
     {
         if (chunk == null)
         {
@@ -227,21 +225,10 @@ public class MapManager : SingletonBase<MapManager>
 
         Vector2Int key = GetChunkIndex(chunk.transform.position);
 
-        if (_chunks.ContainsKey(key))
-        {
-            Debug.LogWarning($"[MapManager] (RegisterChunk) 청크 좌표 중복: {key} / {chunk.name}");
-
-            return;
-        }
-
-        _chunks.Add(key, chunk);
-
-        _isChunkDirty = true;
-
-        Debug.Log($"[MapManager] (RegisterChunk) 등록: {key} / {chunk.name} / 총 {_chunks.Count}개"); //등록된 청크들 체크하는 테스트 코드
+        _chunkActivator.Register(key, chunk);
     }
 
-    public void UnregisterChunk(MapChunk chunk) // ChunkActivator로 이동 예정
+    public void UnregisterChunk(MapChunk chunk)
     {
         if (chunk == null)
         {
@@ -252,14 +239,7 @@ public class MapManager : SingletonBase<MapManager>
 
         Vector2Int key = GetChunkIndex(chunk.transform.position);
 
-        if (_chunks.TryGetValue(key, out MapChunk saved) && saved == chunk)
-        {
-            _chunks.Remove(key);
-
-            _isChunkDirty = true;
-
-            Debug.Log($"[MapManager] (UnregisterChunk) 해제: {key} / {chunk.name} / 총 {_chunks.Count}개");
-        }
+        _chunkActivator.Unregister(key, chunk);
     }
 
     public void SetTarget(Transform target) //플레이어의 위치를 보고 다른 청크로 넘어간 순간을 감지
@@ -276,58 +256,16 @@ public class MapManager : SingletonBase<MapManager>
         _hasCurrentChunk = false;
     }
 
-    private bool IsInActiveRange(Vector2Int chunkIndex, Vector2Int center) //사거리 내의 청크들의 On/Off를 지시 // ChunkActivator로 이동 예정
+
+    private void RefreshActiveChunks(Vector2Int center)
     {
-        int distanceX = Mathf.Abs(chunkIndex.x - center.x);
-        int distanceY = Mathf.Abs(chunkIndex.y - center.y);
-
-        return distanceX <= _activeRadius && distanceY <= _activeRadius;
-    }
-
-    private void RefreshActiveChunks(Vector2Int center) // ChunkActivator로 이동 예정
-    {
-        CollectActiveRooms(center);
-
-        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
-        {
-            pair.Value.SetObjectActive(ShouldBeActive(pair.Key, pair.Value, center));
-        }
-
-        _isChunkDirty = false;
-    }
-
-
-    private bool IsGroupChunk(MapChunk chunk) // ChunkActivator로 이동 예정
-    {
-        return chunk.Room != null && chunk.Room.ActivationMode == RoomActivationMode.Group;
-    }
-
-    private void CollectActiveRooms(Vector2Int center) // ChunkActivator로 이동 예정
-    {
-        _activeRooms.Clear();
-        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
-        {
-            if (IsGroupChunk(pair.Value) && IsInActiveRange(pair.Key, center))
-            {
-                _activeRooms.Add(pair.Value.Room);
-            }
-        }
-    }
-
-    private bool ShouldBeActive(Vector2Int key, MapChunk chunk, Vector2Int center) // ChunkActivator로 이동 예정
-    {
-        if (IsGroupChunk(chunk))
-        {
-            return _activeRooms.Contains(chunk.Room);
-        }
-
-        return IsInActiveRange(key, center);
+        _chunkActivator.Refresh(center, _activeRadius);
     }
 
 
     private void CheckRegionChange(Vector2Int index)
     {
-        if (!_chunks.TryGetValue(index, out MapChunk chunk)) return;
+        if (!_chunkActivator.TryGetChunk(index, out MapChunk chunk)) return;
         if (chunk.Region == null) return;
         if (chunk.Region == _currentRegion) return;
 
