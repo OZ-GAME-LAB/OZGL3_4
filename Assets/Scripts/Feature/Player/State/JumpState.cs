@@ -3,6 +3,7 @@
 public class JumpState : PlayerStateBase
 {
     private bool _isFalling;
+    private float _rotateSpeed = 12f;
 
     public JumpState(Player player) : base(player) { }
 
@@ -15,6 +16,13 @@ public class JumpState : PlayerStateBase
         {
             _player.Animator.Play("Jump");
         }
+    }
+
+    public override void Update()
+    {
+        float targetAngle = 0f;
+        Quaternion target = Quaternion.Euler(0f, 0f, targetAngle);
+        _player.transform.localRotation = Quaternion.Lerp(_player.transform.localRotation, target, _rotateSpeed * Time.deltaTime);
     }
 
     public override void FixedUpdate()

@@ -219,16 +219,25 @@ public class Player : MonoBehaviour
     public void SetVelocity(float speed, bool isFixed = false)
     {
         float xOffset = _movement.x * speed;
+        float yOffset;
 
-        if (_currentState is not JumpState)
+        if (_currentState is JumpState)
         {
-            Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
-            _rigid.linearVelocity = slopeDir * xOffset;
+            // 점프 중일 때는 기존 Y 속도 유지
+            yOffset = _rigid.linearVelocity.y;
         }
-        else 
+        else if (_movement.x == 0 && _isGrounded)
         {
-            _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+            // 멈췄고 지면에 서 있는 상태라면 Y 속도를 0으로 만들어 하늘로 튀는 현상 방지
+            yOffset = 0f;
         }
+        else
+        {
+            // 이동 중이거나 공중에 있을 때
+            yOffset = _rigid.linearVelocity.y;
+        }
+
+        _rigid.linearVelocity = new Vector2(xOffset, yOffset);
 
         if (isFixed == false)
         {
@@ -238,6 +247,7 @@ public class Player : MonoBehaviour
 
     public void SetJump()
     {
+        _rigid.linearVelocityY = 0;
         _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower, ForceMode2D.Impulse);
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
