@@ -15,12 +15,16 @@ public class ChunkTool : EditorWindow
     private int _chunkSize = 32;
     private bool _includeInactive = true;
 
+    private Room _targetRoom;
+
+
     [MenuItem("Tools/Map/Chunk Tool")]
     private static void OpenWindow()
     {
         ChunkTool window = GetWindow<ChunkTool>("Chunk Tool");
-        window.minSize = new Vector2(320f, 220f);
+        window.minSize = new Vector2(320f, 400f);
     }
+
 
     private void OnGUI()
     {
@@ -43,6 +47,7 @@ public class ChunkTool : EditorWindow
         }
         EditorGUI.EndDisabledGroup();
 
+
         EditorGUI.BeginDisabledGroup(chunks.Count == 0 || _chunkSize <= 0);
         if (GUILayout.Button("Hierarchy 정렬 (X → Y 오름차순)"))
         {
@@ -50,12 +55,46 @@ public class ChunkTool : EditorWindow
         }
         EditorGUI.EndDisabledGroup();
 
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Room 이동", EditorStyles.boldLabel);
+
+        _targetRoom = (Room)EditorGUILayout.ObjectField("이동할 Room", _targetRoom, typeof(Room), true);
+
+        int moveCount = CountMoveTargets(chunks);
+        string roomName = _targetRoom != null ? _targetRoom.name : "-";
+        EditorGUILayout.LabelField($"이동 대상: {moveCount}개 → {roomName}");
+
+        EditorGUI.BeginDisabledGroup(moveCount == 0 || _targetRoom == null || _chunkSize <= 0);
+        if (GUILayout.Button("선택한 청크를 Room으로 이동"))
+        {
+            ConfirmAndMoveToRoom(chunks);
+        }
+        EditorGUI.EndDisabledGroup();
+
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Room ID", EditorStyles.boldLabel);
+
+        List<Room> rooms = GetSelectedRooms();
+        int syncCount = CountRoomIdTargets(rooms);
+        EditorGUILayout.LabelField($"선택 Room: {rooms.Count}개 / ID 변경 대상: {syncCount}개");
+
+        EditorGUI.BeginDisabledGroup(syncCount == 0);
+        if (GUILayout.Button("Room 이름으로 RoomId 맞추기"))
+        {
+            ConfirmAndSyncRoomIds(rooms);
+        }
+        EditorGUI.EndDisabledGroup();
+
+
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox(
             "프리팹은 Prefab Mode로 열어 루트를 선택한 뒤 실행하세요.\n" +
             "청크 크기는 MapManager의 _chunkSize와 같아야 합니다.\n" +
             "좌표 중복, 격자 어긋남은 Console에 경고로 표시됩니다.\n" +
             "정렬은 부모(Room)별로 X → Y 오름차순입니다.\n" +
+            "Room 이동은 같은 Region 안에서만 가능하며, 이동 후 Room을 자동 정렬합니다.\n" +
             "Ctrl+Z로 되돌릴 수 있습니다.",
             MessageType.Info);
     }
@@ -281,7 +320,7 @@ public class ChunkTool : EditorWindow
 
         foreach (MapChunk chunk in chunks)
         {
-            if (PrefabUtility.IsPartOfPrefabInstance(chunk.gameObject))
+            if (CanRestructure(chunk.gameObject) == false)
             {
                 Debug.LogWarning($"[ChunkTool] (SortChildren) 프리팹 인스턴스 하위는 순서 변경 불가. Prefab Mode에서 실행하세요: {parent.name}", parent);
                 return 0;
@@ -323,6 +362,219 @@ public class ChunkTool : EditorWindow
         }
 
         return indexA.y.CompareTo(indexB.y);
+    }
+
+    private int CountMoveTargets(List<MapChunk> chunks)
+    {
+        if (_targetRoom == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        foreach (MapChunk chunk in chunks)
+        {
+            if (chunk.transform.parent != _targetRoom.transform)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ConfirmAndMoveToRoom(List<MapChunk> chunks)
+    {
+        if (_targetRoom == null)
+        {
+            Debug.LogError("[ChunkTool] (ConfirmAndMoveToRoom) 이동할 Room이 지정되지 않았습니다.");
+            return;
+        }
+
+        Region targetRegion = _targetRoom.GetComponentInParent<Region>(true);
+        if (targetRegion == null)
+        {
+            Debug.LogError($"[ChunkTool] (ConfirmAndMoveToRoom) Room이 Region 하위에 있지 않습니다: {_targetRoom.name}", _targetRoom);
+            return;
+        }
+
+        int moveCount = CountMoveTargets(chunks);
+        string message = $"청크 {moveCount}개를 '{_targetRoom.name}'(으)로 옮깁니다.\n계속할까요?";
+        if (EditorUtility.DisplayDialog("Chunk Tool", message, "이동", "취소") == false)
+        {
+            return;
+        }
+
+        int undoGroup = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Chunk Move");
+
+        int movedCount = 0;
+        int skippedCount = 0;
+
+        foreach (MapChunk chunk in chunks)
+        {
+            if (chunk.transform.parent == _targetRoom.transform)
+            {
+                continue;
+            }
+
+            if (MoveChunk(chunk, targetRegion))
+            {
+                movedCount++;
+            }
+            else
+            {
+                skippedCount++;
+            }
+        }
+
+        if (movedCount > 0)
+        {
+            SortChildren(_targetRoom.transform, GetDirectChildChunks(_targetRoom.transform));
+        }
+
+        Undo.CollapseUndoOperations(undoGroup);
+
+        Debug.Log($"[ChunkTool] '{_targetRoom.name}'(으)로 청크 {movedCount}개 이동, 건너뜀 {skippedCount}개");
+    }
+
+    private bool MoveChunk(MapChunk chunk, Region targetRegion)
+    {
+        if (chunk.GetComponentInParent<Region>(true) != targetRegion)
+        {
+            Debug.LogWarning($"[ChunkTool] (MoveChunk) 다른 Region의 청크는 옮길 수 없음: {chunk.name}", chunk);
+            return false;
+        }
+
+        if (CanRestructure(chunk.gameObject) == false)
+        {
+            Debug.LogWarning($"[ChunkTool] (MoveChunk) 프리팹 인스턴스 하위는 부모 변경 불가. Prefab Mode에서 실행하세요: {chunk.name}", chunk);
+            return false;
+        }
+
+        Undo.SetTransformParent(chunk.transform, _targetRoom.transform, "Chunk Move");
+
+        if (chunk.transform.parent != _targetRoom.transform)
+        {
+            Debug.LogWarning($"[ChunkTool] (MoveChunk) 부모 변경 실패: {chunk.name}", chunk);
+            return false;
+        }
+
+        MarkDirty(chunk.gameObject);
+
+        return true;
+    }
+
+    private List<MapChunk> GetDirectChildChunks(Transform parent)
+    {
+        List<MapChunk> result = new List<MapChunk>();
+
+        foreach (Transform child in parent)
+        {
+            MapChunk chunk = child.GetComponent<MapChunk>();
+            if (chunk != null)
+            {
+                result.Add(chunk);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 바깥 프리팹 인스턴스에 속한 자식은 부모 변경과 순서 변경이 막혀 있다.
+    /// 프리팹과 무관하거나, 자기 자신이 가장 바깥 인스턴스 루트(중첩 프리팹 청크 등)면 변경 가능.
+    /// </summary>
+    private bool CanRestructure(GameObject target)
+    {
+        GameObject outermost = PrefabUtility.GetOutermostPrefabInstanceRoot(target);
+
+        return outermost == null || outermost == target;
+    }
+
+    private List<Room> GetSelectedRooms()
+    {
+        List<Room> result = new List<Room>();
+        HashSet<Room> added = new HashSet<Room>();
+
+        foreach (GameObject selected in Selection.gameObjects)
+        {
+            if (selected == null)
+            {
+                continue;
+            }
+
+            Room[] found = selected.GetComponentsInChildren<Room>(_includeInactive);
+            foreach (Room room in found)
+            {
+                if (added.Add(room))
+                {
+                    result.Add(room);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private int CountRoomIdTargets(List<Room> rooms)
+    {
+        int count = 0;
+        foreach (Room room in rooms)
+        {
+            if (room.RoomId != room.gameObject.name)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ConfirmAndSyncRoomIds(List<Room> rooms)
+    {
+        string message = $"Room {CountRoomIdTargets(rooms)}개의 RoomId를 오브젝트 이름으로 바꿉니다.\n계속할까요?";
+        if (EditorUtility.DisplayDialog("Chunk Tool", message, "변경", "취소") == false)
+        {
+            return;
+        }
+
+        int undoGroup = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Room Id Sync");
+
+        HashSet<string> usedIds = new HashSet<string>();
+        int changedCount = 0;
+
+        foreach (Room room in rooms)
+        {
+            string newId = room.gameObject.name;
+
+            if (usedIds.Add(newId) == false)
+            {
+                Debug.LogWarning($"[ChunkTool] (ConfirmAndSyncRoomIds) 선택한 Room 중 이름 중복: {newId}. RoomId가 겹칩니다.", room);
+            }
+
+            if (room.RoomId == newId)
+            {
+                continue;
+            }
+
+            SerializedObject serialized = new SerializedObject(room);
+            SerializedProperty idProperty = serialized.FindProperty("_roomId");
+            if (idProperty == null)
+            {
+                Debug.LogError("[ChunkTool] (ConfirmAndSyncRoomIds) Room의 _roomId 필드를 찾을 수 없음. Room.cs 필드 이름 확인 필요");
+                break;
+            }
+
+            idProperty.stringValue = newId;
+            serialized.ApplyModifiedProperties();
+            changedCount++;
+        }
+
+        Undo.CollapseUndoOperations(undoGroup);
+
+        Debug.Log($"[ChunkTool] RoomId {changedCount}개 변경");
     }
 
     private void MarkDirty(GameObject target)
