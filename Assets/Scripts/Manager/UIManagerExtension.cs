@@ -14,6 +14,8 @@ public enum UIRootType
 public enum UIType
 {
     PointUI,
+    LobbyUI,
+    FadeUI,
 }
 
 public static class UIManagerExtension

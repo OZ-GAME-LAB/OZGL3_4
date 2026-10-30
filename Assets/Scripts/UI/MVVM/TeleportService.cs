@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NUnit.Framework.Constraints;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -192,8 +194,27 @@ public class TeleportService
             //Debug.LogError("[TeleportService] 좌표가 등록되지 않은 텔레포트: " + teleportId);
             return false;
         }
-        OnTeleportRequested?.Invoke(position);
+
+        var uiBase = UIManager.Instance.OpenUI(UIRootType.VeryFrontUI, UIType.FadeUI);
+        if (uiBase is FadeUI fadeUI)
+        {
+            UIManager.Instance.CloseUI(UIRootType.PopupUI, UIType.PointUI);
+            fadeUI.StartCoroutine(TeleportRoutine(fadeUI, position));
+        }
+
         return true;
+    }
+
+    private IEnumerator TeleportRoutine(FadeUI fadeUI, Vector2 position)
+    {
+        yield return fadeUI.FadeIn();
+
+        OnTeleportRequested?.Invoke(position);
+        yield return new WaitForFixedUpdate();
+
+        yield return fadeUI.FadeOut();
+
+        UIManager.Instance.CloseUI(UIRootType.VeryFrontUI, UIType.FadeUI);
     }
 }
 

@@ -51,7 +51,7 @@ public class TeleportMenuUI : MonoBehaviour
 
     private void OnClickSlot(TeleportInfo info)
     {
-        Debug.Log($"{info.ThemeNumber} - {info.TeleportNumber}로 텔레포트");
         NetworkManager.Instance.TeleportService.RequestTeleport(info.Id);
+        Debug.Log($"{info.ThemeNumber} - {info.TeleportNumber}로 텔레포트");
     }
 }
