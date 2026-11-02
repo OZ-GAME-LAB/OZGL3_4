@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 public enum UIRootType 
@@ -13,6 +13,7 @@ public enum UIRootType
 
 public enum UIType
 {
+    PointUI,
     Map,
 }
 

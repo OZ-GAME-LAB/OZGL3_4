@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,7 @@ public enum PlayerState
     Jump,
     Dash,
     Grab,
+    Change,
 }
 
 [Serializable]
@@ -33,6 +35,7 @@ public class Player : MonoBehaviour
 
     [Header("Shadow")]
     private ShadowBase _currentShadow;
+    private ShadowBase _pendingShadow;
     public ShadowBase CurrentShadow => _currentShadow;
     private Dictionary<ShadowType, ShadowBase> _shadowList = new Dictionary<ShadowType, ShadowBase>();
     [SerializeField] List<ShadowAnimEntry> _shadowAnimators;
@@ -51,9 +54,11 @@ public class Player : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
-    private Vector2 _groundCheckSize = new Vector2(0.5f, 0.1f);
+    private RaycastHit2D _groundHit;
+    private Vector2 _groundCheckSize = new Vector2(0.8f, 0.1f);
     private float _groundLockTime = 0.1f;
     private float _groundLockTimer;
+    public LayerMask GroundLayer => _groundLayer;
 
     [Header("Dash")]
     private float _dashCooldownTimer;
@@ -67,20 +72,23 @@ public class Player : MonoBehaviour
     public Grabbable GrabTarget { get; private set; }
 
     [Header("Component")]
+    private PlayerInteractor _playerInteractor;
     private Collider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
+    public Collider2D Collider => _collider;
     public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
 
     #region Unity LifeCycle
     private void Awake()
     {
+        _playerInteractor = GetComponent<PlayerInteractor>();
         _collider = GetComponent<Collider2D>();
         _rigid = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
-        _sprite = GetComponent<SpriteRenderer>();
+        _anim = GetComponentInChildren<Animator>();
+        _sprite = GetComponentInChildren<SpriteRenderer>();
         _defaultGravity = _rigid.gravityScale;
 
         // 상태들 초기화
@@ -89,6 +97,7 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Jump, new JumpState(this));
         _stateList.Add(PlayerState.Dash, new DashState(this));
         _stateList.Add(PlayerState.Grab, new GrabState(this));
+        _stateList.Add(PlayerState.Change, new ChangeState(this));
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
@@ -112,6 +121,11 @@ public class Player : MonoBehaviour
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+    }
+
+    private void Update()
+    {
+        _currentState.Update();
     }
 
     private void FixedUpdate()
@@ -161,8 +175,26 @@ public class Player : MonoBehaviour
     {
         ShadowBase nextShadow = _shadowList[_viewModel.CurrentShadowType];
 
-        _currentShadow?.Exit();
-        _currentShadow = nextShadow;
+
+        if (_currentShadow == null)
+        {
+            _currentShadow = nextShadow;
+            _currentShadow.Enter();
+            return;
+        }
+
+        _pendingShadow = nextShadow;
+        ChangeState(PlayerState.Change);
+    }
+
+    public void ApplyPendingShadow()
+    {
+        if (_pendingShadow == null)
+            return;
+
+        _currentShadow.Exit();
+        _currentShadow = _pendingShadow;
+        _pendingShadow = null;
         _currentShadow.Enter();
     }
 
@@ -188,13 +220,21 @@ public class Player : MonoBehaviour
     public void SetVelocity(float speed, bool isFixed = false)
     {
         float xOffset = _movement.x * speed;
-        _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+
+        if (_currentState is not JumpState)
+        {
+            Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
+            _rigid.linearVelocity = slopeDir * xOffset;
+        }
+        else 
+        {
+            _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
+        }
 
         if (isFixed == false)
         {
-            _sprite.flipX = xOffset < 0;
+            _sprite.flipX = _facing < 0;
         }
-        
     }
 
     public void SetJump()
@@ -209,10 +249,12 @@ public class Player : MonoBehaviour
         if (IsGrounded == false)
             return;
 
-        Grabbable target = FindGrabbalbe();
-        if (target == null)
+        Grabbable target = null;
+        float dir = 0;
+        if (FindGrabbalbe(out target, out dir) == false)
             return;
 
+        _sprite.flipX = dir < 0;
         GrabTarget = target;
         ChangeState(PlayerState.Grab);
     }
@@ -225,10 +267,18 @@ public class Player : MonoBehaviour
         ChangeState(PlayerState.Idle);
     }
 
-    private Grabbable FindGrabbalbe()
+    private bool FindGrabbalbe(out Grabbable target, out float dir)
     {
-        Grabbable front = FindGrabbableAt(Facing);
-        return front != null ? front : FindGrabbableAt(-Facing);
+        // 바라보는 방향 체크
+        dir = _facing;
+        target = FindGrabbableAt(dir);
+        if (target != null)
+            return true;
+
+        // 없으면 반대쪽
+        dir = -_facing;
+        target = FindGrabbableAt(dir);
+        return target != null;
     }
 
     private Grabbable FindGrabbableAt(float dir)
@@ -243,6 +293,15 @@ public class Player : MonoBehaviour
             return null;
 
         return hit.GetComponent<Grabbable>();
+    }
+
+    public void TeleportTo(Vector2 dest)
+    {
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.position = dest;
+        transform.position = dest;
+        _rigid.rotation = 0f;
+        ChangeState(PlayerState.Idle);
     }
     #endregion
 
@@ -268,6 +327,7 @@ public class Player : MonoBehaviour
             return;
         }
 
+        _groundHit = Physics2D.Raycast(transform.position, Vector2.down, 1, _groundLayer);
         _isGrounded = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f, _groundLayer);
 
         if(_isGrounded == true && Rigid.linearVelocity.y <= 0.01f)
@@ -313,6 +373,14 @@ public class Player : MonoBehaviour
         else
         {
             _currentShadow.ReleaseAbility();
+        }
+    }
+
+    private void OnInteraction(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            _playerInteractor.TryInteract();
         }
     }
     #endregion

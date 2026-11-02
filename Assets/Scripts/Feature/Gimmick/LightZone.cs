@@ -25,6 +25,9 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     [SerializeField] private Collider2D Collider2D_Zone;
     [SerializeField] private bool _isStartOn = true;
     [SerializeField] private bool _isSyncShapeWithCollider = true;
+    [SerializeField] private float _warningIntensityRatio = 0.3f;
+
+    private float _defaultIntensity = 1f;
 
     public bool IsOn { get; private set; }
 
@@ -35,6 +38,14 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     {
         Light2D_Zone = GetComponentInChildren<Light2D>();
         Collider2D_Zone = GetComponent<Collider2D>();
+    }
+
+    private void Awake()
+    {
+        if (Light2D_Zone != null)
+        {
+            _defaultIntensity = Light2D_Zone.intensity;
+        }
     }
 
     private void OnEnable()
@@ -62,6 +73,19 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     public void ToggleLight()
     {
         ApplyState(!IsOn);
+    }
+
+    /// <summary>
+    /// 빛이 켜지기 직전 예고 표시입니다. 판정 없이 빛만 약하게 켭니다.
+    /// 다음 ReceiveSignal / ToggleLight 호출 시 원래 밝기로 돌아갑니다. (점멸 광원 등에서 사용)
+    /// </summary>
+    public void ShowWarning()
+    {
+        if (IsOn || Light2D_Zone == null)
+            return;
+
+        Light2D_Zone.intensity = _defaultIntensity * _warningIntensityRatio;
+        Light2D_Zone.enabled = true;
     }
 
     /// <summary>
@@ -148,6 +172,7 @@ public class LightZone : MonoBehaviour, ISignalReceiver
 
         if (Light2D_Zone != null)
         {
+            Light2D_Zone.intensity = _defaultIntensity;
             Light2D_Zone.enabled = isOn;
         }
 
