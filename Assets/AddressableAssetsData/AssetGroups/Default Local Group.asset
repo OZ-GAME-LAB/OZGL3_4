@@ -14,7 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Default Local Group
   m_GUID: 9f83d17288fd0fe46af048caa322dee8
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 137fb7e5e1a61754a8b6ca61ae3ef098
+    m_Address: "Assets/ThirdParty/UI/\uC950_\uBAA8\uB4DC_\uCE74\uB4DC_\uC678\uACFD\uD22C\uBA85.png"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47c61c7ebada464468cb15c6bf33dd1a
+    m_Address: "Assets/ThirdParty/UI/\uC824\uB9AC_\uBAA8\uB4DC_\uCE74\uB4DC_\uC678\uACFD\uD22C\uBA85.png"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b24026aaacd08b34d9feb31466184d5f
+    m_Address: "Assets/ThirdParty/UI/\uD1A0\uB07C_\uBAA8\uB4DC_\uCE74\uB4DC_\uC678\uACFD\uD22C\uBA85.png"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: d5867809db3402646b2204f6b974a11d, type: 2}
   m_SchemaSet:
