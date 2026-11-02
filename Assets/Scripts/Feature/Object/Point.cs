@@ -8,6 +8,11 @@ public class Point : MonoBehaviour, IInteractable
     [SerializeField] private ShadowType _acquireShadow;
     private bool _isTouched = false;
 
+    private void Start()
+    {
+        NetworkManager.Instance.TeleportService.RegisterTeleportPosition(_pointId, (Vector2)transform.position);
+    }
+
     public void Interact(Player player)
     {
         if(_isTouched == false)

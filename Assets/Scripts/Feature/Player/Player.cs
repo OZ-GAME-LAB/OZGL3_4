@@ -109,6 +109,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // 텔레포트 이벤트 등록
+        NetworkManager.Instance.TeleportService.OnTeleportRequested += TeleportTo;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Instance.TeleportService.OnTeleportRequested -= TeleportTo;
+    }
+
     private void Start()
     {
         _viewModel = NetworkManager.Instance.PlayerService.GetPlayerViewModel();

@@ -2,6 +2,8 @@
 
 public class PointUI : UIBase
 {
+    [SerializeField] private UIButton _exitButton;
+
     private PointDefaultMenuUI _pointDefaultMenuUI;
     private TeleportMenuUI _teleportMenuUI;
 
@@ -13,6 +15,8 @@ public class PointUI : UIBase
 
     private void OnEnable()
     {
+        _exitButton.BindOnClickButtonEvent(ClosePointUI);
+
         _pointDefaultMenuUI.gameObject.SetActive(true);
         _teleportMenuUI.gameObject.SetActive(false);
 
@@ -21,6 +25,7 @@ public class PointUI : UIBase
 
     private void OnDisable()
     {
+        _exitButton.UnBindOnClickButtonEvent(ClosePointUI);
         _pointDefaultMenuUI.OnClickTeleport -= OpenTeleportMenu;
     }
 
@@ -28,5 +33,10 @@ public class PointUI : UIBase
     {
         _pointDefaultMenuUI.gameObject.SetActive(false);
         _teleportMenuUI.gameObject.SetActive(true);
+    }
+
+    private void ClosePointUI()
+    {
+        UIManager.Instance.CloseUI(UIRootType.PopupUI, UIType.PointUI);
     }
 }
