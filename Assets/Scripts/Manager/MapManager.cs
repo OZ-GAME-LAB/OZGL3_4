@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class MapManager : SingletonBase<MapManager>
 {
@@ -11,12 +12,28 @@ public class MapManager : SingletonBase<MapManager>
     [Header("추적 대상")]
     [SerializeField] private Transform Transform_Target;
 
+    [Header("지역 설정")]
+    [SerializeField] private Transform Transform_RegionRoot;
+    [SerializeField] private string _startRegionId;
+    [SerializeField] private int _keepRegionDistance = 2;
 
-    private Dictionary<Vector2Int, MapChunk> _chunks = new Dictionary<Vector2Int, MapChunk>();
+
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
-    private HashSet<Room> _activeRooms = new HashSet<Room>();
-    private bool _isChunkDirty = false;
+
+    private Region _currentRegion;
+    public event Action<string> OnChangeRegion;
+    private RegionLoader _regionLoader;
+
+    private string _targetRegionId;
+    private List<string> _activeRegionIdBuffer = new List<string>();
+    private Dictionary<string, int> _regionDistances = new Dictionary<string, int>();
+    private Queue<string> _regionQueue = new Queue<string>();
+
+    private ChunkActivator _chunkActivator = new ChunkActivator();
+
+
+    public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
 
 
     // 현재 청크는 HasCurrentChunk가 true일 때만 유효하다.
@@ -36,19 +53,95 @@ public class MapManager : SingletonBase<MapManager>
     public event Action OnClearPlayerChunk;
 
 
-    //private void Start()
-    //{
+    private void Start()
+    {
+        if (_keepRegionDistance < 1)
+        {
+            Debug.LogWarning($"[MapManager] (Start) _keepRegionDistance가 1 미만({_keepRegionDistance}). 1로 보정");
 
-    //}
+            _keepRegionDistance = 1;
+        }
+
+        EnsureRegionLoader();
+
+        if (!string.IsNullOrEmpty(_startRegionId))
+        {
+            EnterRegionAsync(_startRegionId).Forget();
+        }
+    }
 
     private void Update()
     {
         UpdatePlayerChunk(); // 수정된 부분 - 재욱님 추가
 
-        if (_isChunkDirty && _hasCurrentChunk)
+        if (_chunkActivator.IsDirty && _hasCurrentChunk)
         {
+            CheckRegionChange(_currentChunkIndex);
             RefreshActiveChunks(_currentChunkIndex);
         }
+    }
+
+
+    [ContextMenu("테스트: Region_Test01 불러오기")]
+    private void TestLoadRegionTest01()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestLoadRegion_Test01) 플레이 모드에서만 사용 가능");
+
+            return;
+        }
+
+        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+    }
+
+    [ContextMenu("테스트: Region_Test01 내리기")]
+    private void TestUnloadRegionTest01()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.UnloadRegion("Region_Test01");
+    }
+
+    [ContextMenu("테스트: 불러오고 바로 내리기")]
+    private void TestLoadAndUnloadRegionTest01()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestLoadAndUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+        _regionLoader.UnloadRegion("Region_Test01");
+    }
+
+    [ContextMenu("테스트: Region_Test02 숨기기")]
+    private void TestHideRegionTest02()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestHideRegionTest02) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.SetRegionVisible("Region_Test02", false);
+    }
+
+    [ContextMenu("테스트: Region_Test02 보이기")]
+    private void TestVisibleRegionTest02()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestVisibleRegionTest02) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        _regionLoader.SetRegionVisible("Region_Test02", true);
     }
 
 
@@ -72,6 +165,8 @@ public class MapManager : SingletonBase<MapManager>
         _hasCurrentChunk = true;
 
         Debug.Log($"[MapManager] (Update) 청크 이동: {index}"); //청크 이동시 알림 테스트 코드
+
+        CheckRegionChange(index); // 수정된 부분 - 김동혁 (지역 변경 메서드 추가)
 
         RefreshActiveChunks(index);
         OnChangePlayerChunk?.Invoke(index);
@@ -130,18 +225,7 @@ public class MapManager : SingletonBase<MapManager>
 
         Vector2Int key = GetChunkIndex(chunk.transform.position);
 
-        if (_chunks.ContainsKey(key))
-        {
-            Debug.LogWarning($"[MapManager] (RegisterChunk) 청크 좌표 중복: {key} / {chunk.name}");
-
-            return;
-        }
-
-        _chunks.Add(key, chunk);
-
-        _isChunkDirty = true;
-
-        //Debug.Log($"[MapManager] (RegisterChunk) 등록: {key} / {chunk.name} / 총 {_chunks.Count}개"); //등록된 청크들 체크하는 테스트 코드
+        _chunkActivator.Register(key, chunk);
     }
 
     public void UnregisterChunk(MapChunk chunk)
@@ -155,12 +239,7 @@ public class MapManager : SingletonBase<MapManager>
 
         Vector2Int key = GetChunkIndex(chunk.transform.position);
 
-        if (_chunks.TryGetValue(key, out MapChunk saved) && saved == chunk)
-        {
-            _chunks.Remove(key);
-
-            _isChunkDirty = true;
-        }
+        _chunkActivator.Unregister(key, chunk);
     }
 
     public void SetTarget(Transform target) //플레이어의 위치를 보고 다른 청크로 넘어간 순간을 감지
@@ -177,51 +256,164 @@ public class MapManager : SingletonBase<MapManager>
         _hasCurrentChunk = false;
     }
 
-    private bool IsInActiveRange(Vector2Int chunkIndex, Vector2Int center) //사거리 내의 청크들의 On/Off를 지시
-    {
-        int distanceX = Mathf.Abs(chunkIndex.x - center.x);
-        int distanceY = Mathf.Abs(chunkIndex.y - center.y);
-
-        return distanceX <= _activeRadius && distanceY <= _activeRadius;
-    }
 
     private void RefreshActiveChunks(Vector2Int center)
     {
-        CollectActiveRooms(center);
+        _chunkActivator.Refresh(center, _activeRadius);
+    }
 
-        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
+
+    private void CheckRegionChange(Vector2Int index)
+    {
+        if (!_chunkActivator.TryGetChunk(index, out MapChunk chunk)) return;
+        if (chunk.Region == null) return;
+        if (chunk.Region == _currentRegion) return;
+
+        SetCurrentRegion(chunk.Region);
+    }
+
+    private void SetCurrentRegion(Region region)
+    {
+        string previousId = CurrentRegionId;
+
+        _currentRegion = region;
+
+        Debug.Log($"[MapManager] (SetCurrentRegion) 지역 변경: {previousId} → {region.RegionId}");
+
+        OnChangeRegion?.Invoke(region.RegionId);
+
+        EnterRegionAsync(region.RegionId).Forget();
+    }
+
+    private void EnsureRegionLoader()
+    {
+        if (_regionLoader != null) return;
+
+        Transform root = Transform_RegionRoot != null ? Transform_RegionRoot : transform;
+        _regionLoader = new RegionLoader(root);
+    }
+
+    public async UniTask EnterRegionAsync(string regionId)
+    {
+        // 1. 중복 검사
+        if (string.IsNullOrEmpty(regionId))
         {
-            pair.Value.SetObjectActive(ShouldBeActive(pair.Key, pair.Value, center));
+            Debug.LogWarning("[MapManager] (EnterRegionAsync): regionId가 비어 있음");
+
+            return;
         }
 
-        _isChunkDirty = false;
-    }
+        EnsureRegionLoader();
 
-    private bool IsGroupChunk(MapChunk chunk)
-    {
-        return chunk.Room != null && chunk.Room.ActivationMode == RoomActivationMode.Group;
-    }
+        if (regionId == _targetRegionId && _regionLoader.IsRegionLoaded(regionId)) return;
 
-    private void CollectActiveRooms(Vector2Int center)
-    {
-        _activeRooms.Clear();
-        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
+        _targetRegionId = regionId;
+
+
+        // 2. 현재 지역 로드
+        await _regionLoader.LoadRegionAsync(regionId);
+
+        while (_regionLoader.IsRegionLoading(regionId))
         {
-            if (IsGroupChunk(pair.Value) && IsInActiveRange(pair.Key, center))
+            await UniTask.Yield();
+        }
+
+
+        // 3. 목표가 변경되었는지 확인
+        if (_targetRegionId != regionId) return;
+
+
+        // 4. Region 컴포넌트 가져오기
+        Region region = _regionLoader.GetRegion(regionId);
+
+        if (region == null)
+        {
+            Debug.LogError($"[MapManager] (EnterRegionAsync) 지역 불러오기 실패 또는 Region 컴포넌트 없음: {regionId}");
+
+            return;
+        }
+
+
+        // 5. 이웃 지역 로드
+        foreach (string neighborId in region.NeighborRegionIds)
+        {
+            _regionLoader.LoadRegionAsync(neighborId).Forget();
+        }
+
+
+        // 6. 모든 로드 이전까지 대기
+        while (_regionLoader.HasLoadingRegion())
+        {
+            await UniTask.Yield();
+        }
+
+
+        // 7. 기다리는 동안 목표 변경되었는지 재확인
+        if (_targetRegionId != regionId) return;
+
+
+        //8. 거리 계산
+        CalculateRegionDistances(regionId);
+        ApplyRegionStates();
+
+        Debug.Log($"[MapManager] (EnterRegionAsync) 지역 진입 완료: {regionId}");
+    }
+
+    private void CalculateRegionDistances(string startRegionId)
+    {
+        _regionDistances.Clear();
+        _regionQueue.Clear();
+
+        _regionDistances.Add(startRegionId, 0);
+
+        _regionQueue.Enqueue(startRegionId);
+
+        while (_regionQueue.Count > 0)
+        {
+            string id = _regionQueue.Dequeue();
+
+            int distance = _regionDistances[id];
+
+            if (distance >= _keepRegionDistance) continue;
+
+            Region region = _regionLoader.GetRegion(id);
+
+            if (region == null) continue;
+
+            foreach (string neighborId in region.NeighborRegionIds)
             {
-                _activeRooms.Add(pair.Value.Room);
+                if (string.IsNullOrEmpty(neighborId)) continue;
+                if (_regionDistances.ContainsKey(neighborId)) continue;
+
+                _regionDistances.Add(neighborId, distance + 1);
+                _regionQueue.Enqueue(neighborId);
             }
         }
     }
 
-    private bool ShouldBeActive(Vector2Int key, MapChunk chunk, Vector2Int center)
+    private void ApplyRegionStates()
     {
-        if (IsGroupChunk(chunk))
+        _regionLoader.CollectActiveRegionIds(_activeRegionIdBuffer);
+
+        foreach (string id in _activeRegionIdBuffer)
         {
-            return _activeRooms.Contains(chunk.Room);
+            if (!_regionDistances.TryGetValue(id, out int distance) || distance > _keepRegionDistance)
+            {
+                _regionLoader.UnloadRegion(id);
+
+                continue;
+            }
+
+            if (distance > 1)
+            {
+                _regionLoader.SetRegionVisible(id, false);
+            }
+            else
+            {
+                _regionLoader.SetRegionVisible(id, true);
+            }
         }
 
-        return IsInActiveRange(key, center);
+        Debug.Log($"[MapManager] (ApplyRegionStates) 기준: {_targetRegionId} / 대상 {_activeRegionIdBuffer.Count}개");
     }
-
 }

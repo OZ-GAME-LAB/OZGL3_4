@@ -11,7 +11,7 @@ using UnityEngine;
 ///
 /// - _localNormal은 반사면이 바라보는 방향입니다. (씬 뷰에 하늘색 선으로 표시)
 /// - 거울을 회전시키려면 Gimmick_RotatingLight의 Pivot 아래에 거울을 넣으면 됩니다.
-/// - 거울을 밀고 당기려면 PushableObject 아래에 거울을 넣으면 됩니다.
+/// - 거울을 밀고 당기려면 잡을 수 있는 오브젝트(Grabbable) 아래에 거울을 넣으면 됩니다.
 /// - 거울끼리 반사가 이어질 수 있으며, 반사 한 번마다 물리 프레임 1번만큼 늦게 반영됩니다.
 /// </summary>
 [DefaultExecutionOrder(-10)]

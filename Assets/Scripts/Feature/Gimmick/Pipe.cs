@@ -3,41 +3,38 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
-/// 배관 기믹입니다. 입구에서 E 키를 누르면 플레이어가 배관 안으로 들어가고,
+/// 배관 기믹입니다. 입구에서 상호작용 키를 누르면 플레이어가 배관 안으로 들어가고,
 /// 배관 겉을 따라 불빛(Blip)이 이동하는 모습을 보여준 뒤 연결된 출구 배관으로 나옵니다. (레인월드 방식)
+/// 기본 설정은 쥐 형태(ShadowType.Mouse)일 때만 이용할 수 있습니다.
 ///
 /// 구조
-/// Gimmick_Pipe                 ← Pipe, BoxCollider2D(Is Trigger, 입구 범위)
+/// Gimmick_Pipe                 ← Pipe, InteractionPrompt, BoxCollider2D(Is Trigger, 입구 범위)
 /// ├─ Visual                    ← 배관 그림
 /// ├─ ExitPoint                 ← 이 배관으로 나올 때 플레이어가 놓일 위치 (빈 오브젝트)
 /// ├─ PathPoints                ← 배관이 꺾이는 지점들 (빈 오브젝트들, 입구 → 출구 순서)
 /// │   ├─ Point_0
 /// │   └─ Point_1
 /// ├─ Blip                      ← 이동하는 불빛 (SpriteRenderer, 선택: Light 2D, TrailRenderer). 평소에는 꺼 둠
-/// └─ Prompt                    ← 'E' 말주머니 (선택)
+/// └─ Prompt                    ← 말주머니 (InteractionPrompt의 GameObject_Prompt에 연결)
 ///
 /// - 왕복하려면 두 배관의 Pipe_Exit에 서로를 넣어 주세요. (한쪽만 넣으면 일방통행)
 /// - 경로(List_PathPoint)는 한쪽 배관에만 넣어도 됩니다. 반대쪽은 그 경로를 거꾸로 사용합니다.
+/// - _requiredShadowType이 None이면 모든 형태가 이용할 수 있습니다.
 /// - 이동하는 동안 플레이어는 보이지 않고 물리가 멈추며, 위치는 불빛을 따라갑니다. (카메라도 따라감)
 /// - 오브젝트를 선택하면 씬 뷰에 이동 경로가 분홍 선으로 표시됩니다.
-/// - 현재는 임시로 E 키를 직접 감지합니다. 플레이어 상호작용 시스템이 완성되면 교체합니다.
 /// </summary>
-public class Pipe : MonoBehaviour
+public class Pipe : MonoBehaviour, IInteractable
 {
-    private const string PlayerTag = "Player";
-
     [Header("Reference")]
     [SerializeField] private Pipe Pipe_Exit;
     [SerializeField] private Transform Transform_ExitPoint;
     [SerializeField] private Transform Transform_Blip;
-    [SerializeField] private GameObject GameObject_Prompt;
     [SerializeField] private List<Transform> List_PathPoint = new List<Transform>();
 
-    [Header("Input")]
-    [SerializeField] private Key _enterKey = Key.E;
+    [Header("Condition")]
+    [SerializeField] private ShadowType _requiredShadowType = ShadowType.Mouse;
     [SerializeField] private float _reenterDelay = 0.3f;
 
     [Header("Travel")]
@@ -47,14 +44,16 @@ public class Pipe : MonoBehaviour
 
     private readonly List<Vector3> _travelPath = new List<Vector3>();
     private readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
-    private Rigidbody2D _playerInRange;
-    private int _playerOverlapCount;
     private float _lockUntilTime;
 
     // 플레이어가 배관 안에 있는 동안 다른 배관이 동시에 반응하지 않도록 막습니다.
     private static bool s_isAnyTraveling;
 
     public bool IsTraveling { get; private set; }
+
+    // 배관에 들어갈 때 / 나올 때 호출됩니다. (효과음, 연출 연결용)
+    public event Action OnStartTravel;
+    public event Action OnEndTravel;
 
     // 플레이 모드를 다시 시작할 때 이전 상태가 남지 않도록 초기화합니다. (도메인 리로드를 끈 경우 대비)
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -63,48 +62,12 @@ public class Pipe : MonoBehaviour
         s_isAnyTraveling = false;
     }
 
-    // 배관에 들어갈 때 / 나올 때 호출됩니다. (효과음, 연출 연결용)
-    public event Action OnStartTravel;
-    public event Action OnEndTravel;
-
     /// <summary>
     /// 이 배관으로 나올 때 플레이어가 놓일 위치입니다.
     /// </summary>
     public Vector3 ExitPosition
     {
         get { return Transform_ExitPoint != null ? Transform_ExitPoint.position : transform.position; }
-    }
-
-    private void OnEnable()
-    {
-        _playerInRange = null;
-        _playerOverlapCount = 0;
-        _lockUntilTime = 0f;
-        IsTraveling = false;
-        SetBlipVisible(false);
-        RefreshPrompt();
-    }
-
-    private void Update()
-    {
-        if (_playerInRange == null || Pipe_Exit == null || s_isAnyTraveling)
-            return;
-
-        if (Time.time < _lockUntilTime || Keyboard.current == null)
-            return;
-
-        if (Keyboard.current[_enterKey].wasPressedThisFrame)
-        {
-            TravelAsync(_playerInRange, this.GetCancellationTokenOnDestroy()).Forget();
-        }
-    }
-
-    /// <summary>
-    /// 지정한 시간 동안 이 배관의 입력을 받지 않습니다.
-    /// </summary>
-    public void Lock(float duration)
-    {
-        _lockUntilTime = Time.time + duration;
     }
 
     /// <summary>
@@ -120,11 +83,63 @@ public class Pipe : MonoBehaviour
         get { return Pipe_Exit; }
     }
 
+    private void OnEnable()
+    {
+        _lockUntilTime = 0f;
+        IsTraveling = false;
+        SetBlipVisible(false);
+    }
+
+    public Vector2 Position
+    {
+        get { return transform.position; }
+    }
+
+    /// <summary>
+    /// 지금 이 배관을 이용할 수 있는지 돌려줍니다. (형태 조건, 잠금, 이동 중 여부)
+    /// </summary>
+    public bool CanInteract(Player player)
+    {
+        if (Pipe_Exit == null || s_isAnyTraveling || Time.time < _lockUntilTime)
+            return false;
+
+        return IsShadowAllowed(player);
+    }
+
+    /// <summary>
+    /// 플레이어가 상호작용 키를 눌렀을 때 PlayerInteractor가 호출합니다. 조건이 맞지 않으면 아무 일도 하지 않습니다.
+    /// </summary>
+    public void Interact(Player player)
+    {
+        if (player == null || CanInteract(player) == false || player.Rigid == null)
+            return;
+
+        TravelAsync(player.Rigid, this.GetCancellationTokenOnDestroy()).Forget();
+    }
+
+    /// <summary>
+    /// 지정한 시간 동안 이 배관을 이용할 수 없게 합니다.
+    /// </summary>
+    public void Lock(float duration)
+    {
+        _lockUntilTime = Time.time + duration;
+    }
+
+    private bool IsShadowAllowed(Player player)
+    {
+        if (_requiredShadowType == ShadowType.None)
+            return true;
+
+        if (player == null || player.PlayerViewModel == null)
+            return false;
+
+        return player.PlayerViewModel.CurrentShadowType == _requiredShadowType;
+    }
+
     private async UniTaskVoid TravelAsync(Rigidbody2D player, CancellationToken cancellationToken)
     {
         s_isAnyTraveling = true;
         IsTraveling = true;
-        RefreshPrompt();
 
         if (OnStartTravel != null)
         {
@@ -144,7 +159,7 @@ public class Pipe : MonoBehaviour
 
         if (isCanceled == false)
         {
-            isCanceled = await WaitAsync(_exitDelay, cancellationToken);
+            await WaitAsync(_exitDelay, cancellationToken);
         }
 
         // 중간에 취소되더라도(배관 삭제 등) 플레이어는 반드시 다시 보이게 되돌려 놓습니다.
@@ -164,7 +179,6 @@ public class Pipe : MonoBehaviour
 
         IsTraveling = false;
         s_isAnyTraveling = false;
-        RefreshPrompt();
 
         if (OnEndTravel != null)
         {
@@ -311,37 +325,6 @@ public class Pipe : MonoBehaviour
             return cancellationToken.IsCancellationRequested;
 
         return await UniTask.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: cancellationToken).SuppressCancellationThrow();
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag(PlayerTag) == false || other.attachedRigidbody == null)
-            return;
-
-        _playerOverlapCount++;
-        _playerInRange = other.attachedRigidbody;
-        RefreshPrompt();
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag(PlayerTag) == false)
-            return;
-
-        _playerOverlapCount = Mathf.Max(0, _playerOverlapCount - 1);
-        if (_playerOverlapCount == 0)
-        {
-            _playerInRange = null;
-        }
-        RefreshPrompt();
-    }
-
-    private void RefreshPrompt()
-    {
-        if (GameObject_Prompt != null)
-        {
-            GameObject_Prompt.SetActive(_playerInRange != null && Pipe_Exit != null && IsTraveling == false);
-        }
     }
 
     private void OnDrawGizmosSelected()
