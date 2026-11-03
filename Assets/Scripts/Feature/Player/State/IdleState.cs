@@ -40,5 +40,6 @@ public class IdleState : PlayerStateBase
         }
 
         _player.SetVelocity(0);
+        groundHit = Physics2D.Raycast(_player.transform.position, Vector2.down, 2f, _player.GroundLayer);
     }
 }
