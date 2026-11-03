@@ -48,6 +48,17 @@ public class ChunkTool : EditorWindow
         EditorGUI.EndDisabledGroup();
 
 
+        int alignCount = CountAlignTargets(chunks);
+        EditorGUILayout.LabelField($"위치 맞춤 대상: {alignCount}개");
+
+        EditorGUI.BeginDisabledGroup(alignCount == 0 || _chunkSize <= 0);
+        if (GUILayout.Button("이름 기준으로 위치 맞추기"))
+        {
+            ConfirmAndAlignToName(chunks);
+        }
+        EditorGUI.EndDisabledGroup();
+
+
         EditorGUI.BeginDisabledGroup(chunks.Count == 0 || _chunkSize <= 0);
         if (GUILayout.Button("Hierarchy 정렬 (X → Y 오름차순)"))
         {
@@ -95,6 +106,7 @@ public class ChunkTool : EditorWindow
             "좌표 중복, 격자 어긋남은 Console에 경고로 표시됩니다.\n" +
             "정렬은 부모(Room)별로 X → Y 오름차순입니다.\n" +
             "Room 이동은 같은 Region 안에서만 가능하며, 이동 후 Room을 자동 정렬합니다.\n" +
+            "위치 맞추기는 \"Tile x, y\" 이름을 읽어 청크를 그 좌표로 옮깁니다(자식 포함).\n" +
             "Ctrl+Z로 되돌릴 수 있습니다.",
             MessageType.Info);
     }
@@ -575,6 +587,127 @@ public class ChunkTool : EditorWindow
         Undo.CollapseUndoOperations(undoGroup);
 
         Debug.Log($"[ChunkTool] RoomId {changedCount}개 변경");
+    }
+
+    /// <summary>
+    /// "Tile x, y" 형식의 이름에서 청크 좌표를 읽는다. 형식이 다르면 false.
+    /// </summary>
+    private bool TryParseChunkName(string chunkName, out Vector2Int index)
+    {
+        index = Vector2Int.zero;
+
+        string prefix = NamePrefix + " ";
+        if (chunkName.StartsWith(prefix) == false)
+        {
+            return false;
+        }
+
+        string[] parts = chunkName.Substring(prefix.Length).Split(',');
+        if (parts.Length != 2)
+        {
+            return false;
+        }
+
+        if (int.TryParse(parts[0].Trim(), out int x) == false || int.TryParse(parts[1].Trim(), out int y) == false)
+        {
+            return false;
+        }
+
+        index = new Vector2Int(x, y);
+
+        return true;
+    }
+
+    private Vector3 GetChunkPosition(Vector2Int index, float z)
+    {
+        return new Vector3(index.x * _chunkSize, index.y * _chunkSize, z);
+    }
+
+    private int CountAlignTargets(List<MapChunk> chunks)
+    {
+        if (_chunkSize <= 0)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        foreach (MapChunk chunk in chunks)
+        {
+            if (TryParseChunkName(chunk.name, out Vector2Int index) == false)
+            {
+                continue;
+            }
+
+            Vector3 position = chunk.transform.position;
+            Vector3 target = GetChunkPosition(index, position.z);
+
+            if (Mathf.Approximately(position.x, target.x) == false || Mathf.Approximately(position.y, target.y) == false)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void ConfirmAndAlignToName(List<MapChunk> chunks)
+    {
+        if (_chunkSize <= 0)
+        {
+            Debug.LogError($"[ChunkTool] (ConfirmAndAlignToName) 청크 크기가 0 이하. (_chunkSize: {_chunkSize})");
+            return;
+        }
+
+        string message = $"청크 {CountAlignTargets(chunks)}개를 이름의 좌표 위치로 옮깁니다.\n자식(타일맵 등)도 함께 이동합니다.\n계속할까요?";
+        if (EditorUtility.DisplayDialog("Chunk Tool", message, "이동", "취소") == false)
+        {
+            return;
+        }
+
+        int undoGroup = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Chunk Align");
+
+        Dictionary<Vector2Int, MapChunk> usedIndexes = new Dictionary<Vector2Int, MapChunk>();
+        int movedCount = 0;
+        int warningCount = 0;
+
+        foreach (MapChunk chunk in chunks)
+        {
+            if (TryParseChunkName(chunk.name, out Vector2Int index) == false)
+            {
+                Debug.LogWarning($"[ChunkTool] (ConfirmAndAlignToName) 이름 형식이 \"{NamePrefix} x, y\"가 아님: {chunk.name}", chunk);
+                warningCount++;
+                continue;
+            }
+
+            if (usedIndexes.TryGetValue(index, out MapChunk duplicated))
+            {
+                Debug.LogWarning($"[ChunkTool] (ConfirmAndAlignToName) 같은 좌표 이름 중복: {index} / {duplicated.name}, {chunk.name}", chunk);
+                warningCount++;
+            }
+            else
+            {
+                usedIndexes.Add(index, chunk);
+            }
+
+            Transform target = chunk.transform;
+            Vector3 position = target.position;
+            Vector3 destination = GetChunkPosition(index, position.z);
+
+            if (Mathf.Approximately(position.x, destination.x) && Mathf.Approximately(position.y, destination.y))
+            {
+                continue;
+            }
+
+            Undo.RecordObject(target, "Chunk Align");
+            target.position = destination;
+            MarkDirty(chunk.gameObject);
+            movedCount++;
+        }
+
+        Undo.CollapseUndoOperations(undoGroup);
+
+        Debug.Log($"[ChunkTool] 청크 {chunks.Count}개 중 {movedCount}개 위치 이동, 경고 {warningCount}개");
     }
 
     private void MarkDirty(GameObject target)

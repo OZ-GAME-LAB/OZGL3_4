@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -17,6 +17,10 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private string _startRegionId;
     [SerializeField] private int _keepRegionDistance = 2;
 
+    [Header("텔레포트 테스트")]
+    [SerializeField] private string _testTeleportRegionId;
+    [SerializeField] private Vector2 _testTeleportPosition;
+
 
     private Vector2Int _currentChunkIndex;
     private bool _hasCurrentChunk = false;
@@ -26,6 +30,7 @@ public class MapManager : SingletonBase<MapManager>
     private RegionLoader _regionLoader;
 
     private string _targetRegionId;
+    private string _pinnedRegionId; // 대기중인 도착 지역
     private List<string> _activeRegionIdBuffer = new List<string>();
     private Dictionary<string, int> _regionDistances = new Dictionary<string, int>();
     private Queue<string> _regionQueue = new Queue<string>();
@@ -291,6 +296,52 @@ public class MapManager : SingletonBase<MapManager>
 
         Transform root = Transform_RegionRoot != null ? Transform_RegionRoot : transform;
         _regionLoader = new RegionLoader(root);
+    }
+
+
+    public async UniTask<bool> PrepareRegionAsync(string regionId)
+    {
+        if (string.IsNullOrEmpty(regionId))
+        {
+            Debug.LogWarning("[MapManager] (PrepareRegionAsync): regionId가 비어 있음");
+
+            return false;
+        }
+
+        EnsureRegionLoader();
+
+        if (regionId == CurrentRegionId) return true;
+
+        _pinnedRegionId = regionId;
+
+        await _regionLoader.LoadRegionAsync(regionId);
+
+        while (_regionLoader.IsRegionLoading(regionId))
+        {
+            await UniTask.Yield();
+        }
+
+        if (_pinnedRegionId != regionId)
+        {
+            Debug.LogWarning("[MapManager] (PrepareRegionAsync): _pinnedRegionId가 regionId와 일치하지 않음");
+
+            return false;
+        }
+
+        if (_regionLoader.GetRegion(regionId) == null)
+        {
+            Debug.LogError($"[MapManager] (PrepareRegionAsync) 지역 준비 실패: {regionId}");
+
+            _pinnedRegionId = null;
+
+            return false;
+        }
+
+        _regionLoader.SetRegionVisible(regionId, true);
+
+        Debug.Log($"[MapManager] (PrepareRegionAsync) 지역 준비 완료 : {regionId}");
+
+        return true;
     }
 
     public async UniTask EnterRegionAsync(string regionId)
