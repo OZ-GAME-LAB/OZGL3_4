@@ -12,17 +12,19 @@ public class DialogData : GameDataBase
 }
 
 [System.Serializable]
-public class MapData : GameDataBase
+public class MapRegionData : GameDataBase
 {
-    public string Name;
+    // 표시용 설명. 로직에서는 Id만 사용한다.
+    public string Description;
 }
 
 [System.Serializable]
 public class MapRoomData : GameDataBase
 {
-    public string Name;
-    public string MapId;
-    public System.Collections.Generic.List<MapSlotData> OccupiedSlots = new System.Collections.Generic.List<MapSlotData>();
+    // 표시용 설명. 로직에서는 Id만 사용한다.
+    public string Description;
+    public string RegionId;
+    public System.Collections.Generic.List<ChunkIndexData> OccupiedChunks = new System.Collections.Generic.List<ChunkIndexData>();
     public System.Collections.Generic.List<string> RewardIds = new System.Collections.Generic.List<string>();
     public System.Collections.Generic.List<string> HiddenIds = new System.Collections.Generic.List<string>();
     public System.Collections.Generic.List<MapRoomExitData> Exits = new System.Collections.Generic.List<MapRoomExitData>();
@@ -31,7 +33,7 @@ public class MapRoomData : GameDataBase
 [System.Serializable]
 public class MapTeleportData : GameDataBase
 {
-    public string MapId;
+    public string RegionId;
     public string RevealRoomIds;
 }
 
@@ -42,9 +44,9 @@ public class MapRoomExitData
     public string TargetRoomId;
 }
 
-// 구역 전체의 원점을 기준으로 한 점유 청크 좌표다.
+// 청크 좌표다. 하이어라키의 Tile x, y 이름과 같은 값이다.
 [System.Serializable]
-public class MapSlotData
+public class ChunkIndexData
 {
     public int X;
     public int Y;
