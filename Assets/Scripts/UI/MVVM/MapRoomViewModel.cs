@@ -8,13 +8,12 @@ public class MapRoomViewModel : ViewModelBase
     private readonly List<string> _rewardIds;
     private readonly List<string> _hiddenIds;
     private readonly List<MapRoomExitData> _exits;
-    private readonly List<Vector2Int> _occupiedSlots = new List<Vector2Int>();
+    private readonly List<Vector2Int> _occupiedChunks = new List<Vector2Int>();
     private bool _canShowExplorationRate;
 
     public string RoomId { get; }
-    public string RoomName { get; }
-    public string MapId { get; }
-    public IReadOnlyList<Vector2Int> OccupiedSlots { get; }
+    public string RegionId { get; }
+    public IReadOnlyList<Vector2Int> OccupiedChunks { get; }
     public bool IsTerrainRevealed
     {
         get
@@ -175,26 +174,25 @@ public class MapRoomViewModel : ViewModelBase
 
         _roomModel = roomModel;
         RoomId = roomData.Id;
-        RoomName = roomData.Name;
-        MapId = roomData.MapId;
-        if (roomData.OccupiedSlots == null || roomData.OccupiedSlots.Count == 0)
+        RegionId = roomData.RegionId;
+        if (roomData.OccupiedChunks == null || roomData.OccupiedChunks.Count == 0)
         {
-            throw new ArgumentException("방의 점유 슬롯이 필요합니다: " + roomData.Id);
+            throw new ArgumentException("방의 점유 청크가 필요합니다: " + roomData.Id);
         }
-        foreach (MapSlotData slotData in roomData.OccupiedSlots)
+        foreach (ChunkIndexData chunkData in roomData.OccupiedChunks)
         {
-            if (slotData == null)
+            if (chunkData == null)
             {
-                throw new ArgumentException("방의 점유 슬롯에 null이 있습니다: " + roomData.Id);
+                throw new ArgumentException("방의 점유 청크에 null이 있습니다: " + roomData.Id);
             }
-            Vector2Int slot = new Vector2Int(slotData.X, slotData.Y);
-            if (_occupiedSlots.Contains(slot))
+            Vector2Int chunk = new Vector2Int(chunkData.X, chunkData.Y);
+            if (_occupiedChunks.Contains(chunk))
             {
-                throw new ArgumentException("방의 점유 슬롯이 중복됩니다: " + roomData.Id);
+                throw new ArgumentException("방의 점유 청크가 중복됩니다: " + roomData.Id);
             }
-            _occupiedSlots.Add(slot);
+            _occupiedChunks.Add(chunk);
         }
-        OccupiedSlots = _occupiedSlots.AsReadOnly();
+        OccupiedChunks = _occupiedChunks.AsReadOnly();
         _rewardIds = GetUniqueIds(roomData.RewardIds);
         _hiddenIds = GetUniqueIds(roomData.HiddenIds);
         foreach (string hiddenId in _hiddenIds)
@@ -227,10 +225,10 @@ public class MapRoomViewModel : ViewModelBase
         UnlockedExitIds = _roomModel.UnlockedExitIds.AsReadOnly();
     }
 
-    // 사각형 경계가 아닌 실제 점유 슬롯으로 방 포함 여부를 확인한다.
-    public bool ContainsSlot(Vector2Int slot)
+    // 사각형 경계가 아닌 실제 점유 청크로 방 포함 여부를 확인한다.
+    public bool ContainsChunk(Vector2Int chunk)
     {
-        return _occupiedSlots.Contains(slot);
+        return _occupiedChunks.Contains(chunk);
     }
     public bool TrySetVisited(bool isVisited)
     {
@@ -269,7 +267,7 @@ public class MapRoomViewModel : ViewModelBase
         return true;
     }
 
-    // 표시 여부는 저장하지 않고 소속 테마의 텔레포트 진행에서 다시 계산한다.
+    // 표시 여부는 저장하지 않고 소속 리전의 텔레포트 진행에서 다시 계산한다.
     internal void SetExplorationRateVisible(bool isVisible)
     {
         if (_canShowExplorationRate == isVisible)
