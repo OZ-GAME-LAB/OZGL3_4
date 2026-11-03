@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -10,7 +10,7 @@ public class MapManager : SingletonBase<MapManager>
     [SerializeField] private int _activeRadius = 1;
 
     [Header("추적 대상")]
-    [SerializeField] private Transform Transform_Target;
+    [SerializeField] public Transform Transform_Target; // 수정된 부분 - 민형님 추가 (플레이어의 동적 생성으로 인해 변경)
 
     [Header("지역 설정")]
     [SerializeField] private Transform Transform_RegionRoot;

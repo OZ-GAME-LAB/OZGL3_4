@@ -17,9 +17,9 @@ public class GameObjectManager : SingletonBase<GameObjectManager>
         _rootTransform = this.transform;
     }
 
-    public void CreateObject(string dataId, string path, Vector3 spawnSpot)
+    public void CreateObject(string path, Vector3 spawnSpot)
     {
-        CreateObjectAsync(dataId, path, spawnSpot).Forget();
+        CreateObjectAsync(path, spawnSpot).Forget();
     }
 
     public async UniTask LoadObjectAsync(string path)
@@ -27,7 +27,7 @@ public class GameObjectManager : SingletonBase<GameObjectManager>
         await ResourceManager.Instance.LoadAsset<GameObject>(path);
     }
 
-    public async UniTask<GameObject> CreateObjectAsync(string dataId, string path, Vector3 spawnSpot)
+    public async UniTask<GameObject> CreateObjectAsync(string path, Vector3 spawnSpot)
     {
         Debug.Log($"CreateObjectAsync 호출됨, path: {path}");
         GameObject prefab = await ResourceManager.Instance.LoadAsset<GameObject>(path);
