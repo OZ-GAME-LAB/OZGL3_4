@@ -4,42 +4,42 @@ using System.Collections.Generic;
 public class TeleportViewModel : ViewModelBase
 {
     private readonly TeleportModel _teleportModel;
-    private readonly Dictionary<string, string> _teleportMapIds;
+    private readonly Dictionary<string, string> _teleportRegionIds;
 
     public IReadOnlyList<string> TeleportIds { get; }
     public IReadOnlyList<string> ActivatedTeleportIds { get; }
 
-    internal TeleportViewModel(TeleportModel teleportModel, Dictionary<string, string> teleportMapIds)
+    internal TeleportViewModel(TeleportModel teleportModel, Dictionary<string, string> teleportRegionIds)
     {
         if (teleportModel == null)
         {
             throw new ArgumentNullException(nameof(teleportModel));
         }
-        if (teleportMapIds == null)
+        if (teleportRegionIds == null)
         {
-            throw new ArgumentNullException(nameof(teleportMapIds));
+            throw new ArgumentNullException(nameof(teleportRegionIds));
         }
         _teleportModel = teleportModel;
-        _teleportMapIds = new Dictionary<string, string>(teleportMapIds);
-        TeleportIds = new List<string>(_teleportMapIds.Keys).AsReadOnly();
+        _teleportRegionIds = new Dictionary<string, string>(teleportRegionIds);
+        TeleportIds = new List<string>(_teleportRegionIds.Keys).AsReadOnly();
         ActivatedTeleportIds = _teleportModel.ActivatedTeleportIds.AsReadOnly();
     }
 
     public bool GetTeleportActivated(string teleportId)
     {
-        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportMapIds.ContainsKey(teleportId))
+        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportRegionIds.ContainsKey(teleportId))
         {
             return false;
         }
         return _teleportModel.ActivatedTeleportIds.Contains(teleportId);
     }
 
-    public int GetTotalTeleportCount(string mapId)
+    public int GetTotalTeleportCount(string regionId)
     {
         int count = 0;
-        foreach (string teleportMapId in _teleportMapIds.Values)
+        foreach (string teleportRegionId in _teleportRegionIds.Values)
         {
-            if (teleportMapId == mapId)
+            if (teleportRegionId == regionId)
             {
                 count = count + 1;
             }
@@ -47,12 +47,12 @@ public class TeleportViewModel : ViewModelBase
         return count;
     }
 
-    public int GetActivatedTeleportCount(string mapId)
+    public int GetActivatedTeleportCount(string regionId)
     {
         int count = 0;
-        foreach (KeyValuePair<string, string> teleport in _teleportMapIds)
+        foreach (KeyValuePair<string, string> teleport in _teleportRegionIds)
         {
-            if (teleport.Value == mapId && GetTeleportActivated(teleport.Key))
+            if (teleport.Value == regionId && GetTeleportActivated(teleport.Key))
             {
                 count = count + 1;
             }
@@ -60,19 +60,19 @@ public class TeleportViewModel : ViewModelBase
         return count;
     }
 
-    public float GetTeleportActivationRate(string mapId)
+    public float GetTeleportActivationRate(string regionId)
     {
-        int total = GetTotalTeleportCount(mapId);
+        int total = GetTotalTeleportCount(regionId);
         if (total == 0)
         {
             return 0f;
         }
-        return (float)GetActivatedTeleportCount(mapId) / total;
+        return (float)GetActivatedTeleportCount(regionId) / total;
     }
 
     public bool TryActivateTeleport(string teleportId)
     {
-        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportMapIds.ContainsKey(teleportId))
+        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportRegionIds.ContainsKey(teleportId))
         {
             return false;
         }

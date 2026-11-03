@@ -73,29 +73,29 @@ public class MapService
         return viewModel.TryClearCurrentRoom();
     }
 
-    public bool RequestUpdateChunk(string mapId, Vector2Int chunkIndex)
+    public bool RequestUpdateChunk(string regionId, Vector2Int chunkIndex)
     {
         MapViewModel viewModel = GetMapViewModel();
         MapRoomViewModel targetRoom = null;
-        bool hasMap = false;
+        bool hasRegion = false;
         foreach (MapRoomViewModel room in viewModel.Rooms)
         {
-            if (room.MapId != mapId)
+            if (room.RegionId != regionId)
             {
                 continue;
             }
-            hasMap = true;
-            if (room.ContainsSlot(chunkIndex))
+            hasRegion = true;
+            if (room.ContainsChunk(chunkIndex))
             {
                 if (targetRoom != null)
                 {
-                    Debug.LogError("[MapService] 방 슬롯 중복: " + targetRoom.RoomId + ", " + room.RoomId);
+                    Debug.LogError("[MapService] 방 청크 중복: " + targetRoom.RoomId + ", " + room.RoomId);
                     return false;
                 }
                 targetRoom = room;
             }
         }
-        if (!hasMap)
+        if (!hasRegion)
         {
             return false;
         }
@@ -103,9 +103,9 @@ public class MapService
         {
             return RequestEnterRoom(targetRoom.RoomId);
         }
-        bool mapChanged = viewModel.TrySetCurrentMap(mapId);
+        bool regionChanged = viewModel.TrySetCurrentRegion(regionId);
         bool roomExited = RequestExitRoom(viewModel.CurrentRoomId);
-        return mapChanged || roomExited;
+        return regionChanged || roomExited;
     }
 
     public bool RequestUnlockRoomByExploration(string roomId)
