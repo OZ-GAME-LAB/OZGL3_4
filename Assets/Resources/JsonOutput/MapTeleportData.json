@@ -1,17 +1,17 @@
 [
   {
     "Id": "Teleport_1_1",
-    "MapId": "Level_1",
-    "RevealRoomIds": "Room_1_1"
+    "RegionId": "Region_01",
+    "RevealRoomIds": "Room_A01"
   },
   {
     "Id": "Teleport_1_2",
-    "MapId": "Level_1",
-    "RevealRoomIds": "Room_1_1, Room_1_2"
+    "RegionId": "Region_01",
+    "RevealRoomIds": "Room_A01, Room_A02"
   },
   {
     "Id": "Teleport_2_1",
-    "MapId": "Level_2",
-    "RevealRoomIds": "Room_2_1"
+    "RegionId": "Region_02",
+    "RevealRoomIds": "Room_B01"
   }
 ]

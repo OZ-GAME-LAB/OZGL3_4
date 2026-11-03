@@ -26,7 +26,7 @@ public class TeleportSlot : MonoBehaviour
     {
         _info = info;
         _onClick = onClick;
-        _teleportName.text = "테마 " + info.ThemeNumber + " - " + info.TeleportNumber + "번";
+        _teleportName.text = "테마 " + info.RegionNumber + " - " + info.TeleportNumber + "번";
     }
 
     private void OnClickTeleport()

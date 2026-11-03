@@ -6,12 +6,6 @@ public class MapUIInput : MonoBehaviour
     [SerializeField] private InputActionAsset InputActionAsset_Actions;
 
     private InputAction _mapAction;
-    private MapViewModel _mapViewModel;
-
-    public void Init(MapViewModel mapViewModel)
-    {
-        _mapViewModel = mapViewModel;
-    }
 
     private void Awake()
     {
@@ -92,9 +86,9 @@ public class MapUIInput : MonoBehaviour
             return;
         }
 
-        if (_mapViewModel == null)
+        MapViewModel mapViewModel = GetMapViewModel();
+        if (mapViewModel == null)
         {
-            Debug.LogError("[MapUIInput] MapSceneSetup에서 공용 ViewModel을 연결하세요.");
             return;
         }
         UIBase openedUI = uiManager.OpenUI(UIRootType.PopupUI, UIType.Map);
@@ -105,6 +99,23 @@ public class MapUIInput : MonoBehaviour
             uiManager.CloseUI(UIRootType.PopupUI, UIType.Map);
             return;
         }
-        mapView.Init(_mapViewModel);
+        mapView.Init(mapViewModel);
+    }
+
+    // NetworkManager가 소유한 공용 지도 ViewModel을 가져온다.
+    private MapViewModel GetMapViewModel()
+    {
+        NetworkManager networkManager = NetworkManager.Instance;
+        if (networkManager == null)
+        {
+            Debug.LogError("[MapUIInput] NetworkManager가 없습니다.");
+            return null;
+        }
+        if (networkManager.MapService == null)
+        {
+            Debug.LogError("[MapUIInput] MapService가 아직 준비되지 않았습니다.");
+            return null;
+        }
+        return networkManager.MapService.GetMapViewModel();
     }
 }

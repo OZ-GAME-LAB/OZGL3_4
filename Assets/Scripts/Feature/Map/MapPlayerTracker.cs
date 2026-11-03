@@ -1,30 +1,53 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class MapPlayerTracker : MonoBehaviour
 {
     private MapManager Manager_Map;
-    [SerializeField] private string _mapId = "Level_1";
+    [SerializeField] private string _regionId = "Region_01";
 
     private MapService _mapService;
 
-    public bool Init(MapService mapService)
+    private void Start()
     {
-        if (mapService == null)
+        if (NetworkManager.Instance == null)
         {
-            Debug.LogError("[MapPlayerTracker] MapService가 필요합니다.");
+            Debug.LogError("[MapPlayerTracker] NetworkManager가 없습니다.");
+            return;
+        }
+        InitAsync().Forget();
+    }
+
+    // MapService는 NetworkManager.Start에서 만들어지므로 준비될 때까지 기다린 뒤 연결한다.
+    private async UniTaskVoid InitAsync()
+    {
+        bool isCanceled = await UniTask.WaitUntil(HasMapService, cancellationToken: this.GetCancellationTokenOnDestroy()).SuppressCancellationThrow();
+        if (isCanceled)
+        {
+            return;
+        }
+        Init(NetworkManager.Instance.MapService);
+    }
+
+    private bool HasMapService()
+    {
+        NetworkManager networkManager = NetworkManager.Instance;
+        if (networkManager == null)
+        {
             return false;
         }
+        return networkManager.MapService != null;
+    }
+
+    private void Init(MapService mapService)
+    {
         MapManager mapManager = MapManager.Instance;
         if (mapManager == null)
         {
-            Debug.LogError("[MapPlayerTracker] MapManager.Instance가 없습니다. 매니저 초기화 후 Init을 호출하세요.");
-            return false;
+            Debug.LogError("[MapPlayerTracker] MapManager.Instance가 없습니다.");
+            return;
         }
         UnBind();
-        if (_mapService != null && _mapService != mapService)
-        {
-            ClearCurrentRoom();
-        }
         Manager_Map = mapManager;
         _mapService = mapService;
         if (isActiveAndEnabled)
@@ -32,7 +55,6 @@ public class MapPlayerTracker : MonoBehaviour
             Bind();
             UpdatePlayerChunk();
         }
-        return true;
     }
 
     private void OnEnable()
@@ -72,14 +94,14 @@ public class MapPlayerTracker : MonoBehaviour
         Manager_Map.OnClearPlayerChunk -= ClearCurrentRoom;
     }
 
-    public void SetMapId(string mapId)
+    public void SetRegionId(string regionId)
     {
-        if (_mapId == mapId)
+        if (_regionId == regionId)
         {
             return;
         }
         ClearCurrentRoom();
-        _mapId = mapId;
+        _regionId = regionId;
         if (isActiveAndEnabled)
         {
             UpdatePlayerChunk();
@@ -107,12 +129,12 @@ public class MapPlayerTracker : MonoBehaviour
         {
             return;
         }
-        if (string.IsNullOrWhiteSpace(_mapId))
+        if (string.IsNullOrWhiteSpace(_regionId))
         {
             ClearCurrentRoom();
             return;
         }
-        _mapService.RequestUpdateChunk(_mapId, chunkIndex);
+        _mapService.RequestUpdateChunk(_regionId, chunkIndex);
     }
 
     private void ClearCurrentRoom()

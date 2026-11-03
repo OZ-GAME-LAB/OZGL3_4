@@ -19600,7 +19600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a24674fd2918e34086c41b042bc5419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
-  _roomId: A02
+  _roomId: Room_A02
   _activationMode: 0
 --- !u!1 &1138314094323332158
 GameObject:
@@ -29077,7 +29077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a24674fd2918e34086c41b042bc5419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
-  _roomId: A03
+  _roomId: Room_A03
   _activationMode: 0
 --- !u!1 &1338982487679124643
 GameObject:
@@ -76979,7 +76979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a24674fd2918e34086c41b042bc5419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
-  _roomId: A04
+  _roomId: Room_A04
   _activationMode: 0
 --- !u!1 &4303946104403056408
 GameObject:
@@ -98393,7 +98393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a24674fd2918e34086c41b042bc5419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
-  _roomId: A01
+  _roomId: Room_A01
   _activationMode: 0
 --- !u!1 &5715780486179280987
 GameObject:

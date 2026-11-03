@@ -5,7 +5,7 @@ using UnityEngine;
 public class MapView : UIBase
 {
     [SerializeField] private RectTransform Transform_MapContent;
-    [SerializeField] private Vector2 _slotSize = new Vector2(64f, 64f);
+    [SerializeField] private Vector2 _chunkSize = new Vector2(64f, 64f);
     [SerializeField] private List<RoomShapeBinding> _roomShapes = new List<RoomShapeBinding>();
 
     private MapViewModel _mapViewModel;
@@ -30,9 +30,9 @@ public class MapView : UIBase
 
     public void Init(MapViewModel mapViewModel)
     {
-        if (mapViewModel == null || Transform_MapContent == null || _slotSize.x <= 0f || _slotSize.y <= 0f)
+        if (mapViewModel == null || Transform_MapContent == null || _chunkSize.x <= 0f || _chunkSize.y <= 0f)
         {
-            Debug.LogError("[MapView] ViewModel, MapContent와 양수 슬롯 크기를 설정하세요.");
+            Debug.LogError("[MapView] ViewModel, MapContent와 양수 청크 크기를 설정하세요.");
             return;
         }
         if (_mapViewModel == mapViewModel)
@@ -68,23 +68,23 @@ public class MapView : UIBase
 
     private void CreateRoomView(MapRoomViewModel roomViewModel, RectTransform roomShapePrefab)
     {
-        int minX = roomViewModel.OccupiedSlots[0].x;
-        int minY = roomViewModel.OccupiedSlots[0].y;
-        foreach (Vector2Int slot in roomViewModel.OccupiedSlots)
+        int minX = roomViewModel.OccupiedChunks[0].x;
+        int minY = roomViewModel.OccupiedChunks[0].y;
+        foreach (Vector2Int chunk in roomViewModel.OccupiedChunks)
         {
-            if (slot.x < minX)
+            if (chunk.x < minX)
             {
-                minX = slot.x;
+                minX = chunk.x;
             }
-            if (slot.y < minY)
+            if (chunk.y < minY)
             {
-                minY = slot.y;
+                minY = chunk.y;
             }
         }
 
         RectTransform roomTransform = Instantiate(roomShapePrefab, Transform_MapContent, false);
         roomTransform.name = roomViewModel.RoomId;
-        roomTransform.anchoredPosition = new Vector2(minX * _slotSize.x, minY * _slotSize.y);
+        roomTransform.anchoredPosition = new Vector2(minX * _chunkSize.x, minY * _chunkSize.y);
         MapRoomView roomView = roomTransform.GetComponent<MapRoomView>();
         if (roomView == null)
         {

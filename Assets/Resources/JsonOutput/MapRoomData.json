@@ -1,55 +1,87 @@
 [
   {
-    "Id": "Room_1_1",
-    "Name": "숲 입구",
-    "MapId": "Level_1",
+    "Id": "Room_A01",
+    "Description": "숲 입구",
+    "RegionId": "Region_01",
     "RewardIds": [
-      "Room_1_1_Reward_01",
-      "Room_1_1_Reward_02",
-      "Room_1_1_Reward_03"
+      "Room_A01_Reward_01",
+      "Room_A01_Reward_02",
+      "Room_A01_Reward_03"
     ],
     "HiddenIds": [
-      "Room_1_1_Hidden_01",
-      "Room_1_1_Hidden_02"
+      "Room_A01_Hidden_01",
+      "Room_A01_Hidden_02"
     ],
     "Exits": [
       {
-        "Id": "Room_1_1_Exit_01",
-        "TargetRoomId": "Room_1_2"
+        "Id": "Room_A01_Exit_01",
+        "TargetRoomId": "Room_A02"
       }
     ],
-    "OccupiedSlots": [
+    "OccupiedChunks": [
       {
         "X": 0,
         "Y": 0
-      },
+      }
+    ]
+  },
+  {
+    "Id": "Room_A02",
+    "Description": "숲길",
+    "RegionId": "Region_01",
+    "RewardIds": [],
+    "HiddenIds": [],
+    "Exits": [
+      {
+        "Id": "Room_A02_Exit_01",
+        "TargetRoomId": "Room_A01"
+      }
+    ],
+    "OccupiedChunks": [
       {
         "X": 1,
         "Y": 0
       },
       {
+        "X": 2,
+        "Y": 0
+      },
+      {
         "X": 1,
+        "Y": 1
+      },
+      {
+        "X": 2,
         "Y": 1
       }
     ]
   },
   {
-    "Id": "Room_1_2",
-    "Name": "숲길",
-    "MapId": "Level_1",
+    "Id": "Room_A03",
+    "Description": "방 A03",
+    "RegionId": "Region_01",
     "RewardIds": [],
     "HiddenIds": [],
-    "Exits": [
+    "Exits": [],
+    "OccupiedChunks": [
       {
-        "Id": "Room_1_2_Exit_01",
-        "TargetRoomId": "Room_1_1"
-      }
-    ],
-    "OccupiedSlots": [
-      {
-        "X": 2,
-        "Y": 1
+        "X": 3,
+        "Y": 0
       },
+      {
+        "X": 4,
+        "Y": 0
+      }
+    ]
+  },
+  {
+    "Id": "Room_A04",
+    "Description": "방 A04",
+    "RegionId": "Region_01",
+    "RewardIds": [],
+    "HiddenIds": [],
+    "Exits": [],
+    "OccupiedChunks": [
       {
         "X": 3,
         "Y": 1
@@ -61,16 +93,16 @@
     ]
   },
   {
-    "Id": "Room_2_1",
-    "Name": "동굴 입구",
-    "MapId": "Level_2",
+    "Id": "Room_B01",
+    "Description": "동굴 입구",
+    "RegionId": "Region_02",
     "RewardIds": [],
     "HiddenIds": [],
     "Exits": [],
-    "OccupiedSlots": [
+    "OccupiedChunks": [
       {
-        "Y": 0,
-        "X": 0
+        "X": 0,
+        "Y": 0
       }
     ]
   }
