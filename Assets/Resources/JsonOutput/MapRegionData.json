@@ -1,0 +1,14 @@
+[
+  {
+    "Id": "Region_01",
+    "Description": "튜토리얼 구역"
+  },
+  {
+    "Id": "Region_02",
+    "Description": "1구역"
+  },
+  {
+    "Id": "Region_03",
+    "Description": "2구역"
+  }
+]
