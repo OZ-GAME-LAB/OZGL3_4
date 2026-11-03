@@ -1,5 +1,26 @@
+﻿using NUnit.Framework.Constraints;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+
+public readonly struct TeleportInfo
+{
+    public readonly string Id;
+    public readonly string MapId;
+    public readonly int ThemeNumber;
+    public readonly int TeleportNumber;
+    public readonly bool IsActivated;
+
+    public TeleportInfo(string id, string mapId, int themeNumber, int teleportNumber, bool isActivated)
+    {
+        Id = id;
+        MapId = mapId;
+        ThemeNumber = themeNumber;
+        TeleportNumber = teleportNumber;
+        IsActivated = isActivated;
+    }
+}
 
 public class TeleportService
 {
@@ -7,6 +28,12 @@ public class TeleportService
     private readonly TeleportViewModel _teleportViewModel;
     private readonly Dictionary<string, string> _teleportMapIds = new Dictionary<string, string>();
     private readonly Dictionary<string, IReadOnlyList<string>> _teleportRevealRooms = new Dictionary<string, IReadOnlyList<string>>();
+    private readonly Dictionary<string, Vector2> _teleportPositions = new Dictionary<string, Vector2>();
+
+    private readonly List<string> _teleportIds = new List<string>();   // 정렬된 순서 유지
+    private readonly Dictionary<string, (int theme, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
+
+    public event Action<Vector2> OnTeleportRequested;
 
     public TeleportService(TeleportModel teleportModel, IReadOnlyList<MapTeleportData> teleportDataList, MapService mapService)
     {
@@ -118,8 +145,76 @@ public class TeleportService
 
             _teleportMapIds.Add(data.Id, data.MapId);
             _teleportRevealRooms.Add(data.Id, roomIds.AsReadOnly());
+            _teleportIds.Add(data.Id);                                    
+            _teleportNumbers.Add(data.Id, (themeNumber, teleportNumber));
         }
+
+        _teleportIds.Sort((a, b) =>
+        {
+            var x = _teleportNumbers[a];
+            var y = _teleportNumbers[b];
+            return x.theme != y.theme ? x.theme.CompareTo(y.theme) : x.number.CompareTo(y.number);
+        });
     }
 
+    public IReadOnlyList<TeleportInfo> GetTeleportInfos(bool activatedOnly)
+    {
+        List<TeleportInfo> result = new List<TeleportInfo>(_teleportIds.Count);
+        foreach (string teleportId in _teleportIds)
+        {
+            bool isActivated = _teleportViewModel.GetTeleportActivated(teleportId);   // ← 실제 메서드명으로 교체
+            if (activatedOnly && !isActivated)
+            {
+                continue;
+            }
+            var numbers = _teleportNumbers[teleportId];
+            result.Add(new TeleportInfo(teleportId, _teleportMapIds[teleportId], numbers.theme, numbers.number, isActivated));
+        }
+        return result;
+    }
+
+    public bool RegisterTeleportPosition(string teleportId, Vector2 position)
+    {
+        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportMapIds.ContainsKey(teleportId))
+        {
+            return false;
+        }
+        _teleportPositions[teleportId] = position;
+        return true;
+    }
+
+    public bool RequestTeleport(string teleportId)
+    {
+        if (!_teleportViewModel.GetTeleportActivated(teleportId))
+        {
+            return false;
+        }
+        if (!_teleportPositions.TryGetValue(teleportId, out Vector2 position))
+        {
+            //Debug.LogError("[TeleportService] 좌표가 등록되지 않은 텔레포트: " + teleportId);
+            return false;
+        }
+
+        var uiBase = UIManager.Instance.OpenUI(UIRootType.VeryFrontUI, UIType.FadeUI);
+        if (uiBase is FadeUI fadeUI)
+        {
+            UIManager.Instance.CloseUI(UIRootType.PopupUI, UIType.PointUI);
+            fadeUI.StartCoroutine(TeleportRoutine(fadeUI, position));
+        }
+
+        return true;
+    }
+
+    private IEnumerator TeleportRoutine(FadeUI fadeUI, Vector2 position)
+    {
+        yield return fadeUI.FadeIn();
+
+        OnTeleportRequested?.Invoke(position);
+        yield return new WaitForFixedUpdate();
+
+        yield return fadeUI.FadeOut();
+
+        UIManager.Instance.CloseUI(UIRootType.VeryFrontUI, UIType.FadeUI);
+    }
 }
 
