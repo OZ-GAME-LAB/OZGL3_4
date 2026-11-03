@@ -13,9 +13,9 @@ public class UIManager : SingletonBase<UIManager>
     private Dictionary<UIType, UIBase> _createdUIList = new Dictionary<UIType, UIBase>();
     private HashSet<UIType> _opendUIList = new HashSet<UIType>();
 
-    // [나라] TODO : 게임 시작하자마자 LoadingUI 열리도록
     private void Start()
     {
+        OpenUI(UIRootType.MainUI, UIType.LobbyUI);
     }
 
     public UIBase OpenUI(UIRootType uiRootType, UIType uiType, bool isInitialHide = false)

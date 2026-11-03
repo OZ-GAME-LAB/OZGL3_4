@@ -132,6 +132,9 @@ public class Player : MonoBehaviour
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+
+        MapManager.Instance.Transform_Target = transform;
+        Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
     }
 
     private void Update()
