@@ -36,6 +36,15 @@ public abstract class SignalSender : MonoBehaviour
 
             receiver.ReceiveSignal(isOn);
         }
+
+        HandleSignalSent(isOn);
+    }
+
+    /// <summary>
+    /// 신호를 보낸 직후 호출됩니다. 자식 클래스에서 외형 변경 등에 사용합니다. (시작 상태를 맞출 때도 호출됩니다.)
+    /// </summary>
+    protected virtual void HandleSignalSent(bool isOn)
+    {
     }
 
     /// <summary>
@@ -45,7 +54,16 @@ public abstract class SignalSender : MonoBehaviour
     private async UniTaskVoid SyncReceiversAsync()
     {
         await UniTask.Yield(PlayerLoopTiming.Update, this.GetCancellationTokenOnDestroy());
-        SendSignal(_isStartOn);
+        SendSignal(GetStartState());
+    }
+
+    /// <summary>
+    /// 시작할 때 연결된 기믹에 보낼 상태입니다. 기본은 _isStartOn 값이며,
+    /// 자식 클래스에서 실제 상태로 바꿀 수 있습니다. (예: 발판은 눌려 있는지 여부)
+    /// </summary>
+    protected virtual bool GetStartState()
+    {
+        return _isStartOn;
     }
 
     private void OnValidate()

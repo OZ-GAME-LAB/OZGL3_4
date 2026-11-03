@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -71,12 +72,11 @@ public class Player : MonoBehaviour
     public Grabbable GrabTarget { get; private set; }
 
     [Header("Component")]
-    [SerializeField] private GameObject _visual;
+    private PlayerInteractor _playerInteractor;
     private Collider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
-    public GameObject Visual => _visual;
     public Collider2D Collider => _collider;
     public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
@@ -84,6 +84,7 @@ public class Player : MonoBehaviour
     #region Unity LifeCycle
     private void Awake()
     {
+        _playerInteractor = GetComponent<PlayerInteractor>();
         _collider = GetComponent<Collider2D>();
         _rigid = GetComponent<Rigidbody2D>();
         _anim = GetComponentInChildren<Animator>();
@@ -108,6 +109,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // 텔레포트 이벤트 등록
+        NetworkManager.Instance.TeleportService.OnTeleportRequested += TeleportTo;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Instance.TeleportService.OnTeleportRequested -= TeleportTo;
+    }
+
     private void Start()
     {
         _viewModel = NetworkManager.Instance.PlayerService.GetPlayerViewModel();
@@ -120,6 +132,9 @@ public class Player : MonoBehaviour
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+
+        MapManager.Instance.Transform_Target = transform;
+        Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
     }
 
     private void Update()
@@ -303,6 +318,15 @@ public class Player : MonoBehaviour
 
         return hit.GetComponent<Grabbable>();
     }
+
+    public void TeleportTo(Vector2 dest)
+    {
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.position = dest;
+        transform.position = dest;
+        _rigid.rotation = 0f;
+        ChangeState(PlayerState.Idle);
+    }
     #endregion
 
     #region 내부 처리
@@ -373,6 +397,14 @@ public class Player : MonoBehaviour
         else
         {
             _currentShadow.ReleaseAbility();
+        }
+    }
+
+    private void OnInteraction(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            _playerInteractor.TryInteract();
         }
     }
     #endregion

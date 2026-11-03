@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class MapRoomViewModel : ViewModelBase
 {
@@ -7,15 +8,13 @@ public class MapRoomViewModel : ViewModelBase
     private readonly List<string> _rewardIds;
     private readonly List<string> _hiddenIds;
     private readonly List<MapRoomExitData> _exits;
+    private readonly List<Vector2Int> _occupiedSlots = new List<Vector2Int>();
     private bool _canShowExplorationRate;
 
     public string RoomId { get; }
     public string RoomName { get; }
     public string MapId { get; }
-    public int CellX { get; }
-    public int CellY { get; }
-    public int CellWidth { get; }
-    public int CellHeight { get; }
+    public IReadOnlyList<Vector2Int> OccupiedSlots { get; }
     public bool IsTerrainRevealed
     {
         get
@@ -178,14 +177,24 @@ public class MapRoomViewModel : ViewModelBase
         RoomId = roomData.Id;
         RoomName = roomData.Name;
         MapId = roomData.MapId;
-        if (roomData.CellWidth <= 0 || roomData.CellHeight <= 0)
+        if (roomData.OccupiedSlots == null || roomData.OccupiedSlots.Count == 0)
         {
-            throw new ArgumentException("방의 슬롯 크기는 양수여야 합니다: " + roomData.Id);
+            throw new ArgumentException("방의 점유 슬롯이 필요합니다: " + roomData.Id);
         }
-        CellX = roomData.CellX;
-        CellY = roomData.CellY;
-        CellWidth = roomData.CellWidth;
-        CellHeight = roomData.CellHeight;
+        foreach (MapSlotData slotData in roomData.OccupiedSlots)
+        {
+            if (slotData == null)
+            {
+                throw new ArgumentException("방의 점유 슬롯에 null이 있습니다: " + roomData.Id);
+            }
+            Vector2Int slot = new Vector2Int(slotData.X, slotData.Y);
+            if (_occupiedSlots.Contains(slot))
+            {
+                throw new ArgumentException("방의 점유 슬롯이 중복됩니다: " + roomData.Id);
+            }
+            _occupiedSlots.Add(slot);
+        }
+        OccupiedSlots = _occupiedSlots.AsReadOnly();
         _rewardIds = GetUniqueIds(roomData.RewardIds);
         _hiddenIds = GetUniqueIds(roomData.HiddenIds);
         foreach (string hiddenId in _hiddenIds)
@@ -218,6 +227,11 @@ public class MapRoomViewModel : ViewModelBase
         UnlockedExitIds = _roomModel.UnlockedExitIds.AsReadOnly();
     }
 
+    // 사각형 경계가 아닌 실제 점유 슬롯으로 방 포함 여부를 확인한다.
+    public bool ContainsSlot(Vector2Int slot)
+    {
+        return _occupiedSlots.Contains(slot);
+    }
     public bool TrySetVisited(bool isVisited)
     {
         if (IsVisited == isVisited)
