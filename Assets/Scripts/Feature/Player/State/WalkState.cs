@@ -6,8 +6,6 @@ public class WalkState : PlayerStateBase
     private float _rotateSpeed = 12f;
     private float _maxSlopeAngle = 50f;
 
-    private RaycastHit2D groundHit;
-
     public WalkState(Player player) : base(player) { }
 
     public override void Enter()
@@ -20,9 +18,9 @@ public class WalkState : PlayerStateBase
     {
         float targetAngle = 0f;
 
-        if (groundHit)
+        if (_player.GroundHit)
         {
-            float slopeAngle = Vector2.SignedAngle(Vector2.up, groundHit.normal);
+            float slopeAngle = Vector2.SignedAngle(Vector2.up, _player.GroundHit.normal);
             if(Mathf.Abs(slopeAngle) <= _maxSlopeAngle)
             {
                 targetAngle = slopeAngle;
@@ -43,7 +41,5 @@ public class WalkState : PlayerStateBase
 
         float moveSpeed = _player.CurrentShadow.Speed;
         _player.SetVelocity(moveSpeed);
-
-        groundHit = Physics2D.Raycast(_player.transform.position, Vector2.down, 2f, _player.GroundLayer);
     }
 }
