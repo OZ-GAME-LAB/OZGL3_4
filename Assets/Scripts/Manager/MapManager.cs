@@ -149,6 +149,72 @@ public class MapManager : SingletonBase<MapManager>
         _regionLoader.SetRegionVisible("Region_Test02", true);
     }
 
+    [ContextMenu("테스트: 텔레포트")]
+    private void TestTeleport()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestTeleport) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        TestTeleportAsync().Forget();
+    }
+
+    [ContextMenu("테스트: 준비만")]
+    private void TestPrepareOnly()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestPrepareOnly) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        PrepareRegionAsync(_testTeleportRegionId).Forget();
+    }
+
+    [ContextMenu("테스트: 준비 취소")]
+    private void TestReleasePrepared()
+    {
+        if (_regionLoader == null)
+        {
+            Debug.LogWarning("[MapManager] (TestReleasePrepared) 플레이 모드에서만 사용 가능");
+            return;
+        }
+
+        ReleasePreparedRegion(_testTeleportRegionId);
+    }
+
+
+    private async UniTaskVoid TestTeleportAsync()
+    {
+        bool isReady = await PrepareRegionAsync(_testTeleportRegionId);
+
+        if (!isReady)
+        {
+            Debug.LogWarning($"[MapManager] (TestTeleportAsync) 지역 준비 실패로 이동 취소: {_testTeleportRegionId}");
+            return;
+        }
+
+        if (Transform_Target == null)
+        {
+            Debug.LogWarning("[MapManager] (TestTeleportAsync) Transform_Target 없음");
+            return;
+        }
+
+        Player player = Transform_Target.GetComponent<Player>();
+
+        if (player != null)
+        {
+            player.TeleportTo(_testTeleportPosition);
+        }
+        else
+        {
+            Transform_Target.position = _testTeleportPosition;
+        }
+    }
+
+
 
     public void UpdatePlayerChunk() // 수정된 부분 - 재욱님 추가 (청크가 업데이트 될 때마다 이벤트를 통해 알리기 위함)
     {
@@ -344,6 +410,30 @@ public class MapManager : SingletonBase<MapManager>
         return true;
     }
 
+    public void ReleasePreparedRegion(string regionId)
+    {
+        if (string.IsNullOrEmpty(regionId))
+        {
+            Debug.LogWarning($"[MapManager] (ReleasePreparedRegion) regionId가 비어있음");
+
+            return;
+        }
+
+        EnsureRegionLoader();
+
+        if (_pinnedRegionId != regionId) return;
+
+        _pinnedRegionId = null;
+
+        if (!string.IsNullOrEmpty(_targetRegionId) && _regionLoader.IsRegionLoaded(_targetRegionId) && !_regionLoader.HasLoadingRegion())
+        {
+            CalculateRegionDistances(_targetRegionId);
+            ApplyRegionStates();
+        }
+
+        Debug.Log($"[MapManager] (ReleasePreparedRegion) 지역 해제 완료 : {regionId}");
+    }
+
     public async UniTask EnterRegionAsync(string regionId)
     {
         // 1. 중복 검사
@@ -356,7 +446,15 @@ public class MapManager : SingletonBase<MapManager>
 
         EnsureRegionLoader();
 
-        if (regionId == _targetRegionId && _regionLoader.IsRegionLoaded(regionId)) return;
+        if (regionId == _targetRegionId && _regionLoader.IsRegionLoaded(regionId))
+        {
+            if (_pinnedRegionId == regionId)
+            {
+                _pinnedRegionId = null;
+            }
+
+            return;
+        }
 
         _targetRegionId = regionId;
 
@@ -407,6 +505,13 @@ public class MapManager : SingletonBase<MapManager>
         CalculateRegionDistances(regionId);
         ApplyRegionStates();
 
+
+        if (_pinnedRegionId == regionId)
+        {
+            _pinnedRegionId = null;
+        }
+
+
         Debug.Log($"[MapManager] (EnterRegionAsync) 지역 진입 완료: {regionId}");
     }
 
@@ -446,8 +551,16 @@ public class MapManager : SingletonBase<MapManager>
     {
         _regionLoader.CollectActiveRegionIds(_activeRegionIdBuffer);
 
+
         foreach (string id in _activeRegionIdBuffer)
         {
+            if (id == _pinnedRegionId)
+            {
+                _regionLoader.SetRegionVisible(id, true);
+
+                continue;
+            }
+
             if (!_regionDistances.TryGetValue(id, out int distance) || distance > _keepRegionDistance)
             {
                 _regionLoader.UnloadRegion(id);
