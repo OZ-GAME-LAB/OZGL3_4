@@ -1,8 +1,8 @@
-﻿using NUnit.Framework.Constraints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks; // 수정 - 김동혁
 
 public readonly struct TeleportInfo
 {
@@ -34,6 +34,9 @@ public class TeleportService
     private readonly Dictionary<string, (int region, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
 
     public event Action<Vector2> OnTeleportRequested;
+
+    private const int PositionWaitFrames = 10; // 수정 - 김동혁
+    private bool _isPrepared; // 수정 - 김동혁
 
     public TeleportService(TeleportModel teleportModel, IReadOnlyList<MapTeleportData> teleportDataList, MapService mapService)
     {
@@ -189,9 +192,14 @@ public class TeleportService
         {
             return false;
         }
-        if (!_teleportPositions.TryGetValue(teleportId, out Vector2 position))
+        if (!_teleportRegionIds.TryGetValue(teleportId, out string regionId)) // 수정 - 김동혁
         {
-            //Debug.LogError("[TeleportService] 좌표가 등록되지 않은 텔레포트: " + teleportId);
+            Debug.LogError("[TeleportService] (RequestTeleport) RegionId가 없는 텔레포트: " + teleportId);
+            return false;
+        }
+        if (MapManager.Instance == null)
+        {
+            Debug.LogError("[TeleportService] (RequestTeleport) MapManager가 없습니다."); // 수정 - 김동혁
             return false;
         }
 
@@ -199,19 +207,55 @@ public class TeleportService
         if (uiBase is FadeUI fadeUI)
         {
             UIManager.Instance.CloseUI(UIRootType.PopupUI, UIType.PointUI);
-            fadeUI.StartCoroutine(TeleportRoutine(fadeUI, position));
+            fadeUI.StartCoroutine(TeleportRoutine(fadeUI, teleportId, regionId)); // 수정 - 김동혁
         }
 
         return true;
     }
 
-    private IEnumerator TeleportRoutine(FadeUI fadeUI, Vector2 position)
+    private IEnumerator TeleportRoutine(FadeUI fadeUI, string teleportId, string regionId)
     {
         yield return fadeUI.FadeIn();
 
+        // 수정 - 김동혁) 도착 지역 준비 ---
+        _isPrepared = false;
+        yield return MapManager.Instance.PrepareRegionAsync(regionId).ToCoroutine(OnPrepareCompleted);
+
+        if (!_isPrepared)
+        {
+            Debug.LogError("[TeleportService] (TeleportRoutine) 도착 지역 준비 실패: " + regionId);
+            yield return CloseFade(fadeUI);
+            yield break;
+        }
+
+        int waitFrames = 0;
+        while (!_teleportPositions.ContainsKey(teleportId) && waitFrames < PositionWaitFrames)
+        {
+            waitFrames++;
+            yield return null;
+        }
+
+        if (!_teleportPositions.TryGetValue(teleportId, out Vector2 position))
+        {
+            Debug.LogError("[TeleportService] (TeleportRoutine) 좌표가 등록되지 않은 텔레포트: " + teleportId);
+            MapManager.Instance.ReleasePreparedRegion(regionId);
+            yield return CloseFade(fadeUI);
+            yield break;
+        }
+        // -----
         OnTeleportRequested?.Invoke(position);
         yield return new WaitForFixedUpdate();
 
+        yield return CloseFade(fadeUI); // 수정 - 김동혁
+    }
+
+    private void OnPrepareCompleted(bool isReady) // 추가 - 김동혁
+    {
+        _isPrepared = isReady;
+    }
+
+    private IEnumerator CloseFade(FadeUI fadeUI) // 추가 - 김동혁
+    {
         yield return fadeUI.FadeOut();
 
         UIManager.Instance.CloseUI(UIRootType.VeryFrontUI, UIType.FadeUI);
