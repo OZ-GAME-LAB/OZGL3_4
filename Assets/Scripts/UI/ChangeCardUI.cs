@@ -3,7 +3,7 @@ using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ChangeCardUI : MonoBehaviour
+public class ChangeCardUI : UIBase
 {
     [Header("시작할 때 각 자리에 있는 카드")]
     [SerializeField] private RectTransform RectTransform_LeftCard;
@@ -121,6 +121,7 @@ public class ChangeCardUI : MonoBehaviour
 
     private void OnClickChangeCard()
     {
+        Debug.Log("버튼 눌림");
         if (_isMoving || _playerService == null) return;
 
         // 왼쪽 카드가 가운데로 오는 기존 순서를 유지하며 미획득 형태는 건너뛴다.

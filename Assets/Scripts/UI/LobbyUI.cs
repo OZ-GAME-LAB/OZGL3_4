@@ -16,13 +16,6 @@ public class LobbyUI : UIBase
 
     private void StartGame()
     {
-        UIManager.Instance.CloseUI(UIRootType.MainUI, UIType.LobbyUI);
-
-        LoadAsset();
-    }
-
-    private async void LoadAsset()
-    {
-        GameObjectManager.Instance.CreateObject("Player", Vector3.zero);
+        GameManager.Instance.StartGame();
     }
 }
