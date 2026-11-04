@@ -18,6 +18,7 @@ public enum UIType
     LobbyUI,
     FadeUI,
     SettingUI,
+    ChangeCardUI,
 }
 
 public static class UIManagerExtension
