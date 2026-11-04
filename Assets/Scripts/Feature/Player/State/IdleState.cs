@@ -7,8 +7,6 @@ public class IdleState : PlayerStateBase
     private float _rotateSpeed = 12f;
     private float _maxSlopeAngle = 50f;
 
-    private RaycastHit2D groundHit;
-
     public override void Enter()
     {
         // 애니메이션 실행
@@ -19,9 +17,9 @@ public class IdleState : PlayerStateBase
     {
         float targetAngle = 0f;
 
-        if (groundHit)
+        if (_player.GroundHit)
         {
-            float slopeAngle = Vector2.SignedAngle(Vector2.up, groundHit.normal);
+            float slopeAngle = Vector2.SignedAngle(Vector2.up, _player.GroundHit.normal);
             if (Mathf.Abs(slopeAngle) <= _maxSlopeAngle)
             {
                 targetAngle = slopeAngle;
@@ -40,6 +38,5 @@ public class IdleState : PlayerStateBase
         }
 
         _player.SetVelocity(0);
-        groundHit = Physics2D.Raycast(_player.transform.position, Vector2.down, 2f, _player.GroundLayer);
     }
 }
