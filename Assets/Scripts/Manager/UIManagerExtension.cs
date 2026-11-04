@@ -17,6 +17,7 @@ public enum UIType
     Map,
     LobbyUI,
     FadeUI,
+    SettingUI,
     ChangeCardUI,
 }
 

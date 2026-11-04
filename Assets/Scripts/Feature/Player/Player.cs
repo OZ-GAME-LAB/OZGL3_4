@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.UI.Image;
 
 public enum PlayerState
 {
@@ -54,11 +55,14 @@ public class Player : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
+    private ContactFilter2D _groundFilter;
+    private RaycastHit2D[] _groundHits = new RaycastHit2D[4];
     private RaycastHit2D _groundHit;
     private Vector2 _groundCheckSize = new Vector2(0.8f, 0.1f);
     private float _groundLockTime = 0.1f;
     private float _groundLockTimer;
     public LayerMask GroundLayer => _groundLayer;
+    public RaycastHit2D GroundHit => _groundHit;
 
     [Header("Dash")]
     private float _dashCooldownTimer;
@@ -73,11 +77,11 @@ public class Player : MonoBehaviour
 
     [Header("Component")]
     private PlayerInteractor _playerInteractor;
-    private Collider2D _collider;
+    private CapsuleCollider2D _collider;
     private Rigidbody2D _rigid;
     private Animator _anim;
     private SpriteRenderer _sprite;
-    public Collider2D Collider => _collider;
+    public CapsuleCollider2D Collider => _collider;
     public Rigidbody2D Rigid => _rigid;
     public Animator Animator => _anim;
 
@@ -85,7 +89,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _playerInteractor = GetComponent<PlayerInteractor>();
-        _collider = GetComponent<Collider2D>();
+        _collider = GetComponent<CapsuleCollider2D>();
         _rigid = GetComponent<Rigidbody2D>();
         _anim = GetComponentInChildren<Animator>();
         _sprite = GetComponentInChildren<SpriteRenderer>();
@@ -107,6 +111,10 @@ public class Player : MonoBehaviour
                 Debug.LogWarning("애니메이션 중복");
             }
         }
+
+        _groundFilter = new ContactFilter2D();
+        _groundFilter.SetLayerMask(_groundLayer);
+        _groundFilter.useTriggers = false;
     }
 
     private void OnEnable()
@@ -235,13 +243,16 @@ public class Player : MonoBehaviour
     {
         float xOffset = _movement.x * speed;
 
-        if (_currentState is not JumpState)
+        if (_currentState is not JumpState && _isGrounded)
         {
+            // 바닥 위: 경사면을 따라가는 방향으로 이동 (평지면 slopeDir = (1, 0) → y = 0)
+            // 멈추면 xOffset = 0 → 속도 (0, 0) 이라 튀거나 미끄러지지 않음
             Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
             _rigid.linearVelocity = slopeDir * xOffset;
         }
-        else 
+        else
         {
+            // 점프 중이거나 공중: y는 중력에 맡김
             _rigid.linearVelocity = new Vector2(xOffset, _rigid.linearVelocity.y);
         }
 
@@ -253,6 +264,7 @@ public class Player : MonoBehaviour
 
     public void SetJump()
     {
+        _rigid.linearVelocityY = 0;
         _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower, ForceMode2D.Impulse);
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
@@ -335,16 +347,37 @@ public class Player : MonoBehaviour
 
     private void UpdateGround()
     {
-        if(_groundLockTimer > 0f)
+        if (_groundLockTimer > 0f)
         {
             _isGrounded = false;
             return;
         }
 
-        _groundHit = Physics2D.Raycast(transform.position, Vector2.down, 1, _groundLayer);
-        _isGrounded = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f, _groundLayer);
+        int count = _collider.Cast(Vector2.down, _groundFilter, _groundHits, 0.1f);
 
-        if(_isGrounded == true && Rigid.linearVelocity.y <= 0.01f)
+        float minNormalY = Mathf.Cos(50f * Mathf.Deg2Rad);
+        bool found = false;
+        Vector2 bestNormal = Vector2.up;
+
+        // 여러 개가 맞으면 가장 평평한 바닥을 선택 (벽은 제외)
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 normal = _groundHits[i].normal;
+            if (normal.y < minNormalY)
+            {
+                continue;
+            }
+            if (!found || normal.y > bestNormal.y)
+            {
+                _groundHit = _groundHits[i];
+                bestNormal = normal;
+                found = true;
+            }
+        }
+
+        _isGrounded = found;
+
+        if (_isGrounded && Mathf.Abs(Rigid.linearVelocity.y) <= 0.01f)
         {
             _jumpCount = 0;
         }
@@ -405,7 +438,7 @@ public class Player : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_groundCheck.position, _groundCheckSize);
 
-        if (_collider == null) _collider = GetComponent<Collider2D>();
+        if (_collider == null) _collider = GetComponent<CapsuleCollider2D>();
         if (_collider == null) return;
 
 
