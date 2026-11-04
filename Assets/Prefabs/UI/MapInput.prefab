@@ -58,4 +58,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e91fef4bc9d34c4e8c1c87fe281aee12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapPlayerTracker
-  _regionId: Region_01
+  _regionId: 
