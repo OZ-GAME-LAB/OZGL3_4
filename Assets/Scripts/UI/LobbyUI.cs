@@ -21,4 +21,9 @@ public class LobbyUI : UIBase
     {
         GameManager.Instance.StartGame();
     }
+
+    private void OpenSettingUI()
+    {
+        UIManager.Instance.OpenUI(UIRootType.PopupUI, UIType.SettingUI);
+    }
 }
