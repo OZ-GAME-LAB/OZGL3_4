@@ -4,7 +4,7 @@ using UnityEngine;
 public class MapPlayerTracker : MonoBehaviour
 {
     private MapManager Manager_Map;
-    [SerializeField] private string _regionId = "Region_01";
+    [SerializeField] private string _regionId = ""; // 수정 - 김동혁) 기본으로 세팅되어있던 Region_01을 제거
 
     private MapService _mapService;
 
@@ -82,6 +82,12 @@ public class MapPlayerTracker : MonoBehaviour
         UnBind();
         Manager_Map.OnChangePlayerChunk += OnChangePlayerChunk;
         Manager_Map.OnClearPlayerChunk += ClearCurrentRoom;
+        Manager_Map.OnChangeRegion += SetRegionId; // 수정 - 김동혁
+
+        if (!string.IsNullOrEmpty(Manager_Map.CurrentRegionId)) // 수정 - 김동혁
+        {
+            _regionId = Manager_Map.CurrentRegionId;
+        }
     }
 
     private void UnBind()
@@ -92,6 +98,7 @@ public class MapPlayerTracker : MonoBehaviour
         }
         Manager_Map.OnChangePlayerChunk -= OnChangePlayerChunk;
         Manager_Map.OnClearPlayerChunk -= ClearCurrentRoom;
+        Manager_Map.OnChangeRegion -= SetRegionId; // 수정 - 김동혁
     }
 
     public void SetRegionId(string regionId)
