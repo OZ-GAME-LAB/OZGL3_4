@@ -6,7 +6,7 @@ public class MapViewModel : ViewModelBase, IDisposable
 {
     private readonly List<MapRoomViewModel> _rooms = new List<MapRoomViewModel>();
     private TeleportViewModel _teleportViewModel;
-    private string _currentMapId;
+    private string _currentRegionId;
     private string _currentRoomId = string.Empty;
 
     public string CurrentRoomId
@@ -14,22 +14,13 @@ public class MapViewModel : ViewModelBase, IDisposable
         get { return _currentRoomId; }
     }
 
-    public string CurrentRoomName
-    {
-        get
-        {
-            MapRoomViewModel room = GetRoomViewModel(CurrentRoomId);
-            return room == null ? string.Empty : room.RoomName;
-        }
-    }
-
     public IReadOnlyList<MapRoomViewModel> Rooms { get; }
 
-    public string CurrentMapId
+    public string CurrentRegionId
     {
         get
         {
-            return _currentMapId;
+            return _currentRegionId;
         }
     }
 
@@ -37,7 +28,7 @@ public class MapViewModel : ViewModelBase, IDisposable
     {
         get
         {
-            return GetTeleportCount(CurrentMapId, false);
+            return GetTeleportCount(CurrentRegionId, false);
         }
     }
 
@@ -45,7 +36,7 @@ public class MapViewModel : ViewModelBase, IDisposable
     {
         get
         {
-            return GetTeleportCount(CurrentMapId, true);
+            return GetTeleportCount(CurrentRegionId, true);
         }
     }
 
@@ -58,7 +49,7 @@ public class MapViewModel : ViewModelBase, IDisposable
                 return 0f;
             }
 
-            return _teleportViewModel.GetTeleportActivationRate(CurrentMapId);
+            return _teleportViewModel.GetTeleportActivationRate(CurrentRegionId);
         }
     }
 
@@ -66,7 +57,7 @@ public class MapViewModel : ViewModelBase, IDisposable
     {
         get
         {
-            return GetCanShowExplorationRate(CurrentMapId);
+            return GetCanShowExplorationRate(CurrentRegionId);
         }
     }
 
@@ -76,7 +67,7 @@ public class MapViewModel : ViewModelBase, IDisposable
         {
             if (CanShowExplorationRate)
             {
-                return GetExplorationRate(CurrentMapId);
+                return GetExplorationRate(CurrentRegionId);
             }
 
             return null;
@@ -98,9 +89,9 @@ public class MapViewModel : ViewModelBase, IDisposable
 
         foreach (MapRoomData roomData in roomDataList)
         {
-            if (roomData == null || string.IsNullOrWhiteSpace(roomData.Id) || string.IsNullOrWhiteSpace(roomData.MapId))
+            if (roomData == null || string.IsNullOrWhiteSpace(roomData.Id) || string.IsNullOrWhiteSpace(roomData.RegionId))
             {
-                throw new ArgumentException("방 데이터와 Id, MapId가 필요합니다.");
+                throw new ArgumentException("방 데이터와 Id, RegionId가 필요합니다.");
             }
             if (GetRoomViewModel(roomData.Id) != null)
             {
@@ -127,11 +118,11 @@ public class MapViewModel : ViewModelBase, IDisposable
 
         if (_rooms.Count > 0)
         {
-            _currentMapId = _rooms[0].MapId;
+            _currentRegionId = _rooms[0].RegionId;
         }
         foreach (MapRoomViewModel room in _rooms)
         {
-            room.SetExplorationRateVisible(GetCanShowExplorationRate(room.MapId));
+            room.SetExplorationRateVisible(GetCanShowExplorationRate(room.RegionId));
             room.PropertyChanged += OnChangeRoomProperty;
         }
     }
@@ -151,38 +142,36 @@ public class MapViewModel : ViewModelBase, IDisposable
     public void InvokeOnceOnInit()
     {
         OnPropertyChanged(nameof(Rooms));
-        OnPropertyChanged(nameof(CurrentMapId));
+        OnPropertyChanged(nameof(CurrentRegionId));
         OnPropertyChanged(nameof(CurrentRoomId));
-        OnPropertyChanged(nameof(CurrentRoomName));
-        UpdateThemeProgress();
+        UpdateRegionProgress();
         foreach (MapRoomViewModel room in _rooms)
         {
             room.InvokeOnceOnInit();
         }
     }
 
-    public bool TrySetCurrentMap(string mapId)
+    public bool TrySetCurrentRegion(string regionId)
     {
-        if (CurrentMapId == mapId)
+        if (CurrentRegionId == regionId)
         {
             return false;
         }
         foreach (MapRoomViewModel room in _rooms)
         {
-            if (room.MapId != mapId)
+            if (room.RegionId != regionId)
             {
                 continue;
             }
-            _currentMapId = mapId;
+            _currentRegionId = regionId;
             bool hadRoom = !string.IsNullOrEmpty(CurrentRoomId);
             _currentRoomId = string.Empty;
-            OnPropertyChanged(nameof(CurrentMapId));
+            OnPropertyChanged(nameof(CurrentRegionId));
             if (hadRoom)
             {
                 OnPropertyChanged(nameof(CurrentRoomId));
-                OnPropertyChanged(nameof(CurrentRoomName));
             }
-            UpdateThemeProgress();
+            UpdateRegionProgress();
             return true;
         }
         return false;
@@ -199,18 +188,17 @@ public class MapViewModel : ViewModelBase, IDisposable
         {
             return false;
         }
-        bool mapChanged = CurrentMapId != room.MapId;
-        _currentMapId = room.MapId;
+        bool regionChanged = CurrentRegionId != room.RegionId;
+        _currentRegionId = room.RegionId;
         _currentRoomId = roomId;
-        if (mapChanged)
+        if (regionChanged)
         {
-            OnPropertyChanged(nameof(CurrentMapId));
+            OnPropertyChanged(nameof(CurrentRegionId));
         }
         OnPropertyChanged(nameof(CurrentRoomId));
-        OnPropertyChanged(nameof(CurrentRoomName));
-        if (mapChanged)
+        if (regionChanged)
         {
-            UpdateThemeProgress();
+            UpdateRegionProgress();
         }
         return true;
     }
@@ -223,11 +211,10 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
         _currentRoomId = string.Empty;
         OnPropertyChanged(nameof(CurrentRoomId));
-        OnPropertyChanged(nameof(CurrentRoomName));
         return true;
     }
 
-    private int GetTeleportCount(string mapId, bool activatedOnly)
+    private int GetTeleportCount(string regionId, bool activatedOnly)
     {
         if (_teleportViewModel == null)
         {
@@ -235,18 +222,18 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
         if (activatedOnly)
         {
-            return _teleportViewModel.GetActivatedTeleportCount(mapId);
+            return _teleportViewModel.GetActivatedTeleportCount(regionId);
         }
-        return _teleportViewModel.GetTotalTeleportCount(mapId);
+        return _teleportViewModel.GetTotalTeleportCount(regionId);
     }
 
-    private bool GetCanShowExplorationRate(string mapId)
+    private bool GetCanShowExplorationRate(string regionId)
     {
-        int total = GetTeleportCount(mapId, false);
-        return total > 0 && GetTeleportCount(mapId, true) == total;
+        int total = GetTeleportCount(regionId, false);
+        return total > 0 && GetTeleportCount(regionId, true) == total;
     }
 
-    private float GetExplorationRate(string mapId)
+    private float GetExplorationRate(string regionId)
     {
         int totalCount = 0;
         int completedCount = 0;
@@ -254,7 +241,7 @@ public class MapViewModel : ViewModelBase, IDisposable
         int visitedCount = 0;
         foreach (MapRoomViewModel room in _rooms)
         {
-            if (room.MapId != mapId)
+            if (room.RegionId != regionId)
             {
                 continue;
             }
@@ -281,7 +268,7 @@ public class MapViewModel : ViewModelBase, IDisposable
     private void OnChangeRoomProperty(object sender, PropertyChangedEventArgs args)
     {
         MapRoomViewModel changedRoom = (MapRoomViewModel)sender;
-        if (changedRoom.MapId != CurrentMapId)
+        if (changedRoom.RegionId != CurrentRegionId)
         {
             return;
         }
@@ -323,12 +310,12 @@ public class MapViewModel : ViewModelBase, IDisposable
     {
         foreach (MapRoomViewModel room in _rooms)
         {
-            room.SetExplorationRateVisible(GetCanShowExplorationRate(room.MapId));
+            room.SetExplorationRateVisible(GetCanShowExplorationRate(room.RegionId));
         }
-        UpdateThemeProgress();
+        UpdateRegionProgress();
     }
 
-    private void UpdateThemeProgress()
+    private void UpdateRegionProgress()
     {
         OnPropertyChanged(nameof(TotalTeleportCount));
         OnPropertyChanged(nameof(ActivatedTeleportCount));

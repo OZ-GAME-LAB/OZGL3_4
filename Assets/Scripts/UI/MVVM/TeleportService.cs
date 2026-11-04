@@ -7,16 +7,16 @@ using UnityEngine;
 public readonly struct TeleportInfo
 {
     public readonly string Id;
-    public readonly string MapId;
-    public readonly int ThemeNumber;
+    public readonly string RegionId;
+    public readonly int RegionNumber;
     public readonly int TeleportNumber;
     public readonly bool IsActivated;
 
-    public TeleportInfo(string id, string mapId, int themeNumber, int teleportNumber, bool isActivated)
+    public TeleportInfo(string id, string regionId, int regionNumber, int teleportNumber, bool isActivated)
     {
         Id = id;
-        MapId = mapId;
-        ThemeNumber = themeNumber;
+        RegionId = regionId;
+        RegionNumber = regionNumber;
         TeleportNumber = teleportNumber;
         IsActivated = isActivated;
     }
@@ -26,12 +26,12 @@ public class TeleportService
 {
     private readonly MapService _mapService;
     private readonly TeleportViewModel _teleportViewModel;
-    private readonly Dictionary<string, string> _teleportMapIds = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> _teleportRegionIds = new Dictionary<string, string>();
     private readonly Dictionary<string, IReadOnlyList<string>> _teleportRevealRooms = new Dictionary<string, IReadOnlyList<string>>();
     private readonly Dictionary<string, Vector2> _teleportPositions = new Dictionary<string, Vector2>();
 
     private readonly List<string> _teleportIds = new List<string>();   // 정렬된 순서 유지
-    private readonly Dictionary<string, (int theme, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
+    private readonly Dictionary<string, (int region, int number)> _teleportNumbers = new Dictionary<string, (int, int)>();
 
     public event Action<Vector2> OnTeleportRequested;
 
@@ -47,7 +47,7 @@ public class TeleportService
         }
         _mapService = mapService;
         InitTeleports(teleportDataList);
-        _teleportViewModel = new TeleportViewModel(teleportModel, _teleportMapIds);
+        _teleportViewModel = new TeleportViewModel(teleportModel, _teleportRegionIds);
         _mapService.GetMapViewModel().BindTeleportViewModel(_teleportViewModel);
     }
 
@@ -89,38 +89,38 @@ public class TeleportService
         }
         foreach (MapTeleportData data in teleportDataList)
         {
-            if (data == null || string.IsNullOrWhiteSpace(data.Id) || string.IsNullOrWhiteSpace(data.MapId))
+            if (data == null || string.IsNullOrWhiteSpace(data.Id) || string.IsNullOrWhiteSpace(data.RegionId))
             {
-                throw new ArgumentException("텔레포트 Id와 MapId가 필요합니다.");
+                throw new ArgumentException("텔레포트 Id와 RegionId가 필요합니다.");
             }
-            if (_teleportMapIds.ContainsKey(data.Id))
+            if (_teleportRegionIds.ContainsKey(data.Id))
             {
                 throw new ArgumentException("중복된 텔레포트 Id: " + data.Id);
             }
             string[] idParts = data.Id.Split('_');
             if (idParts.Length != 3 || idParts[0] != "Teleport")
             {
-                throw new ArgumentException("텔레포트 Id 형식은 Teleport_테마번호_순번입니다: " + data.Id);
+                throw new ArgumentException("텔레포트 Id 형식은 Teleport_리전번호_순번입니다: " + data.Id);
             }
-            int themeNumber;
+            int regionNumber;
             int teleportNumber;
-            if (!int.TryParse(idParts[1], out themeNumber) || themeNumber < 1
+            if (!int.TryParse(idParts[1], out regionNumber) || regionNumber < 1
                 || !int.TryParse(idParts[2], out teleportNumber) || teleportNumber < 1)
             {
-                throw new ArgumentException("텔레포트 테마번호와 순번은 양의 정수여야 합니다: " + data.Id);
+                throw new ArgumentException("텔레포트 리전번호와 순번은 양의 정수여야 합니다: " + data.Id);
             }
-            bool hasMap = false;
+            bool hasRegion = false;
             foreach (MapRoomViewModel room in _mapService.GetMapViewModel().Rooms)
             {
-                if (room.MapId == data.MapId)
+                if (room.RegionId == data.RegionId)
                 {
-                    hasMap = true;
+                    hasRegion = true;
                     break;
                 }
             }
-            if (!hasMap)
+            if (!hasRegion)
             {
-                throw new ArgumentException("존재하지 않는 텔레포트 테마: " + data.MapId);
+                throw new ArgumentException("존재하지 않는 텔레포트 리전: " + data.RegionId);
             }
 
             List<string> roomIds = new List<string>();
@@ -135,25 +135,25 @@ public class TeleportService
                         continue;
                     }
                     MapRoomViewModel target = _mapService.GetMapViewModel().GetRoomViewModel(roomId);
-                    if (target == null || target.MapId != data.MapId)
+                    if (target == null || target.RegionId != data.RegionId)
                     {
-                        throw new ArgumentException("텔레포트 공개 대상은 같은 테마의 유효한 방이어야 합니다: " + roomId);
+                        throw new ArgumentException("텔레포트 공개 대상은 같은 리전의 유효한 방이어야 합니다: " + roomId);
                     }
                     roomIds.Add(roomId);
                 }
             }
 
-            _teleportMapIds.Add(data.Id, data.MapId);
+            _teleportRegionIds.Add(data.Id, data.RegionId);
             _teleportRevealRooms.Add(data.Id, roomIds.AsReadOnly());
             _teleportIds.Add(data.Id);                                    
-            _teleportNumbers.Add(data.Id, (themeNumber, teleportNumber));
+            _teleportNumbers.Add(data.Id, (regionNumber, teleportNumber));
         }
 
         _teleportIds.Sort((a, b) =>
         {
             var x = _teleportNumbers[a];
             var y = _teleportNumbers[b];
-            return x.theme != y.theme ? x.theme.CompareTo(y.theme) : x.number.CompareTo(y.number);
+            return x.region != y.region ? x.region.CompareTo(y.region) : x.number.CompareTo(y.number);
         });
     }
 
@@ -168,14 +168,14 @@ public class TeleportService
                 continue;
             }
             var numbers = _teleportNumbers[teleportId];
-            result.Add(new TeleportInfo(teleportId, _teleportMapIds[teleportId], numbers.theme, numbers.number, isActivated));
+            result.Add(new TeleportInfo(teleportId, _teleportRegionIds[teleportId], numbers.region, numbers.number, isActivated));
         }
         return result;
     }
 
     public bool RegisterTeleportPosition(string teleportId, Vector2 position)
     {
-        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportMapIds.ContainsKey(teleportId))
+        if (string.IsNullOrWhiteSpace(teleportId) || !_teleportRegionIds.ContainsKey(teleportId))
         {
             return false;
         }
