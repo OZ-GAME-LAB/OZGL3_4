@@ -1,0 +1,674 @@
+fileFormatVersion: 2
+guid: 4f0973eda49347c4ad44fb4bf80598ac
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1311128847766474473
+    second: Cave - RuleTileSet_0
+  - first:
+      213: -268281037017267056
+    second: Cave - RuleTileSet_1
+  - first:
+      213: 2857195932446328154
+    second: Cave - RuleTileSet_2
+  - first:
+      213: -7084418529312018710
+    second: Cave - RuleTileSet_3
+  - first:
+      213: -1820735440740108976
+    second: Cave - RuleTileSet_4
+  - first:
+      213: 6537661697274699758
+    second: Cave - RuleTileSet_5
+  - first:
+      213: -1423852335426141308
+    second: Cave - RuleTileSet_6
+  - first:
+      213: -4945790734519007513
+    second: Cave - RuleTileSet_7
+  - first:
+      213: 3824218663809622465
+    second: Cave - RuleTileSet_8
+  - first:
+      213: -3305647362463141893
+    second: Cave - RuleTileSet_9
+  - first:
+      213: -4510797121577940088
+    second: Cave - RuleTileSet_10
+  - first:
+      213: 7036391786941710892
+    second: Cave - RuleTileSet_11
+  - first:
+      213: -3281467175587166966
+    second: Cave - RuleTileSet_12
+  - first:
+      213: 4430855868021269480
+    second: Cave - RuleTileSet_13
+  - first:
+      213: -3076035574632554646
+    second: Cave - RuleTileSet_14
+  - first:
+      213: -3362412141669056867
+    second: Cave - RuleTileSet_15
+  - first:
+      213: -1912118376359807711
+    second: Cave - RuleTileSet_16
+  - first:
+      213: 3805124001907433824
+    second: Cave - RuleTileSet_17
+  - first:
+      213: -7630610298491789240
+    second: Cave - RuleTileSet_18
+  - first:
+      213: 2726069110942792985
+    second: Cave - RuleTileSet_19
+  - first:
+      213: -478708373368200262
+    second: Cave - RuleTileSet_20
+  - first:
+      213: 6274655548122018734
+    second: Cave - RuleTileSet_21
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 192
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e52ae118e57981722996064b313e11bd
+      internalID: 1311128847766474473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_1
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad881899b1a0307710dfad0d9086d3c5
+      internalID: -268281037017267056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_2
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8e0056f0b7560a8dad76f79d9d4cb14
+      internalID: 2857195932446328154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_3
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 451d65f811eca5843e95f6b568b27144
+      internalID: -7084418529312018710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_4
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 165af3da9e77bde463fe20596568edb9
+      internalID: -1820735440740108976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_5
+      rect:
+        serializedVersion: 2
+        x: 1048
+        y: 632
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 720d6ffcfe99ec605af6d845f27ae12c
+      internalID: 6537661697274699758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_6
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9da79677dde7711b9922453d6e0f0e1b
+      internalID: -1423852335426141308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f94004ce8bca178022accd91dd545802
+      internalID: -4945790734519007513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_8
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adc75f86831bb1040cce4d59f0d380fa
+      internalID: 3824218663809622465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_9
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b8a3133b697f7b4215a7f0f44fde027
+      internalID: -3305647362463141893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_10
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae5f827dc2bee8f25786f3d37ccc7f77
+      internalID: -4510797121577940088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_11
+      rect:
+        serializedVersion: 2
+        x: 1048
+        y: 424
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab90497ea444fd8bf87adabc55e22d3f
+      internalID: 7036391786941710892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_12
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0f003c6394e8616619040365932ae82
+      internalID: -3281467175587166966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_13
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c1b8945a2e590d78d10a720692c80d8
+      internalID: 4430855868021269480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_14
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77141609937f63c86d884bd60d4f0b6a
+      internalID: -3076035574632554646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_15
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce2756ddbb377f9223d73bd21082e351
+      internalID: -3362412141669056867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_16
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 057add944759987defae85494a8135da
+      internalID: -1912118376359807711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_17
+      rect:
+        serializedVersion: 2
+        x: 1048
+        y: 216
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52f8270c726ea59f10547431477ad915
+      internalID: 3805124001907433824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_18
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 8
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93b5bc8c97f625ba99a57594dad81e41
+      internalID: -7630610298491789240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_19
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 8
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05ffd156785ae296107524208c7f5efa
+      internalID: 2726069110942792985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_20
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 8
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4af3879bfc212019bc1345e055c4900a
+      internalID: -478708373368200262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave - RuleTileSet_21
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 8
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c8ba6d4acd0fa906a8579a5cb858766
+      internalID: 6274655548122018734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID:
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Cave - RuleTileSet_0: 1311128847766474473
+      Cave - RuleTileSet_1: -268281037017267056
+      Cave - RuleTileSet_10: -4510797121577940088
+      Cave - RuleTileSet_11: 7036391786941710892
+      Cave - RuleTileSet_12: -3281467175587166966
+      Cave - RuleTileSet_13: 4430855868021269480
+      Cave - RuleTileSet_14: -3076035574632554646
+      Cave - RuleTileSet_15: -3362412141669056867
+      Cave - RuleTileSet_16: -1912118376359807711
+      Cave - RuleTileSet_17: 3805124001907433824
+      Cave - RuleTileSet_18: -7630610298491789240
+      Cave - RuleTileSet_19: 2726069110942792985
+      Cave - RuleTileSet_2: 2857195932446328154
+      Cave - RuleTileSet_20: -478708373368200262
+      Cave - RuleTileSet_21: 6274655548122018734
+      Cave - RuleTileSet_3: -7084418529312018710
+      Cave - RuleTileSet_4: -1820735440740108976
+      Cave - RuleTileSet_5: 6537661697274699758
+      Cave - RuleTileSet_6: -1423852335426141308
+      Cave - RuleTileSet_7: -4945790734519007513
+      Cave - RuleTileSet_8: 3824218663809622465
+      Cave - RuleTileSet_9: -3305647362463141893
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:
