@@ -1680,3 +1680,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SettingUI
   _exitButton: {fileID: 9106810932823754788}
+  _masterSlider: {fileID: 8060696074968821390}
+  _bgmSlider: {fileID: 4042195514785254572}
+  _sfxlider: {fileID: 2203283014673257823}
