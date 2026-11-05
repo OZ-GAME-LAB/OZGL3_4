@@ -87,103 +87,103 @@ public class MapManager : SingletonBase<MapManager>
     }
 
 
-    [ContextMenu("테스트: Region_Test01 불러오기")]
-    private void TestLoadRegionTest01()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestLoadRegion_Test01) 플레이 모드에서만 사용 가능");
+    //[ContextMenu("테스트: Region_Test01 불러오기")]
+    //private void TestLoadRegionTest01()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestLoadRegion_Test01) 플레이 모드에서만 사용 가능");
 
-            return;
-        }
+    //        return;
+    //    }
 
-        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
-    }
+    //    _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+    //}
 
-    [ContextMenu("테스트: Region_Test01 내리기")]
-    private void TestUnloadRegionTest01()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestUnloadRegionTest01) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: Region_Test01 내리기")]
+    //private void TestUnloadRegionTest01()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        _regionLoader.UnloadRegion("Region_Test01");
-    }
+    //    _regionLoader.UnloadRegion("Region_Test01");
+    //}
 
-    [ContextMenu("테스트: 불러오고 바로 내리기")]
-    private void TestLoadAndUnloadRegionTest01()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestLoadAndUnloadRegionTest01) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: 불러오고 바로 내리기")]
+    //private void TestLoadAndUnloadRegionTest01()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestLoadAndUnloadRegionTest01) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        _regionLoader.LoadRegionAsync("Region_Test01").Forget();
-        _regionLoader.UnloadRegion("Region_Test01");
-    }
+    //    _regionLoader.LoadRegionAsync("Region_Test01").Forget();
+    //    _regionLoader.UnloadRegion("Region_Test01");
+    //}
 
-    [ContextMenu("테스트: Region_Test02 숨기기")]
-    private void TestHideRegionTest02()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestHideRegionTest02) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: Region_Test02 숨기기")]
+    //private void TestHideRegionTest02()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestHideRegionTest02) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        _regionLoader.SetRegionVisible("Region_Test02", false);
-    }
+    //    _regionLoader.SetRegionVisible("Region_Test02", false);
+    //}
 
-    [ContextMenu("테스트: Region_Test02 보이기")]
-    private void TestVisibleRegionTest02()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestVisibleRegionTest02) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: Region_Test02 보이기")]
+    //private void TestVisibleRegionTest02()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestVisibleRegionTest02) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        _regionLoader.SetRegionVisible("Region_Test02", true);
-    }
+    //    _regionLoader.SetRegionVisible("Region_Test02", true);
+    //}
 
-    [ContextMenu("테스트: 텔레포트")]
-    private void TestTeleport()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestTeleport) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: 텔레포트")]
+    //private void TestTeleport()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestTeleport) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        TestTeleportAsync().Forget();
-    }
+    //    TestTeleportAsync().Forget();
+    //}
 
-    [ContextMenu("테스트: 준비만")]
-    private void TestPrepareOnly()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestPrepareOnly) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: 준비만")]
+    //private void TestPrepareOnly()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestPrepareOnly) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        PrepareRegionAsync(_testTeleportRegionId).Forget();
-    }
+    //    PrepareRegionAsync(_testTeleportRegionId).Forget();
+    //}
 
-    [ContextMenu("테스트: 준비 취소")]
-    private void TestReleasePrepared()
-    {
-        if (_regionLoader == null)
-        {
-            Debug.LogWarning("[MapManager] (TestReleasePrepared) 플레이 모드에서만 사용 가능");
-            return;
-        }
+    //[ContextMenu("테스트: 준비 취소")] 
+    //private void TestReleasePrepared()
+    //{
+    //    if (_regionLoader == null)
+    //    {
+    //        Debug.LogWarning("[MapManager] (TestReleasePrepared) 플레이 모드에서만 사용 가능");
+    //        return;
+    //    }
 
-        ReleasePreparedRegion(_testTeleportRegionId);
-    }
+    //    ReleasePreparedRegion(_testTeleportRegionId);
+    //}
 
 
     private async UniTaskVoid TestTeleportAsync()
