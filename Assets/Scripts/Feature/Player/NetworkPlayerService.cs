@@ -19,6 +19,10 @@ public class NetworkPlayerService
             return false;
 
         PlayerViewModel viewModel = GetPlayerViewModel();
+        // 변신 연출 중에는 변경하지 않는다.
+        if (viewModel.IsChangingShadow)
+            return false;
+
         ShadowType previousType = viewModel.CurrentShadowType;
         viewModel.ChangeShadow(type);
 
