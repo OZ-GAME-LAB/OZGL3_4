@@ -42,6 +42,13 @@ public class Pipe : MonoBehaviour, IInteractable
     [SerializeField] private float _enterDelay = 0.15f;
     [SerializeField] private float _exitDelay = 0.15f;
 
+    [Header("Body (배관 몸통 선)")]
+    [SerializeField] private LineRenderer LineRenderer_Body;
+    [SerializeField] private bool _isDrawBody = true;
+    [SerializeField] private float _bodyWidth = 0.8f;
+    [SerializeField] private Color _bodyColor = new Color(0.22f, 0.24f, 0.27f, 1f);
+    [SerializeField] private int _bodySortingOrder = 690;
+
     private readonly List<Vector3> _travelPath = new List<Vector3>();
     private readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
     private float _lockUntilTime;
@@ -88,6 +95,98 @@ public class Pipe : MonoBehaviour, IInteractable
         _lockUntilTime = 0f;
         IsTraveling = false;
         SetBlipVisible(false);
+        RefreshBodyLine();
+    }
+
+    private void OnValidate()
+    {
+        // 인스펙터에서 값을 바꾸면 에디터에서도 몸통 선을 다시 그립니다. (컴포넌트 추가는 플레이 중에만)
+        if (LineRenderer_Body != null)
+        {
+            RefreshBodyLine();
+        }
+    }
+
+    /// <summary>
+    /// 입구 → 경유 지점 → 출구를 잇는 배관 몸통 선을 그립니다.
+    /// 경로 점은 한쪽 배관에만 있으므로, 경로 점이 있는 배관(또는 둘 다 없으면 양쪽)이 그립니다.
+    /// LineRenderer 가 없으면 플레이 중에 Body 자식 오브젝트를 만들어 붙입니다.
+    /// </summary>
+    [ContextMenu("배관 몸통 선 갱신")]
+    public void RefreshBodyLine()
+    {
+        if (_isDrawBody == false || Pipe_Exit == null)
+        {
+            if (LineRenderer_Body != null)
+            {
+                LineRenderer_Body.enabled = false;
+            }
+
+            return;
+        }
+
+        bool hasOwnPath = List_PathPoint.Count > 0;
+        bool exitHasPath = Pipe_Exit.PathPoints.Count > 0;
+
+        // 상대 배관이 경로를 가지고 있으면 그쪽이 그립니다.
+        if (hasOwnPath == false && exitHasPath)
+        {
+            if (LineRenderer_Body != null)
+            {
+                LineRenderer_Body.enabled = false;
+            }
+
+            return;
+        }
+
+        if (LineRenderer_Body == null)
+        {
+            if (Application.isPlaying == false)
+                return;
+
+            LineRenderer_Body = CreateBodyLine();
+        }
+
+        BuildTravelPath();
+
+        LineRenderer_Body.enabled = true;
+        LineRenderer_Body.useWorldSpace = true;
+        LineRenderer_Body.positionCount = _travelPath.Count;
+        for (int i = 0; i < _travelPath.Count; i++)
+        {
+            Vector3 point = _travelPath[i];
+            LineRenderer_Body.SetPosition(i, new Vector3(point.x, point.y, transform.position.z));
+        }
+
+        LineRenderer_Body.startWidth = _bodyWidth;
+        LineRenderer_Body.endWidth = _bodyWidth;
+        LineRenderer_Body.startColor = _bodyColor;
+        LineRenderer_Body.endColor = _bodyColor;
+        LineRenderer_Body.numCornerVertices = 6;
+        LineRenderer_Body.numCapVertices = 4;
+        LineRenderer_Body.sortingOrder = _bodySortingOrder;
+    }
+
+    private LineRenderer CreateBodyLine()
+    {
+        GameObject bodyObject = new GameObject("Body");
+        bodyObject.transform.SetParent(transform, false);
+
+        LineRenderer line = bodyObject.AddComponent<LineRenderer>();
+        line.textureMode = LineTextureMode.Stretch;
+        line.alignment = LineAlignment.View;
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
+
+        // 배관 그림과 같은 재질을 써서 2D 조명을 똑같이 받게 합니다.
+        SpriteRenderer visual = GetComponentInChildren<SpriteRenderer>();
+        if (visual != null)
+        {
+            line.sharedMaterial = visual.sharedMaterial;
+            line.sortingLayerID = visual.sortingLayerID;
+        }
+
+        return line;
     }
 
     public Vector2 Position
@@ -111,7 +210,24 @@ public class Pipe : MonoBehaviour, IInteractable
     /// </summary>
     public void Interact(Player player)
     {
-        if (player == null || CanInteract(player) == false || player.Rigid == null)
+        if (player == null)
+            return;
+
+        // 이용할 수 없는 이유를 콘솔에 남깁니다. (형태가 맞지 않는 경우가 대부분)
+        if (Pipe_Exit == null)
+        {
+            Debug.LogWarning($"[Pipe] {name}: Pipe_Exit(출구 배관)이 비어 있습니다.", this);
+            return;
+        }
+
+        if (IsShadowAllowed(player) == false)
+        {
+            ShadowType currentType = player.PlayerViewModel != null ? player.PlayerViewModel.CurrentShadowType : ShadowType.None;
+            Debug.Log($"[Pipe] {name}: 현재 형태({currentType})로는 이용할 수 없습니다. 필요한 형태: {_requiredShadowType}", this);
+            return;
+        }
+
+        if (s_isAnyTraveling || Time.time < _lockUntilTime || player.Rigid == null)
             return;
 
         TravelAsync(player.Rigid, this.GetCancellationTokenOnDestroy()).Forget();
