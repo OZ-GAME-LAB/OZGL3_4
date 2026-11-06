@@ -18,6 +18,7 @@ public class ChangeState : PlayerStateBase
     {
         base.Enter();
 
+        _player.PlayerViewModel.IsChangingShadow = true;
         _player.Animator.SetTrigger("Absorb");
         _timer = _player.Animator.GetCurrentAnimatorClipInfo(0).Length;
         _phase = Phase.Absorb;
@@ -43,5 +44,12 @@ public class ChangeState : PlayerStateBase
         }
 
         _player.ChangeState(PlayerState.Idle);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        _player.PlayerViewModel.IsChangingShadow = false;
     }
 }
