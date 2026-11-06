@@ -6,6 +6,8 @@ public class NetworkManager : SingletonBase<NetworkManager>
     public MapService MapService;
     public TeleportService TeleportService;
 
+    private SaveRepository saveRepository = new SaveRepository();
+
     private void OnEnable()
     {
         PlayerService = new NetworkPlayerService();
