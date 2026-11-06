@@ -7,21 +7,32 @@ public class LobbyUI : UIBase
     [SerializeField] private UIButton _settingButton;
     [SerializeField] private UIButton _exitButton;
 
+    private readonly SaveRepository _saveRepository = new SaveRepository();
+
     private void OnEnable()
     {
-        _startButton.BindOnClickButtonEvent(StartGame);
+        _continueButton.gameObject.SetActive(_saveRepository.TryLoad(out _));
+
+        _continueButton.BindOnClickButtonEvent(OnClickContinue);
+        _startButton.BindOnClickButtonEvent(OnClickNewGame);
         _settingButton.BindOnClickButtonEvent(OpenSettingUI);
         _exitButton.BindOnClickButtonEvent(ExitGame);
     }
 
     private void OnDisable()
     {
-        _startButton.UnBindOnClickButtonEvent(StartGame);
+        _continueButton.UnBindOnClickButtonEvent(OnClickContinue);
+        _startButton.UnBindOnClickButtonEvent(OnClickNewGame);
         _settingButton.UnBindOnClickButtonEvent(OpenSettingUI);
         _exitButton.UnBindOnClickButtonEvent(ExitGame);
     }
 
-    private void StartGame()
+    private void OnClickContinue()
+    {
+
+    }
+
+    private void OnClickNewGame()
     {
         GameManager.Instance.StartGame();
     }

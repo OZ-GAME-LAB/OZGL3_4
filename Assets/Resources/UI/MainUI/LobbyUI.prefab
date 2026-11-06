@@ -190,6 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9e9f07c84331bd4a855f36db0f3ca69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyUI
+  _continueButton: {fileID: 1217743192648728071}
   _startButton: {fileID: 3260371643760912414}
   _settingButton: {fileID: 4507726712563618137}
   _exitButton: {fileID: 4863160982217339764}
