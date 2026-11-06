@@ -6,6 +6,7 @@ public class PlayerViewModel : ViewModelBase, IContainerPropertyChanged<ShadowTy
     public event Action<string, ContainerEventType, ShadowType> ContainerPropertyChanged;
 
     private readonly PlayerModel _playerModel;
+    private bool _isChangingShadow;
 
     public PlayerViewModel() : this(new PlayerModel()) { }
 
@@ -40,6 +41,19 @@ public class PlayerViewModel : ViewModelBase, IContainerPropertyChanged<ShadowTy
             {
                 _playerModel.OwnerShadowType = value;
                 OnPropertyChanged(nameof(OwnerShadowType));
+            }
+        }
+    }
+
+    public bool IsChangingShadow
+    {
+        get { return _isChangingShadow; }
+        set
+        {
+            if (_isChangingShadow != value)
+            {
+                _isChangingShadow = value;
+                OnPropertyChanged(nameof(IsChangingShadow));
             }
         }
     }
