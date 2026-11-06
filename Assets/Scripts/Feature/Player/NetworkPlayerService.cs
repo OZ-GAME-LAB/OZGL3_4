@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class NetworkPlayerService
 {
@@ -23,5 +25,13 @@ public class NetworkPlayerService
         viewModel.ChangeShadow(type);
 
         return viewModel.CurrentShadowType != previousType;
+    }
+
+    public List<ShadowType> GetUnlockedShadows()
+    {
+        if (_playerViewModel == null)
+            return null;
+
+        return _playerViewModel.OwnerShadowType.ToList();
     }
 }

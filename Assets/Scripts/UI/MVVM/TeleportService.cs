@@ -186,6 +186,14 @@ public class TeleportService
         return true;
     }
 
+    public List<string> GetActivedAllTeleport()
+    {
+        if (_teleportViewModel == null)
+            return null;
+
+        return _teleportViewModel.GetActivedAllTeleport();
+    }
+
     public bool RequestTeleport(string teleportId)
     {
         if (!_teleportViewModel.GetTeleportActivated(teleportId))

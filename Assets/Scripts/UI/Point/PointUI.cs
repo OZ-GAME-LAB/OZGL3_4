@@ -29,6 +29,11 @@ public class PointUI : UIBase
         _pointDefaultMenuUI.OnClickTeleport -= OpenTeleportMenu;
     }
 
+    public void SetCurrentTeleportId(string teleportId)
+    {
+        _pointDefaultMenuUI.SetCurrentTeleportId(teleportId);
+    }
+
     private void OpenTeleportMenu()
     {
         _pointDefaultMenuUI.gameObject.SetActive(false);

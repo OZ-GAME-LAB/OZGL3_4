@@ -59,7 +59,7 @@ public class ChunkIndexData
 [Serializable]
 public class SaveData
 {
-    public List<string> UnlockedShadowIds = new List<string>();
+    public List<ShadowType> UnlockedShadowIds = new List<ShadowType>();
     public List<string> ActivatedTeleportIds = new List<string>();
     public string LastSaveTeleportId;
 }

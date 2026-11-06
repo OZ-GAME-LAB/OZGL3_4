@@ -85,6 +85,11 @@ public class TeleportViewModel : ViewModelBase
         return true;
     }
 
+    public List<string> GetActivedAllTeleport()
+    {
+        return _teleportModel.ActivatedTeleportIds;
+    }
+
     public void InvokeOnceOnInit()
     {
         OnPropertyChanged(nameof(TeleportIds));
