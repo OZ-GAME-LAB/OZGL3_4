@@ -27,6 +27,12 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     [SerializeField] private bool _isSyncShapeWithCollider = true;
     [SerializeField] private float _warningIntensityRatio = 0.3f;
 
+    [Header("Light Intensity")]
+    [Tooltip("켜면 아래 Light Intensity 값을 Light2D에 적용합니다. 끄면 Light2D 컴포넌트에 설정된 밝기를 그대로 씁니다.")]
+    [SerializeField] private bool _isOverrideIntensity = false;
+    [Tooltip("빛의 밝기입니다. 1이 기본이고, 2~5 정도로 올리면 훨씬 강하게 비춥니다. (URP 2D Light의 Intensity)")]
+    [SerializeField, Min(0f)] private float _lightIntensity = 1f;
+
     private float _defaultIntensity = 1f;
 
     public bool IsOn { get; private set; }
@@ -44,7 +50,30 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     {
         if (Light2D_Zone != null)
         {
-            _defaultIntensity = Light2D_Zone.intensity;
+            _defaultIntensity = _isOverrideIntensity ? _lightIntensity : Light2D_Zone.intensity;
+        }
+    }
+
+    /// <summary>
+    /// 켜져 있을 때의 밝기입니다.
+    /// </summary>
+    public float LightIntensity
+    {
+        get { return _defaultIntensity; }
+    }
+
+    /// <summary>
+    /// 켜져 있을 때의 밝기를 바꿉니다. 켜져 있으면 즉시 반영됩니다. (연출, 난이도 조절 등에서 사용)
+    /// </summary>
+    public void SetIntensity(float intensity)
+    {
+        _defaultIntensity = Mathf.Max(0f, intensity);
+        _lightIntensity = _defaultIntensity;
+        _isOverrideIntensity = true;
+
+        if (Light2D_Zone != null && IsOn)
+        {
+            Light2D_Zone.intensity = _defaultIntensity;
         }
     }
 
@@ -202,6 +231,17 @@ public class LightZone : MonoBehaviour, ISignalReceiver
         if (Collider2D_Zone != null && Collider2D_Zone.isTrigger == false)
         {
             Debug.LogWarning($"[{name}] 빛 영역의 Collider2D에 Is Trigger를 체크해 주세요.", this);
+        }
+
+        // 인스펙터에서 밝기를 바꾸면 에디터 씬 뷰에도 바로 보이게 합니다.
+        if (_isOverrideIntensity && Light2D_Zone != null)
+        {
+            Light2D_Zone.intensity = _lightIntensity;
+
+            if (Application.isPlaying)
+            {
+                _defaultIntensity = _lightIntensity;
+            }
         }
     }
 }
