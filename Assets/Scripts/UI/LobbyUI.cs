@@ -29,12 +29,12 @@ public class LobbyUI : UIBase
 
     private void OnClickContinue()
     {
-
+        GameManager.Instance.StartGame(isContinue: true);
     }
 
     private void OnClickNewGame()
     {
-        GameManager.Instance.StartGame();
+        GameManager.Instance.StartGame(isContinue: false);
     }
 
     private void OpenSettingUI()

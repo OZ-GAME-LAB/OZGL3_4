@@ -194,6 +194,15 @@ public class TeleportService
         return _teleportViewModel.GetActivedAllTeleport();
     }
 
+    public bool TryGetTeleportPosition(string teleportId, out Vector2 savedPosition)
+    {
+        if(_teleportPositions.TryGetValue(teleportId, out savedPosition) == false)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public bool RequestTeleport(string teleportId)
     {
         if (!_teleportViewModel.GetTeleportActivated(teleportId))

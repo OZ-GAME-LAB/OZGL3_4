@@ -27,6 +27,15 @@ public class NetworkPlayerService
         return viewModel.CurrentShadowType != previousType;
     }
 
+    public void RequestGetNewShadow(ShadowType type)
+    {
+        if (type == ShadowType.None)
+            return;
+
+        PlayerViewModel viewModel = GetPlayerViewModel();
+        viewModel.AddShadow(type);
+    }
+
     public List<ShadowType> GetUnlockedShadows()
     {
         if (_playerViewModel == null)
