@@ -14,7 +14,7 @@ using UnityEngine;
 /// - 스위치에 연결할 때는 스위치의 시작 상태와 문의 시작 상태(_isStartOpen)를 맞춰 주세요.
 ///   예) 스위치 Is Start On 켜짐 + Is Open When Signal On 켜짐 → 문 Is Start Open 켜짐
 /// </summary>
-public class Door : MonoBehaviour, ISignalReceiver
+public class Door : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
     [Header("Reference")]
     [SerializeField] private Transform Transform_Body;
@@ -96,6 +96,14 @@ public class Door : MonoBehaviour, ISignalReceiver
     public void ToggleDoor()
     {
         ChangeState(!IsOpen);
+    }
+
+    /// <summary>
+    /// 토글 방식 스위치(Switch 의 Is Toggle Receiver)가 눌릴 때 호출됩니다. 현재 상태의 반대로 바꿉니다.
+    /// </summary>
+    public void ToggleSignal()
+    {
+        ToggleDoor();
     }
 
     private void ChangeState(bool isOpen)

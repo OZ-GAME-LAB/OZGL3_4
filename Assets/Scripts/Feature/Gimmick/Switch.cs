@@ -11,6 +11,8 @@ using UnityEngine;
 /// └─ Prompt                    ← 말주머니 (InteractionPrompt의 GameObject_Prompt에 연결)
 ///
 /// - List_Receiver에 빛 영역, 문 등 신호를 받을 기믹을 넣습니다.
+/// - Is Toggle Receiver 를 켜면 누를 때마다 연결된 문이 반전됩니다. (한 문에 여러 스위치를 물리는 조합 퍼즐용)
+///   이 경우 문은 스위치 상태와 무관하게 자기 Is Start Open 으로 시작하고, 첫 클릭부터 항상 반응합니다.
 /// - 플레이어가 트리거 범위 안에서 상호작용 키를 누르면 PlayerInteractor가 Interact(player)를 호출합니다.
 ///   (IInteractable은 트리거 콜라이더와 같은 오브젝트에 있어야 합니다)
 ///
@@ -31,6 +33,8 @@ public class Switch : SignalSender, IInteractable
 
     [Header("Behaviour")]
     [SerializeField] private SwitchMode _switchMode = SwitchMode.Toggle;
+    [Tooltip("켜면 누를 때마다 연결된 문을 '반전'시킵니다. (켜짐/꺼짐을 써 넣지 않음)\n여러 스위치가 같은 문에 물린 조합 퍼즐용. 문은 자기 Is Start Open 으로 시작합니다.")]
+    [SerializeField] private bool _isToggleReceiver = false;
 
     [Header("State View")]
     [SerializeField] private Sprite Sprite_On;
@@ -44,6 +48,14 @@ public class Switch : SignalSender, IInteractable
 
     private bool _isUsed;
     private Vector3 _visualDefaultPosition;
+
+    /// <summary>
+    /// 토글 방식이면 시작할 때 문 상태를 덮어쓰지 않습니다. (문은 자기 시작 상태를 유지)
+    /// </summary>
+    protected override bool IsSyncReceiversOnEnable
+    {
+        get { return _isToggleReceiver == false; }
+    }
     private CancellationTokenSource _pressCancellationSource;
 
     private void Reset()
@@ -101,6 +113,14 @@ public class Switch : SignalSender, IInteractable
         }
 
         PlayPressAnimation();
+
+        if (_isToggleReceiver)
+        {
+            // 토글 방식: 연결된 문마다 지금 상태의 반대로. 스위치 자체의 켜짐/꺼짐 표시도 같이 바뀝니다.
+            ToggleReceivers();
+            return;
+        }
+
         SendSignal(!IsOn);
     }
 
