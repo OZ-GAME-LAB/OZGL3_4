@@ -22,9 +22,46 @@ public abstract class SignalSender : MonoBehaviour
     /// </summary>
     public bool IsOn { get; private set; }
 
+    /// <summary>
+    /// 켜질 때 연결된 기믹의 상태를 이 기믹의 시작 상태로 맞출지 여부입니다.
+    /// 토글 방식(누를 때마다 반전)으로 쓰는 자식 클래스는 false 를 돌려줘서 문이 자기 시작 상태를 유지하게 합니다.
+    /// </summary>
+    protected virtual bool IsSyncReceiversOnEnable
+    {
+        get { return true; }
+    }
+
     protected virtual void OnEnable()
     {
+        if (IsSyncReceiversOnEnable == false)
+        {
+            return;
+        }
+
         SyncReceiversAsync().Forget();
+    }
+
+    /// <summary>
+    /// 연결된 모든 수신 기믹을 반전시킵니다. (IToggleReceiver 를 구현한 기믹만 해당)
+    /// 켜짐/꺼짐 값을 써 넣는 SendSignal 과 달리, 문마다 지금 상태의 반대로 바뀝니다.
+    /// 여러 스위치가 같은 문에 물려 있어도 누를 때마다 항상 반응하므로 조합 퍼즐에 사용합니다.
+    /// </summary>
+    protected void ToggleReceivers()
+    {
+        IsOn = !IsOn;
+
+        for (int i = 0; i < List_Receiver.Count; i++)
+        {
+            IToggleReceiver receiver = List_Receiver[i] as IToggleReceiver;
+            if (receiver == null)
+            {
+                continue;
+            }
+
+            receiver.ToggleSignal();
+        }
+
+        HandleSignalSent(IsOn);
     }
 
     /// <summary>
@@ -86,7 +123,7 @@ public abstract class SignalSender : MonoBehaviour
                 continue;
             }
 
-            if (List_Receiver[i] is ISignalReceiver)
+            if (List_Receiver[i] is ISignalReceiver || List_Receiver[i] is IToggleReceiver)
             {
                 continue;
             }
