@@ -74,6 +74,24 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
     }
 
+    // 추가 - 김동혁
+    public int TotalRewardCount
+    {
+        get
+        {
+            return GetRewardCount(false);
+        }
+    }
+
+    public int CollectedRewardCount
+    {
+        get
+        {
+            return GetRewardCount(true);
+        }
+    }
+    // -----
+
     public MapViewModel(MapModel mapModel, IReadOnlyList<MapRoomData> roomDataList)
     {
         if (mapModel == null)
@@ -225,6 +243,25 @@ public class MapViewModel : ViewModelBase, IDisposable
             return _teleportViewModel.GetActivatedTeleportCount(regionId);
         }
         return _teleportViewModel.GetTotalTeleportCount(regionId);
+    }
+
+    private int GetRewardCount(bool isCollectedOnly) //추가 - 김동혁
+    {
+        int count = 0;
+
+        foreach (MapRoomViewModel room in _rooms)
+        {
+            if (isCollectedOnly)
+            {
+                count += room.CollectedRewardCount;
+            }
+            else
+            {
+                count += room.TotalRewardCount;
+            }
+        }
+
+        return count;
     }
 
     private bool GetCanShowExplorationRate(string regionId)
