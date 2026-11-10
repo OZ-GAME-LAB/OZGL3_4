@@ -93,6 +93,7 @@ public class MapRoomView : MonoBehaviour
         {
             if (image != null)
             {
+                image.enabled = _roomViewModel.IsVisited;
                 image.color = color;
             }
         }
