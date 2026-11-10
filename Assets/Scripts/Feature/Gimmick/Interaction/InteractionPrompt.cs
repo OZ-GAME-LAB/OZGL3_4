@@ -13,6 +13,15 @@ public class InteractionPrompt : MonoBehaviour
     [SerializeField] private GameObject GameObject_Prompt;
 
     private int _playerOverlapCount;
+    private bool _isBlocked;
+
+    /// <summary>
+    /// 막혀 있으면 플레이어가 범위 안에 있어도 말주머니를 보여주지 않습니다. (예: 나오기만 하는 배관)
+    /// </summary>
+    public bool IsBlocked
+    {
+        get { return _isBlocked; }
+    }
 
     public bool IsPlayerInRange
     {
@@ -37,7 +46,16 @@ public class InteractionPrompt : MonoBehaviour
     /// </summary>
     public void SetVisible(bool isVisible)
     {
-        GimmickUtil.SetActiveSafe(GameObject_Prompt, isVisible && IsPlayerInRange);
+        GimmickUtil.SetActiveSafe(GameObject_Prompt, isVisible && IsPlayerInRange && _isBlocked == false);
+    }
+
+    /// <summary>
+    /// 말주머니 표시를 막거나 풉니다. 막는 동안은 플레이어가 들어와도 표시되지 않습니다.
+    /// </summary>
+    public void SetBlocked(bool isBlocked)
+    {
+        _isBlocked = isBlocked;
+        GimmickUtil.SetActiveSafe(GameObject_Prompt, _isBlocked == false && IsPlayerInRange);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -47,7 +65,7 @@ public class InteractionPrompt : MonoBehaviour
             return;
 
         _playerOverlapCount++;
-        GimmickUtil.SetActiveSafe(GameObject_Prompt, true);
+        GimmickUtil.SetActiveSafe(GameObject_Prompt, _isBlocked == false);
     }
 
     private void OnTriggerExit2D(Collider2D other)

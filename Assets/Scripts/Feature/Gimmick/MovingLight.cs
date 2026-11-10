@@ -18,7 +18,7 @@ using UnityEngine;
 /// - 잡는 범위(GrabArea)는 빛이 비추지 않는 쪽에 두세요. (잡는 순간 빛에 닿지 않도록)
 /// - 신호를 받으면 켜짐 → 레일 끝(End), 꺼짐 → 레일 시작(Start)으로 스스로 이동합니다.
 /// </summary>
-public class MovingLight : MonoBehaviour, ISignalReceiver
+public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
     [Header("Reference")]
     [SerializeField] private Transform Transform_Carriage;
@@ -121,6 +121,15 @@ public class MovingLight : MonoBehaviour, ISignalReceiver
     {
         ReleaseGrab();
         _targetRatio = isOn ? 1f : 0f;
+    }
+
+    /// <summary>
+    /// 토글 스위치가 눌릴 때마다 호출됩니다. 목표가 레일 시작이면 끝으로, 끝이면 시작으로 바꿉니다.
+    /// </summary>
+    public void ToggleSignal()
+    {
+        ReleaseGrab();
+        _targetRatio = _targetRatio < 0.5f ? 1f : 0f;
     }
 
     /// <summary>

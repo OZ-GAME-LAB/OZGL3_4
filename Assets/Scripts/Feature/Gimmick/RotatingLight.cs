@@ -44,7 +44,7 @@ public class AngleStep
 ///   _isSnapToStepOnStop이 켜져 있으면 멈출 때 가장 가까운 단계 각도로 맞춰 들어가고 그 단계의 그림자가 켜집니다.
 ///   스위치와 연결할 때는 스위치의 Is Start On으로 시작 시 회전 여부를 정합니다. (꺼짐 = 멈춘 상태로 시작)
 /// </summary>
-public class RotatingLight : MonoBehaviour, ISignalReceiver
+public class RotatingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
     public enum SignalMode
     {
@@ -181,6 +181,34 @@ public class RotatingLight : MonoBehaviour, ISignalReceiver
         if (_hasReceivedSignal == false)
         {
             _hasReceivedSignal = true;
+            return;
+        }
+
+        NextStep();
+    }
+
+    /// <summary>
+    /// 토글 스위치가 눌릴 때마다 호출됩니다.
+    /// Continuous 모드: 회전 시작/멈춤 반전, OnOff 모드: 첫 단계/마지막 단계 반전, Advance 모드: 다음 단계로 회전
+    /// </summary>
+    public void ToggleSignal()
+    {
+        if (_signalMode == SignalMode.Continuous)
+        {
+            if (IsContinuousRotating)
+            {
+                StopContinuousRotation();
+            }
+            else
+            {
+                StartContinuousRotation();
+            }
+            return;
+        }
+
+        if (_signalMode == SignalMode.OnOff)
+        {
+            ChangeStep(_currentStepIndex == 0 ? List_Step.Count - 1 : 0);
             return;
         }
 
