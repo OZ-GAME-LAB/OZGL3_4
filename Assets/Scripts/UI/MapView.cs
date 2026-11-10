@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -7,19 +7,21 @@ using UnityEngine.UI;
 public class MapView : UIBase
 {
     [SerializeField] private RectTransform Transform_MapContent;
+    [SerializeField] private RectTransform Transform_MapOrigin;
     [SerializeField] private Vector2 _chunkSize = new Vector2(250f, 250f);
     [SerializeField] private string _roomSpriteFolder = "UI/MapRooms";
     [SerializeField] private float _viewPadding = 24f;
+    [SerializeField, Range(0.01f, 1f)] private float _displayScale = 1f;
 
     private MapViewModel _mapViewModel;
     private readonly Dictionary<string, MapRoomView> _roomViews = new Dictionary<string, MapRoomView>();
 
     public void Init(MapViewModel mapViewModel)
     {
-        if (mapViewModel == null || Transform_MapContent == null || _chunkSize.x <= 0f
+        if (mapViewModel == null || Transform_MapContent == null || Transform_MapOrigin == null || _chunkSize.x <= 0f
             || !Mathf.Approximately(_chunkSize.x, _chunkSize.y))
         {
-            Debug.LogError("[MapView] ViewModel, MapContent와 동일한 양수 청크 가로·세로 크기를 설정하세요.");
+            Debug.LogError("[MapView] ViewModel, MapContent, MapOrigin과 동일한 양수 청크 가로·세로 크기를 설정하세요.");
             return;
         }
         if (_mapViewModel == mapViewModel)
@@ -31,7 +33,8 @@ public class MapView : UIBase
         UnBind();
         ClearRoomViews();
         _mapViewModel = mapViewModel;
-        Transform_MapContent.anchorMin = Transform_MapContent.anchorMax = new Vector2(0.5f, 0.5f);
+        Transform_MapContent.SetParent(Transform_MapOrigin, false);
+        Transform_MapContent.anchorMin = Transform_MapContent.anchorMax = Transform_MapOrigin.pivot;
         Transform_MapContent.pivot = Vector2.zero;
         Transform_MapContent.sizeDelta = Vector2.zero;
 
@@ -159,8 +162,9 @@ public class MapView : UIBase
         Vector2 size = max - min;
         float scale = Mathf.Min(1f, Mathf.Max(1f, viewport.width - _viewPadding * 2f) / size.x,
             Mathf.Max(1f, viewport.height - _viewPadding * 2f) / size.y);
+        scale *= Mathf.Clamp(_displayScale, 0.01f, 1f);
         Transform_MapContent.localScale = new Vector3(scale, scale, 1f);
-        Transform_MapContent.anchoredPosition = -(min + max) * (0.5f * scale);
+        Transform_MapContent.anchoredPosition = Vector2.zero;
     }
 
     private void ClearRoomViews()
