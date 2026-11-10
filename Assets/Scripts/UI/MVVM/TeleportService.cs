@@ -35,8 +35,10 @@ public class TeleportService
 
     public event Action<Vector2> OnTeleportRequested;
 
-    private const int PositionWaitFrames = 10; // 수정 - 김동혁
-    private bool _isPrepared; // 수정 - 김동혁
+    // 추가 - 김동혁
+    private const int PositionWaitFrames = 10;
+    private bool _isPrepared;
+    private bool _isTeleporting;
 
     public TeleportService(TeleportModel teleportModel, IReadOnlyList<MapTeleportData> teleportDataList, MapService mapService)
     {
@@ -188,11 +190,16 @@ public class TeleportService
 
     public bool RequestTeleport(string teleportId)
     {
+        if(_isTeleporting) // 추가 - 김동혁
+        {
+            Debug.LogWarning("[TeleportService] (RequestTeleport) 이미 텔레포트 진행 중: " + teleportId);
+            return false;
+        }
         if (!_teleportViewModel.GetTeleportActivated(teleportId))
         {
             return false;
         }
-        if (!_teleportRegionIds.TryGetValue(teleportId, out string regionId)) // 수정 - 김동혁
+        if (!_teleportRegionIds.TryGetValue(teleportId, out string regionId)) // 추가 - 김동혁
         {
             Debug.LogError("[TeleportService] (RequestTeleport) RegionId가 없는 텔레포트: " + teleportId);
             return false;
@@ -207,6 +214,7 @@ public class TeleportService
         if (uiBase is FadeUI fadeUI)
         {
             UIManager.Instance.CloseUI(UIRootType.PopupUI, UIType.PointUI);
+            _isTeleporting = true; // 추가 - 김동혁
             fadeUI.StartCoroutine(TeleportRoutine(fadeUI, teleportId, regionId)); // 수정 - 김동혁
         }
 
@@ -259,6 +267,8 @@ public class TeleportService
         yield return fadeUI.FadeOut();
 
         UIManager.Instance.CloseUI(UIRootType.VeryFrontUI, UIType.FadeUI);
+
+        _isTeleporting = false;
     }
 }
 
