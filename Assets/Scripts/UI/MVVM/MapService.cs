@@ -163,6 +163,34 @@ public class MapService
 
         return roomViewModel.CollectedRewardIds.Contains(rewardId);
     }
+
+    public bool RequestDiscoverHidden(string roomId, string hiddenId)
+    {
+        MapRoomViewModel roomViewModel = GetMapViewModel().GetRoomViewModel(roomId);
+
+        if (roomViewModel == null)
+        {
+            Debug.LogWarning($"[MapService] (RequestCollectReward) : {roomId}를 찾을 수 없습니다.");
+
+            return false;
+        }
+
+        return roomViewModel.TryDiscoverHidden(hiddenId);
+    }
+
+    public bool IsHiddenDiscovered(string roomId, string hiddenId)
+    {
+        MapRoomViewModel roomViewModel = GetMapViewModel().GetRoomViewModel(roomId);
+
+        if (roomViewModel == null)
+        {
+            Debug.LogWarning($"[MapService] (IsRewardCollected) : {roomId}를 찾을 수 없습니다.");
+
+            return false;
+        }
+
+        return roomViewModel.DiscoveredHiddenIds.Contains(hiddenId);
+    }
     // -----
 }
 
