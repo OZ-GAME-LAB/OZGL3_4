@@ -171,15 +171,26 @@ public class MapView : UIBase
         if (_mapViewModel == null || Transform_MapContent == null || Transform_MapOrigin == null) return;
         bool hasBounds = false;
         Vector2 min = Vector2.zero, max = Vector2.zero;
-        MapRoomViewModel firstRoom = null;
+        bool hasOriginChunk = false;
+        Vector2Int originChunk = Vector2Int.zero;
         foreach (MapRoomViewModel room in _mapViewModel.Rooms)
         {
             if (!_roomViews.TryGetValue(room.RoomId, out MapRoomView view)) continue;
             // 모든 리전의 상대 배치를 유지하고, 화면 바깥은 RectMask2D로 자른다.
             view.gameObject.SetActive(true);
-            if (room.RegionId == _mapViewModel.CurrentRegionId
-                && (firstRoom == null || string.CompareOrdinal(room.RoomId, firstRoom.RoomId) < 0))
-                firstRoom = room;
+            if (room.RegionId == _mapViewModel.CurrentRegionId)
+            {
+                foreach (Vector2Int chunk in room.OccupiedChunks)
+                {
+                    // X 오름차순 우선, 같은 X에서는 Y 내림차순으로 기준 청크를 고른다.
+                    if (!hasOriginChunk || chunk.x < originChunk.x
+                        || (chunk.x == originChunk.x && chunk.y > originChunk.y))
+                    {
+                        originChunk = chunk;
+                        hasOriginChunk = true;
+                    }
+                }
+            }
             Rect rect = GetRoomLayout(room.OccupiedChunks, _chunkSize.x);
             min = hasBounds ? Vector2.Min(min, rect.min) : rect.min;
             max = hasBounds ? Vector2.Max(max, rect.max) : rect.max;
@@ -196,7 +207,7 @@ public class MapView : UIBase
         }
         else
         {
-            Vector2 start = firstRoom == null ? Vector2.zero : GetRoomLayout(firstRoom.OccupiedChunks, _chunkSize.x).position;
+            Vector2 start = hasOriginChunk ? (Vector2)originChunk * _chunkSize.x : Vector2.zero;
             Transform_MapContent.anchoredPosition = -start * scale;
         }
     }
