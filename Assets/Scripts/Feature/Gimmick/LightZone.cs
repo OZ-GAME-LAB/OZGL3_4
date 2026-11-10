@@ -17,7 +17,7 @@ using UnityEditor;
 /// 4. 컴포넌트 우클릭 → "빛 모양을 콜라이더에 맞추기"를 누르면 빛 모양이 콜라이더와 같아집니다.
 ///    (게임 실행 시에는 자동으로 맞춰집니다.)
 /// </summary>
-public class LightZone : MonoBehaviour, ISignalReceiver
+public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
     private const string LightZoneLayerName = "LightZone";
 
@@ -102,6 +102,14 @@ public class LightZone : MonoBehaviour, ISignalReceiver
     public void ToggleLight()
     {
         ApplyState(!IsOn);
+    }
+
+    /// <summary>
+    /// 토글 스위치가 눌릴 때마다 호출됩니다. 빛을 반대 상태로 바꿉니다.
+    /// </summary>
+    public void ToggleSignal()
+    {
+        ToggleLight();
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ using UnityEngine;
 /// - 스위치의 List_Receiver에는 LightZone이 아니라 이 BlinkingLight를 넣으세요.
 ///   신호 켜짐 → 점멸 시작, 신호 꺼짐 → 점멸 정지(빛 꺼짐)
 /// </summary>
-public class BlinkingLight : MonoBehaviour, ISignalReceiver
+public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
     [Header("Reference")]
     [SerializeField] private LightZone LightZone_Target;
@@ -83,6 +83,21 @@ public class BlinkingLight : MonoBehaviour, ISignalReceiver
         CancelBlink();
         _blinkCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(this.GetCancellationTokenOnDestroy());
         BlinkLoopAsync(_blinkCancellationSource.Token).Forget();
+    }
+
+    /// <summary>
+    /// 토글 스위치가 눌릴 때마다 호출됩니다. 점멸 중이면 멈추고(빛 꺼짐), 멈춰 있으면 다시 점멸을 시작합니다.
+    /// </summary>
+    public void ToggleSignal()
+    {
+        if (IsBlinking)
+        {
+            StopBlinking();
+        }
+        else
+        {
+            StartBlinking();
+        }
     }
 
     /// <summary>
