@@ -96,6 +96,19 @@ public class Pipe : MonoBehaviour, IInteractable
         IsTraveling = false;
         SetBlipVisible(false);
         RefreshBodyLine();
+        RefreshPromptAvailability();
+    }
+
+    /// <summary>
+    /// 출구 배관(Pipe_Exit)이 없는 배관은 나오기만 하는 쪽이므로 말주머니를 표시하지 않습니다.
+    /// </summary>
+    private void RefreshPromptAvailability()
+    {
+        InteractionPrompt prompt = GetComponent<InteractionPrompt>();
+        if (prompt == null)
+            return;
+
+        prompt.SetBlocked(Pipe_Exit == null);
     }
 
     private void OnValidate()
