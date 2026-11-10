@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -35,6 +36,7 @@ public class MapRoomEditorWindow : EditorWindow
     private string _message;
     private MessageType _messageType;
     private readonly List<MapRegionData> _regions = new List<MapRegionData>();
+
     [MenuItem("Tools/Map/Room Data Editor")]
     public static void OpenWindow()
     {
@@ -281,9 +283,62 @@ public class MapRoomEditorWindow : EditorWindow
                 if (GUILayout.Button("출입구 삭제")) { room.Exits.RemoveAt(i); break; }
             }
         }
-        if (GUILayout.Button("출입구 추가")) room.Exits.Add(new MapRoomExitData());
+        if (GUILayout.Button("출입구 추가")) room.Exits.Add(CreateDefaultExit(room));
+        if (GUILayout.Button("이전·다음 방 출입구 자동 추가"))
+        {
+            int added = AddPreviousNextExits(room, _data.items);
+            SetMessage("출입구 " + added + "개를 추가했습니다. 없는 방과 이미 연결된 방은 건너뛰었습니다. 대상은 직접 수정할 수 있으며 저장은 별도입니다.", MessageType.Info);
+        }
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox("이 도구는 방 데이터 JSON을 편집합니다. 실제 월드 방이나 지도 이미지 프리팹을 자동 생성하지 않습니다.", MessageType.Info);
+    }
+
+    public static MapRoomExitData CreateDefaultExit(MapRoomData room)
+    {
+        if (room == null) throw new ArgumentNullException(nameof(room));
+        string prefix = (room.Id ?? "") + "_Exit_";
+        int suffix = 1;
+        string exitId;
+        do { exitId = prefix + (suffix++).ToString("D2", CultureInfo.InvariantCulture); }
+        while (room.Exits.Exists(exit => exit != null && exit.Id == exitId));
+
+        return new MapRoomExitData { Id = exitId, TargetRoomId = GetNumberedRoomId(room.Id, 1) };
+    }
+
+    public static int AddPreviousNextExits(MapRoomData room, IReadOnlyList<MapRoomData> rooms)
+    {
+        if (room == null) throw new ArgumentNullException(nameof(room));
+        if (rooms == null) throw new ArgumentNullException(nameof(rooms));
+        int added = 0;
+        foreach (int offset in new[] { -1, 1 })
+        {
+            string targetId = GetNumberedRoomId(room.Id, offset);
+            if (string.IsNullOrEmpty(targetId) || room.Exits.Exists(exit => exit != null && exit.TargetRoomId == targetId)) continue;
+            bool exists = false;
+            foreach (MapRoomData target in rooms)
+                if (target != null && target.Id == targetId) { exists = true; break; }
+            if (!exists) continue;
+            MapRoomExitData exitData = CreateDefaultExit(room);
+            exitData.TargetRoomId = targetId;
+            room.Exits.Add(exitData);
+            added++;
+        }
+        return added;
+    }
+
+    private static string GetNumberedRoomId(string roomId, int offset)
+    {
+        roomId = roomId ?? "";
+        int numberStart = roomId.Length;
+        while (numberStart > 0 && roomId[numberStart - 1] >= '0' && roomId[numberStart - 1] <= '9') numberStart--;
+        if (numberStart < roomId.Length
+            && long.TryParse(roomId.Substring(numberStart), NumberStyles.None, CultureInfo.InvariantCulture, out long number)
+            && (offset == -1 ? number > 0 : number < long.MaxValue))
+        {
+            string nextNumber = (number + offset).ToString(CultureInfo.InvariantCulture).PadLeft(roomId.Length - numberStart, '0');
+            return roomId.Substring(0, numberStart) + nextNumber;
+        }
+        return "";
     }
 
     private static void DrawIds(string title, List<string> ids)
