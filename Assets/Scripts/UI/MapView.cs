@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class MapView : UIBase
 {
@@ -10,10 +11,12 @@ public class MapView : UIBase
     [SerializeField] private RectTransform Transform_MapOrigin;
     [SerializeField] private Vector2 _chunkSize = new Vector2(250f, 250f);
     [SerializeField] private string _roomSpriteFolder = "UI/MapRooms";
-    [SerializeField] private float _viewPadding = 24f;
-    [SerializeField, Range(0.01f, 1f)] private float _displayScale = 1f;
+    [SerializeField, Range(0.01f, 1f)] private float _displayScale = 0.5f;
+    [SerializeField, Range(0.01f, 1f)] private float _overviewScale = 0.25f;
 
     private MapViewModel _mapViewModel;
+    private InputAction _zoomAction;
+    private bool _showOverview;
     private readonly Dictionary<string, MapRoomView> _roomViews = new Dictionary<string, MapRoomView>();
 
     public void Init(MapViewModel mapViewModel)
@@ -26,7 +29,7 @@ public class MapView : UIBase
         }
         if (_mapViewModel == mapViewModel)
         {
-            FitCurrentRegion();
+            RefreshMapLayout();
             return;
         }
 
@@ -57,7 +60,7 @@ public class MapView : UIBase
         }
         if (_roomViews.Count == 0) Debug.LogWarning("[MapView] 표시할 방 이미지가 없습니다: Resources/" + _roomSpriteFolder);
         if (isActiveAndEnabled) Bind();
-        FitCurrentRegion();
+        RefreshMapLayout();
     }
 
     public static string GetRoomIdFromImageName(string imageName)
@@ -105,18 +108,40 @@ public class MapView : UIBase
 
     private void OnEnable()
     {
+        _showOverview = false;
+        if (_zoomAction == null)
+            _zoomAction = new InputAction("MapZoom", InputActionType.Value, "<Mouse>/scroll/y");
+        _zoomAction.performed -= OnZoom;
+        _zoomAction.performed += OnZoom;
+        _zoomAction.Enable();
         Bind();
-        FitCurrentRegion();
+        RefreshMapLayout();
     }
 
     private void OnDisable()
     {
+        if (_zoomAction != null)
+        {
+            _zoomAction.performed -= OnZoom;
+            _zoomAction.Disable();
+        }
         UnBind();
     }
 
     private void OnDestroy()
     {
+        _zoomAction?.Dispose();
         UnBind();
+    }
+
+    private void OnZoom(InputAction.CallbackContext context)
+    {
+        float scroll = context.ReadValue<float>();
+        if (Mathf.Approximately(scroll, 0f)) return;
+        bool overview = scroll < 0f;
+        if (_showOverview == overview) return;
+        _showOverview = overview;
+        RefreshMapLayout();
     }
 
     private void Bind()
@@ -133,38 +158,47 @@ public class MapView : UIBase
 
     private void OnChangeMapProperty(object sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(MapViewModel.CurrentRegionId)) FitCurrentRegion();
+        if (args.PropertyName == nameof(MapViewModel.CurrentRegionId)) RefreshMapLayout();
     }
 
     private void OnRectTransformDimensionsChange()
     {
-        FitCurrentRegion();
+        RefreshMapLayout();
     }
 
-    private void FitCurrentRegion()
+    private void RefreshMapLayout()
     {
-        if (_mapViewModel == null || Transform_MapContent == null) return;
+        if (_mapViewModel == null || Transform_MapContent == null || Transform_MapOrigin == null) return;
         bool hasBounds = false;
         Vector2 min = Vector2.zero, max = Vector2.zero;
+        MapRoomViewModel firstRoom = null;
         foreach (MapRoomViewModel room in _mapViewModel.Rooms)
         {
             if (!_roomViews.TryGetValue(room.RoomId, out MapRoomView view)) continue;
-            bool visible = room.RegionId == _mapViewModel.CurrentRegionId;
-            view.gameObject.SetActive(visible);
-            if (!visible) continue;
+            // 모든 리전의 상대 배치를 유지하고, 화면 바깥은 RectMask2D로 자른다.
+            view.gameObject.SetActive(true);
+            if (room.RegionId == _mapViewModel.CurrentRegionId
+                && (firstRoom == null || string.CompareOrdinal(room.RoomId, firstRoom.RoomId) < 0))
+                firstRoom = room;
             Rect rect = GetRoomLayout(room.OccupiedChunks, _chunkSize.x);
             min = hasBounds ? Vector2.Min(min, rect.min) : rect.min;
             max = hasBounds ? Vector2.Max(max, rect.max) : rect.max;
             hasBounds = true;
         }
         if (!hasBounds) return;
-        Rect viewport = ((RectTransform)transform).rect;
-        Vector2 size = max - min;
-        float scale = Mathf.Min(1f, Mathf.Max(1f, viewport.width - _viewPadding * 2f) / size.x,
-            Mathf.Max(1f, viewport.height - _viewPadding * 2f) / size.y);
-        scale *= Mathf.Clamp(_displayScale, 0.01f, 1f);
+        float scale = Mathf.Clamp(_showOverview ? _overviewScale : _displayScale, 0.01f, 1f);
         Transform_MapContent.localScale = new Vector3(scale, scale, 1f);
-        Transform_MapContent.anchoredPosition = Vector2.zero;
+        if (_showOverview)
+        {
+            RectTransform viewport = (RectTransform)transform;
+            Vector2 viewportCenter = Transform_MapOrigin.InverseTransformPoint(viewport.TransformPoint(viewport.rect.center));
+            Transform_MapContent.anchoredPosition = viewportCenter - (min + max) * (0.5f * scale);
+        }
+        else
+        {
+            Vector2 start = firstRoom == null ? Vector2.zero : GetRoomLayout(firstRoom.OccupiedChunks, _chunkSize.x).position;
+            Transform_MapContent.anchoredPosition = -start * scale;
+        }
     }
 
     private void ClearRoomViews()
