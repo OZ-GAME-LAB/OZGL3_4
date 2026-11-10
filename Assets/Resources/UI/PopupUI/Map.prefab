@@ -90,12 +90,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapView
   Transform_MapContent: {fileID: 4419341188631747321}
-  _chunkSize: {x: 64, y: 64}
-  _roomShapes:
-  - _roomId: Room_A01
-    Prefab_RoomShape: {fileID: 2064965233393261396, guid: 74cbbf9e9c14278478630f9f161ab7ce, type: 3}
-  - _roomId: Room_A02
-    Prefab_RoomShape: {fileID: 6356178600498926410, guid: cc062f465109d024784bf7e89c62b1eb, type: 3}
+  _chunkSize: {x: 250, y: 250}
+  _roomSpriteFolder: UI/MapRooms
+  _viewPadding: 24
 --- !u!1 &1698539967500466860
 GameObject:
   m_ObjectHideFlags: 0
