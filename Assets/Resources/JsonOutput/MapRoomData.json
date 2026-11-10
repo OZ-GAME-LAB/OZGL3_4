@@ -9,15 +9,8 @@
                     "Y": 0
                 }
             ],
-            "RewardIds": [
-                "Room_A01_Reward_01",
-                "Room_A01_Reward_02",
-                "Room_A01_Reward_03"
-            ],
-            "HiddenIds": [
-                "Room_A01_Hidden_01",
-                "Room_A01_Hidden_02"
-            ],
+            "RewardIds": [],
+            "HiddenIds": [],
             "Exits": [
                 {
                     "Id": "Room_A01_Exit_01",
@@ -317,7 +310,7 @@
         },
         {
             "Id": "Room_B06",
-            "Description": "방 B07",
+            "Description": "방 B06",
             "RegionId": "Region_02",
             "OccupiedChunks": [
                 {
@@ -344,7 +337,7 @@
         },
         {
             "Id": "Room_B07",
-            "Description": "방 B08",
+            "Description": "방 B07",
             "RegionId": "Region_02",
             "OccupiedChunks": [
                 {

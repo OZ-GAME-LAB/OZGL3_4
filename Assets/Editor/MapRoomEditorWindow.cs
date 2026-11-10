@@ -267,8 +267,8 @@ public class MapRoomEditorWindow : EditorWindow
         }
         if (GUILayout.Button("청크 좌표 직접 추가")) room.OccupiedChunks.Add(new ChunkIndexData());
         EditorGUILayout.Space();
-        DrawIds("보상 ID", room.RewardIds);
-        DrawIds("히든 ID", room.HiddenIds);
+        DrawIds("보상 ID", room, false);
+        DrawIds("히든 ID", room, true);
         EditorGUILayout.LabelField("출입구", EditorStyles.boldLabel);
         for (int i = 0; i < room.Exits.Count; i++)
         {
@@ -341,8 +341,20 @@ public class MapRoomEditorWindow : EditorWindow
         return "";
     }
 
-    private static void DrawIds(string title, List<string> ids)
+    public static string CreateDefaultElementId(MapRoomData room, bool isHidden)
     {
+        if (room == null) throw new ArgumentNullException(nameof(room));
+        string prefix = (room.Id ?? "") + (isHidden ? "_Hidden_" : "_Reward_");
+        int suffix = 1;
+        string id;
+        do { id = prefix + (suffix++).ToString("D2", CultureInfo.InvariantCulture); }
+        while (room.RewardIds.Contains(id) || room.HiddenIds.Contains(id));
+        return id;
+    }
+
+    private static void DrawIds(string title, MapRoomData room, bool isHidden)
+    {
+        List<string> ids = isHidden ? room.HiddenIds : room.RewardIds;
         EditorGUILayout.LabelField(title + " (" + ids.Count + ")", EditorStyles.boldLabel);
         for (int i = 0; i < ids.Count; i++)
         {
@@ -352,7 +364,7 @@ public class MapRoomEditorWindow : EditorWindow
                 if (GUILayout.Button("−", GUILayout.Width(24))) { ids.RemoveAt(i); break; }
             }
         }
-        if (GUILayout.Button(title + " 추가")) ids.Add("");
+        if (GUILayout.Button(title + " 추가")) ids.Add(CreateDefaultElementId(room, isHidden));
         EditorGUILayout.Space();
     }
 
