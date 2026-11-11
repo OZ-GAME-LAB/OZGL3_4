@@ -109,9 +109,9 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Change, new ChangeState(this));
 
         // 그림자 초기화
-        _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
-        _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
-        _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));
+        //  _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
+        // _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
+        // _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));*/
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)

@@ -7,7 +7,6 @@ public class MapChunk : MonoBehaviour
 
     public Room Room { get; private set; }
     public Region Region { get; private set; }
-    public SpawnSpot SpawnSpot { get; private set; }
 
 
     private bool _isStarted = false;
@@ -17,7 +16,6 @@ public class MapChunk : MonoBehaviour
     {
         Room = GetComponentInParent<Room>();
         Region = GetComponentInParent<Region>();
-        SpawnSpot = GetComponentInChildren<SpawnSpot>(true);
 
         if (MapManager.Instance == null)
         {
