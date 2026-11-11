@@ -10,16 +10,16 @@ public class GameManager : SingletonBase<GameManager>
 
     public event Action OnStartGame;
 
-    public void StartGame()
+    public void StartGame(bool isContinue)
     {
         if (IsPlaying)
         {
             return;
         }
-        StartGameAsync().Forget();
+        StartGameAsync(isContinue).Forget();
     }
 
-    private async UniTaskVoid StartGameAsync()
+    private async UniTaskVoid StartGameAsync(bool isContinue)
     {
         if (UIManager.Instance == null || GameObjectManager.Instance == null)
         {
@@ -30,7 +30,15 @@ public class GameManager : SingletonBase<GameManager>
         IsPlaying = true;
         UIManager.Instance.CloseUI(UIRootType.MainUI, UIType.LobbyUI);
 
-        GameObject player = await GameObjectManager.Instance.CreateObjectAsync(_playerPath, Vector3.zero);
+
+        Vector2 spawnPosition = Vector3.zero;
+        if (isContinue)
+        {
+            NetworkManager.Instance.LoadGame(out string lastSaveTeleportId);
+            NetworkManager.Instance.TeleportService.TryGetTeleportPosition(lastSaveTeleportId, out spawnPosition);
+        }
+
+        GameObject player = await GameObjectManager.Instance.CreateObjectAsync(_playerPath, spawnPosition);
         if (player == null)
         {
             Debug.LogError("[GameManager] 플레이어 생성에 실패했습니다. 로비로 돌아갑니다.");

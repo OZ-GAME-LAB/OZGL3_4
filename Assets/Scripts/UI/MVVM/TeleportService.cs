@@ -188,6 +188,23 @@ public class TeleportService
         return true;
     }
 
+    public List<string> GetActivedAllTeleport()
+    {
+        if (_teleportViewModel == null)
+            return null;
+
+        return _teleportViewModel.GetActivedAllTeleport();
+    }
+
+    public bool TryGetTeleportPosition(string teleportId, out Vector2 savedPosition)
+    {
+        if(_teleportPositions.TryGetValue(teleportId, out savedPosition) == false)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public bool RequestTeleport(string teleportId)
     {
         if(_isTeleporting) // 추가 - 김동혁
