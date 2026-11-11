@@ -51,6 +51,8 @@ MonoBehaviour:
   Transform_RegionRoot: {fileID: 5091330640494559610}
   _startRegionId: Region_01
   _keepRegionDistance: 2
+  _testTeleportRegionId: 
+  _testTeleportPosition: {x: 0, y: 0}
 --- !u!1 &6341306663076529675
 GameObject:
   m_ObjectHideFlags: 0
