@@ -1,0 +1,689 @@
+fileFormatVersion: 2
+guid: cdb4616546bbfa04cbad8421f5928144
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5857171838187764146
+    second: ShadowCrow_Idle_Design_v2_0
+  - first:
+      213: -5637416164615536590
+    second: ShadowCrow_Idle_Design_v2_1
+  - first:
+      213: 6407746464046702224
+    second: ShadowCrow_Idle_Design_v2_2
+  - first:
+      213: -2148111166399430557
+    second: ShadowCrow_Idle_Design_v2_3
+  - first:
+      213: 8575379791447008778
+    second: ShadowCrow_Idle_Design_v2_4
+  - first:
+      213: -1403357622831463934
+    second: ShadowCrow_Idle_Design_v2_5
+  - first:
+      213: 2061020074119093479
+    second: ShadowCrow_Idle_Design_v2_6
+  - first:
+      213: 2230635073093290114
+    second: ShadowCrow_Idle_Design_v2_7
+  - first:
+      213: -2773534921816028684
+    second: ShadowCrow_Idle_Design_v2_8
+  - first:
+      213: 871159452374216449
+    second: ShadowCrow_Idle_Design_v2_9
+  - first:
+      213: 2799389728881625257
+    second: ShadowCrow_Idle_Design_v2_10
+  - first:
+      213: 5064902427800935004
+    second: ShadowCrow_Idle_Design_v2_11
+  - first:
+      213: -6104128003434161508
+    second: ShadowCrow_Idle_Design_v2_12
+  - first:
+      213: 4984537874193842640
+    second: ShadowCrow_Idle_Design_v2_13
+  - first:
+      213: -2234724923668712839
+    second: ShadowCrow_Idle_Design_v2_14
+  - first:
+      213: -503590504645389461
+    second: ShadowCrow_Idle_Design_v2_15
+  - first:
+      213: 5089427937316852230
+    second: ShadowCrow_Idle_Design_v2_16
+  - first:
+      213: 2946131030327119289
+    second: ShadowCrow_Idle_Design_v2_17
+  - first:
+      213: -7783968690102734848
+    second: ShadowCrow_Idle_Design_v2_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: VisionOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: tvOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_0
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 346
+        width: 362
+        height: 489
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b97a9311cad84150800000000000000
+      internalID: 5857171838187764146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_1
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 471
+        width: 388
+        height: 362
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 230cb09dddfd3c1b0800000000000000
+      internalID: -5637416164615536590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_2
+      rect:
+        serializedVersion: 2
+        x: 1635
+        y: 805
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09ed4489573ece850800000000000000
+      internalID: 6407746464046702224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_3
+      rect:
+        serializedVersion: 2
+        x: 1639
+        y: 823
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36046bc76406032e0800000000000000
+      internalID: -2148111166399430557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_4
+      rect:
+        serializedVersion: 2
+        x: 1173
+        y: 789
+        width: 58
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a06234b6c7ed10770800000000000000
+      internalID: 8575379791447008778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_5
+      rect:
+        serializedVersion: 2
+        x: 1228
+        y: 781
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2024b466da5468ce0800000000000000
+      internalID: -1403357622831463934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_6
+      rect:
+        serializedVersion: 2
+        x: 1395
+        y: 344
+        width: 340
+        height: 440
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec51d076d63a9c10800000000000000
+      internalID: 2061020074119093479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_7
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 763
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 288c043d7cec4fe10800000000000000
+      internalID: 2230635073093290114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_8
+      rect:
+        serializedVersion: 2
+        x: 919
+        y: 469
+        width: 356
+        height: 307
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f9c305feac6289d0800000000000000
+      internalID: -2773534921816028684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_9
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 475
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10f2d7508eaf61c00800000000000000
+      internalID: 871159452374216449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_10
+      rect:
+        serializedVersion: 2
+        x: 1119
+        y: 473
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a8cdd9602e69d620800000000000000
+      internalID: 2799389728881625257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_11
+      rect:
+        serializedVersion: 2
+        x: 466
+        y: 34
+        width: 384
+        height: 353
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5a961f4ce52a4640800000000000000
+      internalID: 5064902427800935004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_12
+      rect:
+        serializedVersion: 2
+        x: 1707
+        y: 378
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9adac30ce7c94ba0800000000000000
+      internalID: -6104128003434161508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_13
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 51
+        width: 368
+        height: 280
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d10ec099c2ac2540800000000000000
+      internalID: 4984537874193842640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_14
+      rect:
+        serializedVersion: 2
+        x: 923
+        y: 35
+        width: 364
+        height: 328
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 972b302a589acf0e0800000000000000
+      internalID: -2234724923668712839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_15
+      rect:
+        serializedVersion: 2
+        x: 1379
+        y: 16
+        width: 352
+        height: 301
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b631a5aaa13e209f0800000000000000
+      internalID: -503590504645389461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_16
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 289
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60258b97eb741a640800000000000000
+      internalID: 5089427937316852230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_17
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 33
+        width: 23
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bd47641092c2e820800000000000000
+      internalID: 2946131030327119289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShadowCrow_Idle_Design_v2_18
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 31
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 000f9a3b7b9c9f390800000000000000
+      internalID: -7783968690102734848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ShadowCrow_Idle_Design_v2_0: 5857171838187764146
+      ShadowCrow_Idle_Design_v2_1: -5637416164615536590
+      ShadowCrow_Idle_Design_v2_10: 2799389728881625257
+      ShadowCrow_Idle_Design_v2_11: 5064902427800935004
+      ShadowCrow_Idle_Design_v2_12: -6104128003434161508
+      ShadowCrow_Idle_Design_v2_13: 4984537874193842640
+      ShadowCrow_Idle_Design_v2_14: -2234724923668712839
+      ShadowCrow_Idle_Design_v2_15: -503590504645389461
+      ShadowCrow_Idle_Design_v2_16: 5089427937316852230
+      ShadowCrow_Idle_Design_v2_17: 2946131030327119289
+      ShadowCrow_Idle_Design_v2_18: -7783968690102734848
+      ShadowCrow_Idle_Design_v2_2: 6407746464046702224
+      ShadowCrow_Idle_Design_v2_3: -2148111166399430557
+      ShadowCrow_Idle_Design_v2_4: 8575379791447008778
+      ShadowCrow_Idle_Design_v2_5: -1403357622831463934
+      ShadowCrow_Idle_Design_v2_6: 2061020074119093479
+      ShadowCrow_Idle_Design_v2_7: 2230635073093290114
+      ShadowCrow_Idle_Design_v2_8: -2773534921816028684
+      ShadowCrow_Idle_Design_v2_9: 871159452374216449
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

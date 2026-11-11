@@ -6,6 +6,7 @@ public class MapUIInput : MonoBehaviour
     [SerializeField] private InputActionAsset InputActionAsset_Actions;
 
     private InputAction _mapAction;
+    private InputAction _unlockMapAction;
 
     private void Awake()
     {
@@ -24,6 +25,7 @@ public class MapUIInput : MonoBehaviour
 
     private void OnDestroy()
     {
+        _unlockMapAction?.Dispose();
         if (_mapAction != null)
         {
             _mapAction.Dispose();
@@ -46,6 +48,7 @@ public class MapUIInput : MonoBehaviour
         }
 
         _mapAction = mapAction.Clone();
+        _unlockMapAction = new InputAction("UnlockMapCheat", InputActionType.Button, "<Keyboard>/q");
     }
 
     private void Bind()
@@ -58,6 +61,9 @@ public class MapUIInput : MonoBehaviour
         _mapAction.performed -= OnToggleMap;
         _mapAction.performed += OnToggleMap;
         _mapAction.Enable();
+        _unlockMapAction.performed -= OnUnlockMap;
+        _unlockMapAction.performed += OnUnlockMap;
+        _unlockMapAction.Enable();
     }
 
     private void UnBind()
@@ -69,6 +75,21 @@ public class MapUIInput : MonoBehaviour
 
         _mapAction.performed -= OnToggleMap;
         _mapAction.Disable();
+        _unlockMapAction.performed -= OnUnlockMap;
+        _unlockMapAction.Disable();
+    }
+
+    private void OnUnlockMap(InputAction.CallbackContext context)
+    {
+        NetworkManager networkManager = NetworkManager.Instance;
+        if (networkManager == null || networkManager.MapService == null)
+        {
+            Debug.LogWarning("[MapUIInput] 지도 데이터가 준비된 후 Q 치트를 사용할 수 있습니다.");
+            return;
+        }
+
+        networkManager.MapService.RequestUnlockAllRoomsForTesting();
+        Debug.Log("[MapUIInput] 치트: 모든 리전의 미니맵을 해금했습니다.");
     }
 
     private void OnToggleMap(InputAction.CallbackContext context)
