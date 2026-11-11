@@ -37,6 +37,7 @@ public class MapManager : SingletonBase<MapManager>
 
     private ChunkActivator _chunkActivator = new ChunkActivator();
     private MapChunk _lastValidChunk; // 플레이어가 마지막으로 서 있던 실제 청크 (부활 기준)
+    private Dictionary<string, int> _reachedSpawnStages = new Dictionary<string, int>(); // RoomId → 도달한 최고 부활 단계
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -376,7 +377,26 @@ public class MapManager : SingletonBase<MapManager>
     }
 
 
-    public bool TryGetRespawnPosition(out Vector2 position) // 부활 위치를 찾는다. 마지막 청크의 스팟 → 없으면 같은 방에서 가장 가까운 스팟.
+    // 스폰 스팟을 지나갈 때 호출. 방마다 도달한 최고 단계만 기록한다.
+    public void ReachSpawnStage(string roomId, int stage)
+    {
+        if (string.IsNullOrEmpty(roomId))
+        {
+            Debug.LogWarning("[MapManager] (ReachSpawnStage) - RoomId 없음");
+
+            return;
+        }
+
+        if (_reachedSpawnStages.TryGetValue(roomId, out int currentStage) && stage <= currentStage)
+            return;
+
+        _reachedSpawnStages[roomId] = stage;
+
+        Debug.Log($"[MapManager] (ReachSpawnStage) - {roomId} 단계 갱신: {stage}");
+    }
+
+    
+    public bool TryGetRespawnPosition(out Vector2 position) // 부활 위치를 찾는다. 죽은 방에서 도달한 최고 단계의 스팟, 도달 기록이 없으면 가장 낮은 단계의 스팟.
     {
         position = Vector2.zero;
 
@@ -387,25 +407,54 @@ public class MapManager : SingletonBase<MapManager>
             return false;
         }
 
-        if (_lastValidChunk.SpawnSpot != null)
-        {
-            position = _lastValidChunk.SpawnSpot.Position;
+        Room room = _lastValidChunk.Room;
 
-            return true;
+        if (room == null)
+        {
+            Debug.LogError($"[MapManager] (TryGetRespawnPosition) - 청크에 Room 없음: {_lastValidChunk.name}");
+
+            return false;
         }
 
-        if (_chunkActivator.TryGetNearestSpawnSpot(_lastValidChunk.Room, _lastValidChunk.transform.position, out SpawnSpot spawnSpot))
+        _reachedSpawnStages.TryGetValue(room.RoomId, out int reachedStage);
+
+        SpawnSpot[] spawnSpots = room.GetComponentsInChildren<SpawnSpot>(true);
+        SpawnSpot spawnSpot = SelectSpawnSpot(spawnSpots, reachedStage);
+
+        if (spawnSpot == null)
         {
-            Debug.Log($"[MapManager] (TryGetRespawnPosition) - 같은 방의 가장 가까운 스팟 사용: {spawnSpot.name}");
+            Debug.LogError($"[MapManager] (TryGetRespawnPosition) - 방에 스폰 스팟 없음: {room.RoomId}");
 
-            position = spawnSpot.Position;
-
-            return true;
+            return false;
         }
 
-        Debug.LogError($"[MapManager] (TryGetRespawnPosition) - 같은 방에 스폰 스팟 없음: {_lastValidChunk.name}");
+        position = spawnSpot.Position;
 
-        return false;
+        return true;
+    }
+
+    private SpawnSpot SelectSpawnSpot(SpawnSpot[] spawnSpots, int reachedStage) // 도달한 단계 이하 중 가장 높은 스팟. 없으면 가장 낮은 단계의 스팟.
+    {
+        SpawnSpot best = null;
+        SpawnSpot lowest = null;
+
+        foreach (SpawnSpot spot in spawnSpots)
+        {
+            if (spot.Stage <= reachedStage && (best == null || spot.Stage > best.Stage))
+            {
+                best = spot;
+            }
+
+            if (lowest == null || spot.Stage < lowest.Stage)
+            {
+                lowest = spot;
+            }
+        }
+
+        if (best != null)
+            return best;
+
+        return lowest;
     }
 
     public async UniTask<bool> PrepareRegionAsync(string regionId)
