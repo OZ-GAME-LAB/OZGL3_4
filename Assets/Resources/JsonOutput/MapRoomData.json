@@ -1,109 +1,864 @@
 [
-  {
-    "Id": "Room_A01",
-    "Description": "숲 입구",
-    "RegionId": "Region_01",
-    "RewardIds": [
-      "Room_A01_Reward_01",
-      "Room_A01_Reward_02",
-      "Room_A01_Reward_03"
-    ],
-    "HiddenIds": [
-      "Room_A01_Hidden_01",
-      "Room_A01_Hidden_02"
-    ],
-    "Exits": [
-      {
-        "Id": "Room_A01_Exit_01",
-        "TargetRoomId": "Room_A02"
-      }
-    ],
-    "OccupiedChunks": [
-      {
-        "X": 0,
-        "Y": 0
-      }
+        {
+            "Id": "Room_A01",
+            "Description": "숲 입구",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 0,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A01_Exit_01",
+                    "TargetRoomId": "Room_A02"
+                }
+            ]
+        },
+        {
+            "Id": "Room_A02",
+            "Description": "숲길",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 1,
+                    "Y": 0
+                },
+                {
+                    "X": 2,
+                    "Y": 0
+                },
+                {
+                    "X": 1,
+                    "Y": 1
+                },
+                {
+                    "X": 2,
+                    "Y": 1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A02_Exit_01",
+                    "TargetRoomId": "Room_A01"
+                },
+                {
+                    "Id": "Room_A02_Exit_02",
+                    "TargetRoomId": "Room_A03"
+                }
+            ]
+        },
+        {
+            "Id": "Room_A03",
+            "Description": "방 A03",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 3,
+                    "Y": 0
+                },
+                {
+                    "X": 4,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A03_Exit_01",
+                    "TargetRoomId": "Room_A04"
+                },
+                {
+                    "Id": "Room_A03_Exit_02",
+                    "TargetRoomId": "Room_A02"
+                }
+            ]
+        },
+        {
+            "Id": "Room_A04",
+            "Description": "방 A04",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 3,
+                    "Y": 1
+                },
+                {
+                    "X": 4,
+                    "Y": 1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A04_Exit_01",
+                    "TargetRoomId": "Room_A03"
+                },
+                {
+                    "Id": "Room_A04_Exit_02",
+                    "TargetRoomId": "Room_A05"
+                }
+            ]
+        },
+        {
+            "Id": "Room_A05",
+            "Description": "방 A05",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 5,
+                    "Y": 1
+                },
+                {
+                    "X": 6,
+                    "Y": 1
+                },
+                {
+                    "X": 6,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A05_Exit_01",
+                    "TargetRoomId": "Room_A04"
+                },
+                {
+                    "Id": "Room_A05_Exit_02",
+                    "TargetRoomId": "Room_A06"
+                }
+            ]
+        },
+        {
+            "Id": "Room_A06",
+            "Description": "방 A06",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": 7,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_A06_Exit_01",
+                    "TargetRoomId": "Room_A05"
+                },
+                {
+                    "Id": "Room_A06_Exit_02",
+                    "TargetRoomId": "Room_B01"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B01",
+            "Description": "방 B01",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 8,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B01_Exit_02",
+                    "TargetRoomId": "Room_A06"
+                },
+                {
+                    "Id": "Room_B01_Exit_01",
+                    "TargetRoomId": "Room_B02"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B02",
+            "Description": "방 B02",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 9,
+                    "Y": 0
+                },
+                {
+                    "X": 10,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B02_Exit_01",
+                    "TargetRoomId": "Room_B01"
+                },
+                {
+                    "Id": "Room_B02_Exit_02",
+                    "TargetRoomId": "Room_B03"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B03",
+            "Description": "방 B03",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 11,
+                    "Y": 0
+                },
+                {
+                    "X": 11,
+                    "Y": -1
+                },
+                {
+                    "X": 10,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B03_Exit_01",
+                    "TargetRoomId": "Room_B02"
+                },
+                {
+                    "Id": "Room_B03_Exit_02",
+                    "TargetRoomId": "Room_B04"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B04",
+            "Description": "방 B04",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 9,
+                    "Y": -1
+                },
+                {
+                    "X": 8,
+                    "Y": -1
+                },
+                {
+                    "X": 8,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B04_Exit_01",
+                    "TargetRoomId": "Room_B03"
+                },
+                {
+                    "Id": "Room_B04_Exit_02",
+                    "TargetRoomId": "Room_B05"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B05",
+            "Description": "방 B05",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 9,
+                    "Y": -2
+                },
+                {
+                    "X": 9,
+                    "Y": -3
+                },
+                {
+                    "X": 10,
+                    "Y": -3
+                },
+                {
+                    "X": 10,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B05_Exit_01",
+                    "TargetRoomId": "Room_B04"
+                },
+                {
+                    "Id": "Room_B05_Exit_02",
+                    "TargetRoomId": "Room_B06"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B06",
+            "Description": "방 B06",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 11,
+                    "Y": -2
+                },
+                {
+                    "X": 11,
+                    "Y": -3
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B06_Exit_01",
+                    "TargetRoomId": "Room_B05"
+                },
+                {
+                    "Id": "Room_B06_Exit_02",
+                    "TargetRoomId": "Room_B07"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B07",
+            "Description": "방 B07",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 12,
+                    "Y": -2
+                },
+                {
+                    "X": 12,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B07_Exit_01",
+                    "TargetRoomId": "Room_B06"
+                },
+                {
+                    "Id": "Room_B07_Exit_02",
+                    "TargetRoomId": "Room_B08"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B08",
+            "Description": "방 B08",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 12,
+                    "Y": 0
+                },
+                {
+                    "X": 13,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B08_Exit_01",
+                    "TargetRoomId": "Room_B07"
+                },
+                {
+                    "Id": "Room_B08_Exit_02",
+                    "TargetRoomId": "Room_B09"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B09",
+            "Description": "방 B09",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 13,
+                    "Y": -2
+                },
+                {
+                    "X": 13,
+                    "Y": -1
+                },
+                {
+                    "X": 14,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B09_Exit_01",
+                    "TargetRoomId": "Room_B08"
+                },
+                {
+                    "Id": "Room_B09_Exit_02",
+                    "TargetRoomId": "Room_B10"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B10",
+            "Description": "방 B10",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 14,
+                    "Y": 0
+                },
+                {
+                    "X": 15,
+                    "Y": 0
+                },
+                {
+                    "X": 15,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B10_Exit_01",
+                    "TargetRoomId": "Room_B09"
+                },
+                {
+                    "Id": "Room_B10_Exit_02",
+                    "TargetRoomId": "Room_B11"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B11",
+            "Description": "방 B11",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 15,
+                    "Y": -2
+                },
+                {
+                    "X": 16,
+                    "Y": -2
+                },
+                {
+                    "X": 16,
+                    "Y": -1
+                },
+                {
+                    "X": 17,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B11_Exit_01",
+                    "TargetRoomId": "Room_B10"
+                },
+                {
+                    "Id": "Room_B11_Exit_02",
+                    "TargetRoomId": "Room_B12"
+                }
+            ]
+        },
+        {
+            "Id": "Room_B12",
+            "Description": "방 B12",
+            "RegionId": "Region_02",
+            "OccupiedChunks": [
+                {
+                    "X": 17,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_B12_Exit_01",
+                    "TargetRoomId": "Room_B11"
+                },
+                {
+                    "Id": "Room_B12_Exit_02",
+                    "TargetRoomId": "Room_C01"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C01",
+            "Description": "방 C01",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 18,
+                    "Y": -2
+                },
+                {
+                    "X": 19,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C01_Exit_01",
+                    "TargetRoomId": "Room_C02"
+                },
+                {
+                    "Id": "Room_C01_Exit_02",
+                    "TargetRoomId": "Room_B12"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C02",
+            "Description": "방 C02",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 18,
+                    "Y": -1
+                },
+                {
+                    "X": 18,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C02_Exit_01",
+                    "TargetRoomId": "Room_C01"
+                },
+                {
+                    "Id": "Room_C02_Exit_02",
+                    "TargetRoomId": "Room_C03"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C03",
+            "Description": "방 C03",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 18,
+                    "Y": 1
+                },
+                {
+                    "X": 19,
+                    "Y": 1
+                },
+                {
+                    "X": 19,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C03_Exit_01",
+                    "TargetRoomId": "Room_C02"
+                },
+                {
+                    "Id": "Room_C03_Exit_02",
+                    "TargetRoomId": "Room_C04"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C04",
+            "Description": "방 C04",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 20,
+                    "Y": 0
+                },
+                {
+                    "X": 20,
+                    "Y": 1
+                },
+                {
+                    "X": 21,
+                    "Y": 1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C04_Exit_01",
+                    "TargetRoomId": "Room_C03"
+                },
+                {
+                    "Id": "Room_C04_Exit_02",
+                    "TargetRoomId": "Room_C05"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C05",
+            "Description": "방 C05",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 21,
+                    "Y": 0
+                },
+                {
+                    "X": 21,
+                    "Y": -1
+                },
+                {
+                    "X": 22,
+                    "Y": -1
+                },
+                {
+                    "X": 22,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C05_Exit_01",
+                    "TargetRoomId": "Room_C04"
+                },
+                {
+                    "Id": "Room_C05_Exit_02",
+                    "TargetRoomId": "Room_C06"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C06",
+            "Description": "방 C06",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 21,
+                    "Y": -2
+                },
+                {
+                    "X": 22,
+                    "Y": -2
+                },
+                {
+                    "X": 23,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C06_Exit_01",
+                    "TargetRoomId": "Room_C05"
+                },
+                {
+                    "Id": "Room_C06_Exit_02",
+                    "TargetRoomId": "Room_C07"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C07",
+            "Description": "방 C07",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 23,
+                    "Y": -1
+                },
+                {
+                    "X": 23,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C07_Exit_01",
+                    "TargetRoomId": "Room_C06"
+                },
+                {
+                    "Id": "Room_C07_Exit_02",
+                    "TargetRoomId": "Room_C08"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C08",
+            "Description": "방 C08",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 23,
+                    "Y": 1
+                },
+                {
+                    "X": 24,
+                    "Y": 1
+                },
+                {
+                    "X": 24,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C08_Exit_01",
+                    "TargetRoomId": "Room_C07"
+                },
+                {
+                    "Id": "Room_C08_Exit_02",
+                    "TargetRoomId": "Room_C09"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C09",
+            "Description": "방 C09",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 25,
+                    "Y": 1
+                },
+                {
+                    "X": 25,
+                    "Y": 0
+                },
+                {
+                    "X": 25,
+                    "Y": -1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C09_Exit_01",
+                    "TargetRoomId": "Room_C08"
+                },
+                {
+                    "Id": "Room_C09_Exit_02",
+                    "TargetRoomId": "Room_C10"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C10",
+            "Description": "방 C10",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 26,
+                    "Y": 0
+                },
+                {
+                    "X": 26,
+                    "Y": 1
+                },
+                {
+                    "X": 27,
+                    "Y": 1
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C10_Exit_01",
+                    "TargetRoomId": "Room_C09"
+                },
+                {
+                    "Id": "Room_C10_Exit_02",
+                    "TargetRoomId": "Room_C11"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C11",
+            "Description": "방 C11",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 27,
+                    "Y": 0
+                },
+                {
+                    "X": 27,
+                    "Y": -1
+                },
+                {
+                    "X": 27,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C11_Exit_01",
+                    "TargetRoomId": "Room_C10"
+                },
+                {
+                    "Id": "Room_C11_Exit_02",
+                    "TargetRoomId": "Room_C12"
+                }
+            ]
+        },
+        {
+            "Id": "Room_C12",
+            "Description": "방 C12",
+            "RegionId": "Region_03",
+            "OccupiedChunks": [
+                {
+                    "X": 26,
+                    "Y": -2
+                }
+            ],
+            "RewardIds": [],
+            "HiddenIds": [],
+            "Exits": [
+                {
+                    "Id": "Room_C12_Exit_01",
+                    "TargetRoomId": "Room_C11"
+                }
+            ]
+        }
     ]
-  },
-  {
-    "Id": "Room_A02",
-    "Description": "숲길",
-    "RegionId": "Region_01",
-    "RewardIds": [],
-    "HiddenIds": [],
-    "Exits": [
-      {
-        "Id": "Room_A02_Exit_01",
-        "TargetRoomId": "Room_A01"
-      }
-    ],
-    "OccupiedChunks": [
-      {
-        "X": 1,
-        "Y": 0
-      },
-      {
-        "X": 2,
-        "Y": 0
-      },
-      {
-        "X": 1,
-        "Y": 1
-      },
-      {
-        "X": 2,
-        "Y": 1
-      }
-    ]
-  },
-  {
-    "Id": "Room_A03",
-    "Description": "방 A03",
-    "RegionId": "Region_01",
-    "RewardIds": [],
-    "HiddenIds": [],
-    "Exits": [],
-    "OccupiedChunks": [
-      {
-        "X": 3,
-        "Y": 0
-      },
-      {
-        "X": 4,
-        "Y": 0
-      }
-    ]
-  },
-  {
-    "Id": "Room_A04",
-    "Description": "방 A04",
-    "RegionId": "Region_01",
-    "RewardIds": [],
-    "HiddenIds": [],
-    "Exits": [],
-    "OccupiedChunks": [
-      {
-        "X": 3,
-        "Y": 1
-      },
-      {
-        "X": 4,
-        "Y": 1
-      }
-    ]
-  },
-  {
-    "Id": "Room_B01",
-    "Description": "동굴 입구",
-    "RegionId": "Region_02",
-    "RewardIds": [],
-    "HiddenIds": [],
-    "Exits": [],
-    "OccupiedChunks": [
-      {
-        "X": 0,
-        "Y": 0
-      }
-    ]
-  }
-]

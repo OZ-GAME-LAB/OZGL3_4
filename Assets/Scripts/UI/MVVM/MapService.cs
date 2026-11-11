@@ -135,6 +135,20 @@ public class MapService
         return false;
     }
 
+    // 테스트 치트: 현재 방/리전과 보상/히든 진행 상태는 유지한다.
+    public bool RequestUnlockAllRoomsForTesting()
+    {
+        bool changed = false;
+        foreach (MapRoomViewModel room in _mapViewModel.Rooms)
+        {
+            if (RequestUnlockRoomByExploration(room.RoomId))
+            {
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
     // 추가 - 김동혁
     public bool RequestCollectReward(string roomId, string rewardId)
     {

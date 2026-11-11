@@ -7,12 +7,14 @@ public class MapRoomView : MonoBehaviour
     private MapViewModel _mapViewModel;
     private MapRoomViewModel _roomViewModel;
     private Image[] _images;
+    private bool _preserveSpriteColors;
 
-    public void Init(MapViewModel mapViewModel, MapRoomViewModel roomViewModel)
+    public void Init(MapViewModel mapViewModel, MapRoomViewModel roomViewModel, bool preserveSpriteColors = false)
     {
         UnBind();
         _mapViewModel = mapViewModel;
         _roomViewModel = roomViewModel;
+        _preserveSpriteColors = preserveSpriteColors;
         _images = GetComponentsInChildren<Image>(true);
         if (isActiveAndEnabled)
         {
@@ -78,19 +80,20 @@ public class MapRoomView : MonoBehaviour
         {
             return;
         }
-        Color color = Color.red;
+        Color color = _preserveSpriteColors ? Color.white : Color.red;
         if (_mapViewModel.CurrentRoomId == _roomViewModel.RoomId)
         {
-            color = Color.green;
+            color = _preserveSpriteColors ? new Color(0.8f, 1f, 0.85f) : Color.green;
         }
         else if (_roomViewModel.IsVisited)
         {
-            color = Color.blue;
+            color = _preserveSpriteColors ? Color.white : Color.blue;
         }
         foreach (Image image in _images)
         {
             if (image != null)
             {
+                image.enabled = _roomViewModel.IsVisited;
                 image.color = color;
             }
         }
