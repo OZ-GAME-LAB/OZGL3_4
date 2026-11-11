@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -108,9 +109,9 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Change, new ChangeState(this));
 
         // 그림자 초기화
-        _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
-        _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
-        _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));
+        //_shadowList.Add(ShadowType.Default, new DefaultShadow(this));
+        //_shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
+        //_shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));
 
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
@@ -144,11 +145,12 @@ public class Player : MonoBehaviour
         _viewModel.PropertyChanged += OnPropertyChanged;
         _viewModel.ContainerPropertyChanged += OnContainerPropChanged;
 
-        // 초기 상태 설정
-        ChangeState(PlayerState.Idle);
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+        // 초기 상태 설정
+        ChangeState(PlayerState.Idle);
+        
 
         MapManager.Instance.Transform_Target = transform;
         Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
@@ -348,6 +350,15 @@ public class Player : MonoBehaviour
         _rigid.linearVelocity = Vector2.zero;
         _rigid.simulated = false;
         _anim.Play("Dead");
+
+        DeadAsync().Forget();
+        
+    }
+
+    private async UniTaskVoid DeadAsync()
+    {
+        float delayTime = _anim.GetCurrentAnimatorClipInfo(0).Length;
+        await UniTask.Delay(TimeSpan.FromSeconds(delayTime));
 
         Died?.Invoke();
     }
