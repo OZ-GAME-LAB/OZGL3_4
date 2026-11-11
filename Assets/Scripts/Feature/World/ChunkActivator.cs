@@ -42,34 +42,6 @@ public class ChunkActivator
         return _chunks.TryGetValue(key, out chunk);
     }
 
-    public bool TryGetNearestSpawnSpot(Room room, Vector2 position, out SpawnSpot spawnSpot)
-    {
-        spawnSpot = null;
-
-        if (room == null)
-            return false;
-
-        float bestDistance = float.MaxValue;
-
-        foreach (KeyValuePair<Vector2Int, MapChunk> pair in _chunks)
-        {
-            MapChunk chunk = pair.Value;
-
-            if (chunk.Room != room || chunk.SpawnSpot == null)
-                continue;
-
-            float distance = (chunk.SpawnSpot.Position - position).sqrMagnitude;
-
-            if (distance < bestDistance)
-            {
-                bestDistance = distance;
-                spawnSpot = chunk.SpawnSpot;
-            }
-        }
-
-        return spawnSpot != null;
-    }
-
     public void Refresh(Vector2Int center, int activeRadius)
     {
         CollectActiveRooms(center, activeRadius);
