@@ -94,7 +94,7 @@ MonoBehaviour:
   Transform_MapOrigin: {fileID: 100011}
   _chunkSize: {x: 250, y: 250}
   _roomSpriteFolder: UI/MapRooms
-  _displayScale: 0.65
+  _displayScale: 0.6
   _overviewScale: 0.25
 --- !u!114 &100004
 MonoBehaviour:
