@@ -81,7 +81,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1000
+  m_SortingOrder: 605
   m_MaskInteraction: 0
   m_Sprite: {fileID: -4877374327531110893, guid: b427d898273d6d74184b061e3958032d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -174,6 +174,7 @@ GameObject:
   - component: {fileID: 8158507263626246517}
   - component: {fileID: 8085268429044505465}
   - component: {fileID: 7318691679688196536}
+  - component: {fileID: 3747080586806242129}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -327,3 +328,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bf50bc2f08042245858a4a8434f59d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+--- !u!114 &3747080586806242129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8049861768388385633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0de75f127f6dd43a7d2b043195ecbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawner
+  _respawnDelay: 1

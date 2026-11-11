@@ -36,6 +36,7 @@ public class MapManager : SingletonBase<MapManager>
     private Queue<string> _regionQueue = new Queue<string>();
 
     private ChunkActivator _chunkActivator = new ChunkActivator();
+    private MapChunk _lastValidChunk; // 플레이어가 마지막으로 서 있던 실제 청크 (부활 기준)
 
 
     public string CurrentRegionId => _currentRegion != null ? _currentRegion.RegionId : null;
@@ -235,6 +236,11 @@ public class MapManager : SingletonBase<MapManager>
         _currentChunkIndex = index;
         _hasCurrentChunk = true;
 
+        if (_chunkActivator.TryGetChunk(index, out MapChunk chunk))
+        {
+            _lastValidChunk = chunk;
+        }
+
         Debug.Log($"[MapManager] (Update) 청크 이동: {index}"); //청크 이동시 알림 테스트 코드
 
         CheckRegionChange(index); // 수정된 부분 - 김동혁 (지역 변경 메서드 추가)
@@ -297,6 +303,11 @@ public class MapManager : SingletonBase<MapManager>
         Vector2Int key = GetChunkIndex(chunk.transform.position);
 
         _chunkActivator.Register(key, chunk);
+
+        if (_hasCurrentChunk && key == _currentChunkIndex)
+        {
+            _lastValidChunk = chunk;
+        }
     }
 
     public void UnregisterChunk(MapChunk chunk)
@@ -364,6 +375,38 @@ public class MapManager : SingletonBase<MapManager>
         _regionLoader = new RegionLoader(root);
     }
 
+
+    public bool TryGetRespawnPosition(out Vector2 position) // 부활 위치를 찾는다. 마지막 청크의 스팟 → 없으면 같은 방에서 가장 가까운 스팟.
+    {
+        position = Vector2.zero;
+
+        if (_lastValidChunk == null)
+        {
+            Debug.LogError("[MapManager] (TryGetRespawnPosition) - 기준 청크 없음");
+
+            return false;
+        }
+
+        if (_lastValidChunk.SpawnSpot != null)
+        {
+            position = _lastValidChunk.SpawnSpot.Position;
+
+            return true;
+        }
+
+        if (_chunkActivator.TryGetNearestSpawnSpot(_lastValidChunk.Room, _lastValidChunk.transform.position, out SpawnSpot spawnSpot))
+        {
+            Debug.Log($"[MapManager] (TryGetRespawnPosition) - 같은 방의 가장 가까운 스팟 사용: {spawnSpot.name}");
+
+            position = spawnSpot.Position;
+
+            return true;
+        }
+
+        Debug.LogError($"[MapManager] (TryGetRespawnPosition) - 같은 방에 스폰 스팟 없음: {_lastValidChunk.name}");
+
+        return false;
+    }
 
     public async UniTask<bool> PrepareRegionAsync(string regionId)
     {
