@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.UI.Image;
@@ -74,6 +75,9 @@ public class Player : MonoBehaviour
 
     [Header("Grab")]
     public Grabbable GrabTarget { get; private set; }
+
+    public bool IsDead { get; private set; }
+    public event Action Died;
 
     [Header("Component")]
     private PlayerInteractor _playerInteractor;
@@ -328,6 +332,29 @@ public class Player : MonoBehaviour
         transform.position = dest;
         _rigid.rotation = 0f;
         ChangeState(PlayerState.Idle);
+    }
+
+    public void Die()
+    {
+        if (IsDead)
+            return;
+        IsDead = true;
+
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.simulated = false;
+        _anim.Play("Dead");
+
+        Died?.Invoke();
+    }
+
+    public void Revive(Vector2 position)
+    {
+        _rigid.simulated = true;     // 물리를 먼저 켜야 위치 이동이 제대로 반영됨
+        TeleportTo(position);        // 속도 0, 위치 이동, 회전 초기화
+        IsDead = false;
+
+        ChangeState(PlayerState.Idle);     // 프로젝트의 상태 전환 방식에 맞게
+        Animator.Play("Idle");
     }
     #endregion
 

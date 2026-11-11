@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -35,6 +35,11 @@ public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
 
     private float _defaultIntensity = 1f;
 
+    [SerializeField] private LayerMask _playerMask;
+
+    private ContactFilter2D _playerFilter;
+    private Collider2D[] _overlapResults = new Collider2D[2];
+
     public bool IsOn { get; private set; }
 
     // 빛이 켜지거나 꺼질 때 호출됩니다. (효과음, 연출 연결용)
@@ -52,6 +57,10 @@ public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
         {
             _defaultIntensity = _isOverrideIntensity ? _lightIntensity : Light2D_Zone.intensity;
         }
+
+        _playerFilter = new ContactFilter2D();
+        _playerFilter.SetLayerMask(_playerMask);
+        _playerFilter.useTriggers = false;
     }
 
     /// <summary>
@@ -222,6 +231,11 @@ public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
         {
             OnChangeLightState.Invoke(isOn);
         }
+
+        if (IsOn)
+        {
+            KillPlayerInside();
+        }
     }
 
     private void OnValidate()
@@ -250,6 +264,29 @@ public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
             {
                 _defaultIntensity = _lightIntensity;
             }
+        }
+    }
+
+    private void KillPlayerInside()
+    {
+        if(_overlapResults == null)
+            _overlapResults = new Collider2D[2];
+
+        int count = Collider2D_Zone.Overlap(_playerFilter, _overlapResults);
+        for (int i = 0; i < count; i++)
+        {
+            if (_overlapResults[i].TryGetComponent(out Player player))
+            {
+                player.Die();
+            }
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (IsOn && other.TryGetComponent(out Player player))
+        {
+            player.Die();
         }
     }
 }
