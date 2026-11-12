@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,6 +53,13 @@ public class Player : MonoBehaviour
     private int _jumpCount;
     public bool IsGrounded => _isGrounded;
     public int JumpCount => _jumpCount;
+
+    [Header("Jump Feel")] // 헤더 추가 - 김동혁, 숏~롱 점프나 코요테 타임 등을 구현하기 위함
+    [SerializeField, Range(0f, 1f)] private float _jumpCutMultiplier = 0.5f;
+    [SerializeField] private float _coyoteTime = 0.1f;
+    private float _coyoteTimer;
+    [SerializeField] private float _fallGravityMultiplier = 2f;
+    [SerializeField] private float _maxFallSpeed = 20f;
 
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
@@ -116,7 +123,7 @@ public class Player : MonoBehaviour
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
         {
-            if(ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
+            if (ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
             {
                 Debug.LogWarning("애니메이션 중복");
             }
@@ -150,7 +157,7 @@ public class Player : MonoBehaviour
         _viewModel.CurrentShadowType = ShadowType.Default;
         // 초기 상태 설정
         ChangeState(PlayerState.Idle);
-        
+
 
         MapManager.Instance.Transform_Target = transform;
         Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
@@ -165,7 +172,9 @@ public class Player : MonoBehaviour
     {
         UpdateTimer();
         UpdateGround();
+        UpdateCoyote(); // 추가 - 김동혁, 코요테 타이머 메서드
         _currentState.FixedUpdate();
+        ApplyFallGravity(); // 추가 - 김동혁, 낙하 속도 메서드
     }
     #endregion
 
@@ -284,6 +293,17 @@ public class Player : MonoBehaviour
         _groundLockTimer = _groundLockTime;
     }
 
+    private void CutJump() // 추가 - 김동혁, 숏~롱점프 구현을 위한 점프 끊기 메서드
+    {
+        if (IsDead) return;
+
+        if (_currentStateType != PlayerState.Jump) return;
+
+        if (_rigid.linearVelocityY <= 0f) return;
+
+        _rigid.linearVelocityY *= _jumpCutMultiplier;
+    }
+
     public void TryStartGrab()
     {
         if (IsGrounded == false)
@@ -355,7 +375,7 @@ public class Player : MonoBehaviour
         _anim.Play("Dead");
 
         DeadAsync().Forget();
-        
+
     }
 
     private async UniTaskVoid DeadAsync()
@@ -380,12 +400,12 @@ public class Player : MonoBehaviour
     #region 내부 처리
     private void UpdateTimer()
     {
-        if(_dashCooldownTimer > 0f)
+        if (_dashCooldownTimer > 0f)
         {
             _dashCooldownTimer -= Time.fixedDeltaTime;
         }
 
-        if(_groundLockTimer > 0f)
+        if (_groundLockTimer > 0f)
         {
             _groundLockTimer -= Time.fixedDeltaTime;
         }
@@ -428,6 +448,39 @@ public class Player : MonoBehaviour
             _jumpCount = 0;
         }
     }
+
+    private void UpdateCoyote() // 추가 - 김동혁, 코요테 타이머 메서드
+    {
+        if (_isGrounded) // 땅에 있으면 타이머 초기화
+        {
+            _coyoteTimer = _coyoteTime;
+
+            return;
+        }
+
+        if (_coyoteTimer > 0f) // 땅에서 벗어나면 타이머 작동
+        {
+            _coyoteTimer -= Time.fixedDeltaTime;
+
+            return;
+        }
+
+        if (_jumpCount == 0) // 타이머가 0.1초가 지나면 점프 쓴것으로 처리
+        {
+            _jumpCount = 1;
+        }
+    }
+
+    private void ApplyFallGravity()
+    {
+        if (IsDead || _isGrounded || _currentStateType == PlayerState.Dash) return;
+
+        if (_rigid.linearVelocityY >= 0f) return;
+
+        float extraVelocity = Physics2D.gravity.y * _defaultGravity * (_fallGravityMultiplier - 1f) * Time.fixedDeltaTime;
+
+        _rigid.linearVelocityY = Mathf.Max(_rigid.linearVelocityY + extraVelocity, -_maxFallSpeed);
+    }
     #endregion
 
     #region Player Input
@@ -435,7 +488,7 @@ public class Player : MonoBehaviour
     {
         _movement = value.Get<Vector2>();
 
-        if(_movement.x != 0)
+        if (_movement.x != 0)
         {
             _facing = Mathf.Sign(_movement.x);
         }
@@ -446,6 +499,10 @@ public class Player : MonoBehaviour
         if (value.isPressed)
         {
             _currentState.TryJump();
+        }
+        else // 추가 - 김동혁
+        {
+            CutJump();
         }
     }
 
