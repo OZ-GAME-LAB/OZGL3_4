@@ -10,7 +10,7 @@ public enum VolumeChannel : byte
     SFX,
 }
 
-public enum SoundId 
+public enum SoundId : byte
 {
     None,
     // BGM
