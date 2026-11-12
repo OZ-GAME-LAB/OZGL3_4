@@ -8,7 +8,7 @@ using UnityEngine;
 public class PlayerRespawner : MonoBehaviour
 {
     [Header("부활")]
-    [SerializeField] private float _respawnDelay = 1f;
+    [SerializeField] private float _respawnDelay = 0.2f;
 
     private Player _player;
 
