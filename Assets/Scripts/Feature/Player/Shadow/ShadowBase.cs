@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public enum ShadowType
 {
@@ -8,16 +8,17 @@ public enum ShadowType
     Rabbit,
 }
 
+// 메모 - 김동혁, 속도 5f 점프파워 3f던걸 각각 6f, 4f로 상향했습니다.
 public abstract class ShadowBase
 {
     protected Player _player;
 
     [Header("Move")]
-    protected float _speed = 5f;
+    protected float _speed = 6f;
     public float Speed => _speed;
 
     [Header("Jump")]
-    protected float _jumpPower = 3f;
+    protected float _jumpPower = 4f;
     protected int _maxJumpCount = 2;
     public float JumpPower => _jumpPower;
     public int MaxJumpCount => _maxJumpCount;
