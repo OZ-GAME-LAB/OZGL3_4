@@ -340,4 +340,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0de75f127f6dd43a7d2b043195ecbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawner
-  _respawnDelay: 1
+  _respawnDelay: 0.2
