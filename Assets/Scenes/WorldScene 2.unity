@@ -262088,6 +262088,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3352222146929902757, guid: fecf1a3ca65f0a34f8a9fffedc33e4d9, type: 3}
+      propertyPath: _startRatio
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6717925221991362001, guid: fecf1a3ca65f0a34f8a9fffedc33e4d9, type: 3}
       propertyPath: m_Name
       value: Region_02
