@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -30,6 +30,8 @@ public class Switch : SignalSender, IInteractable
 
     [Header("Reference")]
     [SerializeField] private SpriteRenderer SpriteRenderer_Switch;
+    [SerializeField] private Animator _anim;
+    private int _isOnHash = Animator.StringToHash("IsOn"); // 애니메이션 관련 변수 추가 - 유민형
 
     [Header("Behaviour")]
     [SerializeField] private SwitchMode _switchMode = SwitchMode.Toggle;
@@ -142,14 +144,20 @@ public class Switch : SignalSender, IInteractable
 
     private void PlayPressAnimation()
     {
-        if (SpriteRenderer_Switch == null)
+        // 버튼 On/Off 애니메이션 실행 - 유민형
+        if (_anim == null)
             return;
 
-        // 연타했을 때 이전 연출을 멈추고 처음부터 다시 재생합니다.
-        StopPressAnimation();
+        _anim.SetBool(_isOnHash, !IsOn);
 
-        _pressCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(this.GetCancellationTokenOnDestroy());
-        PressAsync(_pressCancellationSource.Token).Forget();
+        //if (SpriteRenderer_Switch == null)
+        //    return;
+
+        //// 연타했을 때 이전 연출을 멈추고 처음부터 다시 재생합니다.
+        //StopPressAnimation();
+
+        //_pressCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(this.GetCancellationTokenOnDestroy());
+        //PressAsync(_pressCancellationSource.Token).Forget();
     }
 
     private void StopPressAnimation()
