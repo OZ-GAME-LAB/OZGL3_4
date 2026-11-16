@@ -5,6 +5,7 @@ public class PointDefaultMenuUI : MonoBehaviour
 {
     [SerializeField] private UIButton _saveButton;
     [SerializeField] private UIButton _teleportButton;
+    [SerializeField] private UIButton _settingButton;
 
     private string _currentTeleportId;
 
@@ -14,6 +15,7 @@ public class PointDefaultMenuUI : MonoBehaviour
     {
         _saveButton.BindOnClickButtonEvent(OnClickedSaveButton);
         _teleportButton.BindOnClickButtonEvent(OnClickedTeleportButton);
+        _settingButton.BindOnClickButtonEvent(OnClickedSettingButton);
     }
 
     private void OnDisable()
@@ -35,5 +37,10 @@ public class PointDefaultMenuUI : MonoBehaviour
     private void OnClickedTeleportButton()
     {
         OnClickTeleport?.Invoke();
+    }
+
+    private void OnClickedSettingButton()
+    {
+        UIManager.Instance.OpenUI(UIRootType.PopupUI, UIType.SettingUI);
     }
 }
