@@ -17,6 +17,8 @@ public class LobbyUI : UIBase
         _startButton.BindOnClickButtonEvent(OnClickNewGame);
         _settingButton.BindOnClickButtonEvent(OpenSettingUI);
         _exitButton.BindOnClickButtonEvent(ExitGame);
+
+        SoundManager.Instance.PlayBGM(SoundId.BGM_Cave);
     }
 
     private void OnDisable()

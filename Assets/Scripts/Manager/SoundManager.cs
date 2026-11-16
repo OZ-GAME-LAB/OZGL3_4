@@ -14,8 +14,8 @@ public enum SoundId : byte
 {
     None,
     // BGM
-    BGM_Title,
-    BGM_Title2,
+    BGM_Cave,
+    BGM_Forest,
 
     // SFX
 }
@@ -37,8 +37,12 @@ public class SoundManager : SingletonBase<SoundManager>
     private int _sfxMaxSize = 16;
     private int _nextSfxIndex;
 
-    private void Start()
+    private RegionBgmController _controller;
+
+    protected override void Awake()
     {
+        base.Awake();
+
         _bgmSources = new AudioSource[2];
         for(int i = 0; i < _bgmSources.Length; i++)
         {
@@ -50,6 +54,9 @@ public class SoundManager : SingletonBase<SoundManager>
         {
             _sfxSources[i] = CreateSource("SFX_" + (i + 1), _sfxGroup, loop: false);
         }
+
+        _controller = GetComponentInChildren<RegionBgmController>();
+        _controller.Init();
     }
 
     private AudioSource CreateSource(string name, AudioMixerGroup group, bool loop)
