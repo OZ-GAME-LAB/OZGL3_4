@@ -7,16 +7,22 @@ using UnityEngine.Serialization;
 ///
 /// 구조
 /// Gimmick_PressurePlate        ← PressurePlate, BoxCollider2D(Is Trigger, 발판 위 감지 범위)
-/// └─ Visual                    ← 발판 그림 (눌리면 살짝 내려감)
+/// └─ Visual                    ← 발판 그림 (SpriteRenderer_Visual에 연결. 눌리면 그림이 바뀌거나 살짝 내려감)
 ///
 /// - 올라가면 신호 켜짐, 모두 내려가면 신호 꺼짐입니다.
 /// - _isLatched를 켜면 한 번 눌린 뒤에는 내려가도 계속 켜져 있습니다.
+/// - Sprite_On, Sprite_Off를 둘 다 넣으면 눌림 상태에 따라 그림이 바뀝니다. (비워 두면 그림은 그대로)
 /// - 시작할 때는 실제로 눌려 있는지에 따라 연결된 기믹 상태를 맞춥니다. (Is Start On 값은 사용하지 않음)
 /// </summary>
 public class PressurePlate : SignalSender
 {
     [Header("Reference")]
     [SerializeField] private Transform Transform_Visual;
+    [SerializeField] private SpriteRenderer SpriteRenderer_Visual;
+
+    [Header("Visual")]
+    [SerializeField] private Sprite Sprite_On;  // 눌린 모습
+    [SerializeField] private Sprite Sprite_Off; // 눌리지 않은 모습
 
     [Header("Press")]
     [SerializeField] private bool _isPressedByPlayer = true;
@@ -40,6 +46,8 @@ public class PressurePlate : SignalSender
         {
             Transform_Visual = transform.GetChild(0);
         }
+
+        SpriteRenderer_Visual = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Awake()
@@ -120,6 +128,12 @@ public class PressurePlate : SignalSender
 
     private void RefreshVisual()
     {
+        // 눌림 상태에 맞는 그림으로 바꿉니다.
+        if (SpriteRenderer_Visual != null && Sprite_On != null && Sprite_Off != null)
+        {
+            SpriteRenderer_Visual.sprite = IsPressed ? Sprite_On : Sprite_Off;
+        }
+
         if (Transform_Visual == null)
             return;
 

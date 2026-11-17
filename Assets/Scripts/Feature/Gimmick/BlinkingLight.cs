@@ -30,6 +30,7 @@ public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     [SerializeField] private bool _isStartBlinking = true;
 
     private CancellationTokenSource _blinkCancellationSource;
+    private float _scheduledTime;
 
     public bool IsBlinking { get; private set; }
 
@@ -134,24 +135,28 @@ public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         if (isCanceled)
             return;
 
-        if (await WaitAsync(_startDelay, cancellationToken))
+        // 기다릴 때마다 생기는 프레임 단위 오차가 쌓이지 않도록, 시작 시각 기준의 예정 시각에 맞춰 기다립니다.
+        // (여러 점멸등의 박자를 맞춰 둔 구간이 시간이 지나도 어긋나지 않게 하기 위함)
+        _scheduledTime = Time.time;
+
+        if (await WaitScheduledAsync(_startDelay, cancellationToken))
             return;
 
         while (true)
         {
             LightZone_Target.ReceiveSignal(true);
-            if (await WaitAsync(_onDuration, cancellationToken))
+            if (await WaitScheduledAsync(_onDuration, cancellationToken))
                 return;
 
             LightZone_Target.ReceiveSignal(false);
             float waitBeforeWarning = Mathf.Max(0f, _offDuration - _warningDuration);
-            if (await WaitAsync(waitBeforeWarning, cancellationToken))
+            if (await WaitScheduledAsync(waitBeforeWarning, cancellationToken))
                 return;
 
             if (_warningDuration > 0f)
             {
                 LightZone_Target.ShowWarning();
-                if (await WaitAsync(_warningDuration, cancellationToken))
+                if (await WaitScheduledAsync(Mathf.Min(_warningDuration, _offDuration), cancellationToken))
                     return;
             }
         }
@@ -160,6 +165,15 @@ public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     /// <summary>
     /// 지정한 시간만큼 기다립니다. 중간에 취소되면 true를 돌려줍니다.
     /// </summary>
+    /// <summary>
+    /// 예정 시각을 seconds만큼 뒤로 옮기고, 그 시각이 될 때까지 기다립니다. 취소되면 true를 돌려줍니다.
+    /// </summary>
+    private async UniTask<bool> WaitScheduledAsync(float seconds, CancellationToken cancellationToken)
+    {
+        _scheduledTime += Mathf.Max(0f, seconds);
+        return await WaitAsync(_scheduledTime - Time.time, cancellationToken);
+    }
+
     private async UniTask<bool> WaitAsync(float seconds, CancellationToken cancellationToken)
     {
         if (seconds <= 0f)
