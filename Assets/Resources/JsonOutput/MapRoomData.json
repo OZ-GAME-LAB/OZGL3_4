@@ -860,5 +860,23 @@
                     "TargetRoomId": "Room_C11"
                 }
             ]
+        },
+        {
+            "Id": "Room_A07",
+            "Description": "히든01",
+            "RegionId": "Region_01",
+            "OccupiedChunks": [
+                {
+                    "X": -1,
+                    "Y": 0
+                }
+            ],
+            "RewardIds": [
+                "Room_A07_Reward_01"
+            ],
+            "HiddenIds": [
+                "Room_A07_Hidden_01"
+            ],
+            "Exits": []
         }
     ]
