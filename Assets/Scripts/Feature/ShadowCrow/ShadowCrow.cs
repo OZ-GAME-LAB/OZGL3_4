@@ -15,25 +15,25 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     [SerializeField] private Animator Animator_Crow;
     [SerializeField] private SpriteRenderer SpriteRenderer_Crow;
     [SerializeField] private Collider2D Collider_Interact;
+    [SerializeField] private ShadowCrowSpeechBubble SpeechBubble_Crow;
     [SerializeField] private float _appearDistance = 4f;
     [SerializeField] private string _dialogId;
 
     private ShadowCrowStateBase _currentState;
     private ShadowCrowState _currentStateType = ShadowCrowState.None;
     private Dictionary<ShadowCrowState, ShadowCrowStateBase> _stateList = new Dictionary<ShadowCrowState, ShadowCrowStateBase>();
-    private DialogUI _dialogUI;
 
     public ShadowCrowState CurrentStateType => _currentStateType;
     public Vector2 Position => transform.position;
 
-    public bool IsDialogPlaying => _dialogUI != null && _dialogUI.IsPlaying;
+    public bool IsDialogPlaying => SpeechBubble_Crow != null && SpeechBubble_Crow.IsPlaying;
 
     #region 수명
     private void Awake()
     {
-        if (Animator_Crow == null || SpriteRenderer_Crow == null || Collider_Interact == null)
+        if (Animator_Crow == null || SpriteRenderer_Crow == null || Collider_Interact == null || SpeechBubble_Crow == null)
         {
-            Debug.LogError($"[ShadowCrow] {name}: Animator_Crow, SpriteRenderer_Crow, Collider_Interact를 연결하세요.");
+            Debug.LogError($"[ShadowCrow] {name}: Animator_Crow, SpriteRenderer_Crow, Collider_Interact, SpeechBubble_Crow를 연결하세요.");
         }
 
         _stateList.Add(ShadowCrowState.Hidden, new ShadowCrowHiddenState(this));
@@ -53,7 +53,6 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         _currentState?.Exit();
         _currentState = null;
         _currentStateType = ShadowCrowState.None;
-        _dialogUI = null;
     }
 
     private void Update()
@@ -95,6 +94,12 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     #region 대사
     public void Interact(Player player)
     {
+        if (_currentStateType == ShadowCrowState.Talk)
+        {
+            SpeechBubble_Crow.ShowNextDialog();
+            return;
+        }
+
         if (_currentStateType != ShadowCrowState.Idle)
         {
             return;
@@ -106,25 +111,14 @@ public class ShadowCrow : MonoBehaviour, IInteractable
             return;
         }
 
-        StartDialog(GetDialogUI(), _dialogId);
+        StartDialog(_dialogId);
     }
 
-    private DialogUI GetDialogUI()
+    public bool StartDialog(string dialogId)
     {
-        DialogUI dialogUI = FindAnyObjectByType<DialogUI>();
-        if (dialogUI == null)
+        if (SpeechBubble_Crow == null)
         {
-            Debug.LogError($"[ShadowCrow] {name}: 씬에 활성화된 DialogUI가 없습니다.");
-        }
-
-        return dialogUI;
-    }
-
-    public bool StartDialog(DialogUI dialogUI, string dialogId)
-    {
-        if (dialogUI == null)
-        {
-            Debug.LogError($"[ShadowCrow] {name}: DialogUI가 없습니다.");
+            Debug.LogError($"[ShadowCrow] {name}: SpeechBubble_Crow가 없습니다.");
             return false;
         }
 
@@ -134,14 +128,28 @@ public class ShadowCrow : MonoBehaviour, IInteractable
             return false;
         }
 
-        if (dialogUI.StartDialog(dialogId) == false)
+        if (SpeechBubble_Crow.StartDialog(dialogId) == false)
         {
             return false;
         }
 
-        _dialogUI = dialogUI;
         ChangeState(ShadowCrowState.Talk);
         return true;
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (_currentStateType != ShadowCrowState.Talk)
+        {
+            return;
+        }
+
+        if (collision.GetComponent<Player>() == null)
+        {
+            return;
+        }
+
+        SpeechBubble_Crow.StopDialog();
     }
     #endregion
 
