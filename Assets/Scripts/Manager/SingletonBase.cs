@@ -5,7 +5,7 @@ public class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
     private static T _instance;
     public static T Instance => _instance;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         if(_instance != null)
         {

@@ -184,7 +184,7 @@ public class MapService
 
         if (roomViewModel == null)
         {
-            Debug.LogWarning($"[MapService] (RequestCollectReward) : {roomId}를 찾을 수 없습니다.");
+            Debug.LogWarning($"[MapService] (RequestDiscoverHidden) - 방 없음: {roomId}");
 
             return false;
         }
@@ -198,7 +198,7 @@ public class MapService
 
         if (roomViewModel == null)
         {
-            Debug.LogWarning($"[MapService] (IsRewardCollected) : {roomId}를 찾을 수 없습니다.");
+            Debug.LogWarning($"[MapService] (IsHiddenDiscovered) - 방 없음: {roomId}");
 
             return false;
         }

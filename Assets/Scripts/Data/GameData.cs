@@ -1,3 +1,6 @@
+﻿using System;
+using System.Collections.Generic;
+
 [System.Serializable]
 public class GameDataBase
 {
@@ -50,4 +53,13 @@ public class ChunkIndexData
 {
     public int X;
     public int Y;
+}
+
+// 게임 저장용 데이터
+[Serializable]
+public class SaveData
+{
+    public List<ShadowType> UnlockedShadowIds = new List<ShadowType>();
+    public List<string> ActivatedTeleportIds = new List<string>();
+    public string LastSaveTeleportId;
 }

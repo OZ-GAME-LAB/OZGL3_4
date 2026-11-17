@@ -1,7 +1,9 @@
-﻿using System;
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.UI.Image;
@@ -52,6 +54,20 @@ public class Player : MonoBehaviour
     public bool IsGrounded => _isGrounded;
     public int JumpCount => _jumpCount;
 
+    // 헤더 추가 - 김동혁, 숏~롱 점프나 코요테 타임 등을 구현하기 위함
+    [Header("Jump Feel")]
+    [SerializeField, Range(0f, 1f)] private float _jumpCutMultiplier = 0.5f;
+    [SerializeField] private float _coyoteTime = 0.1f;
+    private float _coyoteTimer;
+    [SerializeField] private float _fallGravityMultiplier = 2f;
+    [SerializeField] private float _maxFallSpeed = 20f;
+    [SerializeField] private float _snapMinDistance = 0.03f;
+    [SerializeField] private float _riseIgnoreSpeed = 0.1f;
+    private float _lastVelocityY;
+    private bool _isJumpImpulse;
+    [SerializeField] private float _airRiseTolerance = 0.01f;
+    // -----
+
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
@@ -74,6 +90,9 @@ public class Player : MonoBehaviour
 
     [Header("Grab")]
     public Grabbable GrabTarget { get; private set; }
+
+    public bool IsDead { get; private set; }
+    public event Action Died;
 
     [Header("Component")]
     private PlayerInteractor _playerInteractor;
@@ -103,10 +122,15 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Grab, new GrabState(this));
         _stateList.Add(PlayerState.Change, new ChangeState(this));
 
+        // 그림자 초기화
+        //  _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
+        // _shadowList.Add(ShadowType.Mouse, new MouseShadow(this));
+        // _shadowList.Add(ShadowType.Rabbit, new RabbitShadow(this));*/
+
         // 그림자 애니메이션
         foreach (var entry in _shadowAnimators)
         {
-            if(ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
+            if (ShadowAnimatorList.TryAdd(entry.Type, entry.Controller) == false)
             {
                 Debug.LogWarning("애니메이션 중복");
             }
@@ -135,11 +159,12 @@ public class Player : MonoBehaviour
         _viewModel.PropertyChanged += OnPropertyChanged;
         _viewModel.ContainerPropertyChanged += OnContainerPropChanged;
 
-        // 초기 상태 설정
-        ChangeState(PlayerState.Idle);
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
+        // 초기 상태 설정
+        ChangeState(PlayerState.Idle);
+
 
         MapManager.Instance.Transform_Target = transform;
         Camera.main.GetComponent<CameraFollow>().SetTarget(transform);
@@ -154,7 +179,15 @@ public class Player : MonoBehaviour
     {
         UpdateTimer();
         UpdateGround();
+        UpdateCoyote(); // 추가 - 김동혁, 코요테 타이머 메서드
+        LimitAirRise(); // 추가 - 김동혁, 공중 가속도 제어 메서드
+
         _currentState.FixedUpdate();
+
+        // 추가 - 김동혁, 낙하 속도 메서드
+        ApplyFallGravity();
+        _lastVelocityY = _rigid.linearVelocityY;
+        // -----
     }
     #endregion
 
@@ -197,7 +230,6 @@ public class Player : MonoBehaviour
     {
         ShadowBase nextShadow = _shadowList[_viewModel.CurrentShadowType];
 
-
         if (_currentShadow == null)
         {
             _currentShadow = nextShadow;
@@ -222,6 +254,9 @@ public class Player : MonoBehaviour
 
     public void AddShadow(ShadowType type)
     {
+        if (_shadowList.ContainsKey(type) == true)
+            return;
+
         ShadowBase newShadow = null;
 
         switch (type)
@@ -236,6 +271,7 @@ public class Player : MonoBehaviour
                 newShadow = new RabbitShadow(this);
                 break;
         }
+
         _shadowList.Add(type, newShadow);
     }
 
@@ -248,7 +284,9 @@ public class Player : MonoBehaviour
             // 바닥 위: 경사면을 따라가는 방향으로 이동 (평지면 slopeDir = (1, 0) → y = 0)
             // 멈추면 xOffset = 0 → 속도 (0, 0) 이라 튀거나 미끄러지지 않음
             Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
-            _rigid.linearVelocity = slopeDir * xOffset;
+
+            // 수정 - 김동혁, 이번 물리 계산에서 더해질 중력을 미리 상쇄해서 경사면에서 미끄러지지 않게
+            _rigid.linearVelocity = slopeDir * xOffset - Physics2D.gravity * _rigid.gravityScale * Time.fixedDeltaTime;
         }
         else
         {
@@ -268,6 +306,19 @@ public class Player : MonoBehaviour
         _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower, ForceMode2D.Impulse);
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
+
+        _isJumpImpulse = true; // 추가 - 김동혁
+    }
+
+    private void CutJump() // 추가 - 김동혁, 숏~롱점프 구현을 위한 점프 끊기 메서드
+    {
+        if (IsDead) return;
+
+        if (_currentStateType != PlayerState.Jump) return;
+
+        if (_rigid.linearVelocityY <= 0f) return;
+
+        _rigid.linearVelocityY *= _jumpCutMultiplier;
     }
 
     public void TryStartGrab()
@@ -324,22 +375,55 @@ public class Player : MonoBehaviour
     public void TeleportTo(Vector2 dest)
     {
         _rigid.linearVelocity = Vector2.zero;
+        _lastVelocityY = 0f; // 추가 - 김동혁, 순간이동 전 속도가 LimitAirRise에 남지 않도록
         _rigid.position = dest;
         transform.position = dest;
         _rigid.rotation = 0f;
         ChangeState(PlayerState.Idle);
+    }
+
+    public void Die()
+    {
+        if (IsDead)
+            return;
+        IsDead = true;
+
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.simulated = false;
+        _anim.Play("Dead");
+
+        DeadAsync().Forget();
+
+    }
+
+    private async UniTaskVoid DeadAsync()
+    {
+        float delayTime = _anim.GetCurrentAnimatorClipInfo(0).Length;
+        await UniTask.Delay(TimeSpan.FromSeconds(delayTime));
+
+        Died?.Invoke();
+    }
+
+    public void Revive(Vector2 position)
+    {
+        _rigid.simulated = true;     // 물리를 먼저 켜야 위치 이동이 제대로 반영됨
+        TeleportTo(position);        // 속도 0, 위치 이동, 회전 초기화
+        IsDead = false;
+
+        ChangeState(PlayerState.Idle);     // 프로젝트의 상태 전환 방식에 맞게
+        Animator.Play("Idle");
     }
     #endregion
 
     #region 내부 처리
     private void UpdateTimer()
     {
-        if(_dashCooldownTimer > 0f)
+        if (_dashCooldownTimer > 0f)
         {
             _dashCooldownTimer -= Time.fixedDeltaTime;
         }
 
-        if(_groundLockTimer > 0f)
+        if (_groundLockTimer > 0f)
         {
             _groundLockTimer -= Time.fixedDeltaTime;
         }
@@ -375,13 +459,89 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (found && _currentStateType == PlayerState.Jump && _rigid.linearVelocityY > _riseIgnoreSpeed) // 추가 - 김동혁, 점프로 올라가는 중에는 앞의 경사에 닿아도 착지로 보지 않음
+        {
+            found = false;
+        }
+
         _isGrounded = found;
 
-        if (_isGrounded && Mathf.Abs(Rigid.linearVelocity.y) <= 0.01f)
+        if (_isGrounded) // 수정 - 김동혁, 조건 간략화
         {
             _jumpCount = 0;
         }
+
+        SnapToGround();
+        // -----
     }
+
+    // 추가 - 김동혁
+    private void UpdateCoyote()
+    {
+        if (_isGrounded) // 땅에 있으면 타이머 초기화
+        {
+            _coyoteTimer = _coyoteTime;
+
+            return;
+        }
+
+        if (_coyoteTimer > 0f) // 땅에서 벗어나면 타이머 작동
+        {
+            _coyoteTimer -= Time.fixedDeltaTime;
+
+            return;
+        }
+
+        if (_jumpCount == 0) // 타이머가 0.1초가 지나면 점프 쓴것으로 처리
+        {
+            _jumpCount = 1;
+        }
+    }
+
+    private void ApplyFallGravity()
+    {
+        if (IsDead || _isGrounded || _currentStateType == PlayerState.Dash) return;
+
+        if (_rigid.linearVelocityY >= 0f) return;
+
+        float extraVelocity = Physics2D.gravity.y * _defaultGravity * (_fallGravityMultiplier - 1f) * Time.fixedDeltaTime;
+
+        _rigid.linearVelocityY = Mathf.Max(_rigid.linearVelocityY + extraVelocity, -_maxFallSpeed);
+    }
+
+    private void SnapToGround()
+    {
+        if (!_isGrounded || IsDead) return;
+
+        if (_currentStateType == PlayerState.Jump || _currentStateType == PlayerState.Dash) return;
+
+        // 아래로 쏜 거리를 경사에 수직인 실제 간격으로 교체
+        float gap = _groundHit.distance * _groundHit.normal.y;
+        if (gap <= _snapMinDistance) return;
+
+        // 경사에 수직으로 붙여서 옆으로 밀리는 성분이 생기지 않게끔
+        _rigid.position -= _groundHit.normal * gap;
+    }
+
+    private void LimitAirRise()
+    {
+        if (_isJumpImpulse)
+        {
+            _isJumpImpulse = false;
+            return;
+        }
+
+        if (_isGrounded || IsDead || _currentStateType == PlayerState.Dash)
+        {
+            return;
+        }
+
+        if (_rigid.linearVelocityY > _lastVelocityY + _airRiseTolerance)
+        {
+            _rigid.linearVelocityY = _lastVelocityY;
+        }
+    }
+    // -----
     #endregion
 
     #region Player Input
@@ -389,7 +549,7 @@ public class Player : MonoBehaviour
     {
         _movement = value.Get<Vector2>();
 
-        if(_movement.x != 0)
+        if (_movement.x != 0)
         {
             _facing = Mathf.Sign(_movement.x);
         }
@@ -400,6 +560,10 @@ public class Player : MonoBehaviour
         if (value.isPressed)
         {
             _currentState.TryJump();
+        }
+        else // 추가 - 김동혁
+        {
+            CutJump();
         }
     }
 

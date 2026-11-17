@@ -17,6 +17,7 @@ using UnityEngine;
 /// - 레일은 오브젝트를 선택하면 씬 뷰에 노란 선으로 표시됩니다.
 /// - 잡는 범위(GrabArea)는 빛이 비추지 않는 쪽에 두세요. (잡는 순간 빛에 닿지 않도록)
 /// - 신호를 받으면 켜짐 → 레일 끝(End), 꺼짐 → 레일 시작(Start)으로 스스로 이동합니다.
+/// - Move Delay를 주면 신호를 받은 뒤 그 시간만큼 기다렸다가 움직이기 시작합니다. (플레이어가 잡고 끌 때는 적용되지 않음)
 /// </summary>
 public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
 {
@@ -30,6 +31,10 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     [SerializeField, Range(0f, 1f)] private float _startRatio = 0f;
     [SerializeField] private float _moveSpeed = 3f;
 
+    [Header("Signal")]
+    [Tooltip("신호를 받은 뒤 움직이기 시작할 때까지 기다리는 시간(초)입니다. 0이면 바로 움직입니다.")]
+    [SerializeField, Min(0f)] private float _moveDelay = 0f;
+
     [Header("Grab")]
     [SerializeField] private bool _isGrabbable = true;
 
@@ -37,6 +42,15 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     private float _grabOffsetRatio;
     private float _currentRatio;
     private float _targetRatio;
+    private float _delayTimer;
+
+    /// <summary>
+    /// 신호를 받고 움직이기 전 유예 시간을 기다리는 중인지 여부입니다.
+    /// </summary>
+    public bool IsWaitingToMove
+    {
+        get { return _delayTimer > 0f; }
+    }
 
     /// <summary>
     /// 레일 위 현재 위치입니다. 0 = 시작, 1 = 끝
@@ -71,6 +85,7 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         _grabbingPlayer = null;
         _currentRatio = _startRatio;
         _targetRatio = _startRatio;
+        _delayTimer = 0f;
         ApplyCarriagePosition();
     }
 
@@ -93,6 +108,13 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
             }
         }
 
+        // 신호를 받은 직후에는 유예 시간이 끝날 때까지 움직이지 않습니다.
+        if (_delayTimer > 0f)
+        {
+            _delayTimer -= Time.deltaTime;
+            return;
+        }
+
         MoveCarriage();
     }
 
@@ -110,6 +132,10 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         if (_isGrabbable == false || player == null)
             return;
 
+        // 잡으면 기다리던 신호 이동은 취소하고 플레이어를 바로 따라갑니다.
+        _delayTimer = 0f;
+        _targetRatio = _currentRatio;
+
         _grabbingPlayer = player.transform;
         _grabOffsetRatio = _currentRatio - GetRatioOnRail(_grabbingPlayer.position);
     }
@@ -120,7 +146,7 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     public void ReceiveSignal(bool isOn)
     {
         ReleaseGrab();
-        _targetRatio = isOn ? 1f : 0f;
+        SetSignalTarget(isOn ? 1f : 0f);
     }
 
     /// <summary>
@@ -129,7 +155,7 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     public void ToggleSignal()
     {
         ReleaseGrab();
-        _targetRatio = _targetRatio < 0.5f ? 1f : 0f;
+        SetSignalTarget(_targetRatio < 0.5f ? 1f : 0f);
     }
 
     /// <summary>
@@ -138,7 +164,28 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
     public void MoveToRatio(float ratio)
     {
         ReleaseGrab();
-        _targetRatio = Mathf.Clamp01(ratio);
+        SetSignalTarget(Mathf.Clamp01(ratio));
+    }
+
+    /// <summary>
+    /// 신호로 정해진 목표 위치를 적용합니다. 실제로 움직여야 할 때만 유예 시간(_moveDelay)을 시작합니다.
+    /// </summary>
+    private void SetSignalTarget(float targetRatio)
+    {
+        bool isTargetChanged = Mathf.Approximately(_targetRatio, targetRatio) == false;
+        _targetRatio = targetRatio;
+
+        if (isTargetChanged == false)
+            return;
+
+        // 이미 목표 위치에 있으면 기다릴 필요가 없습니다.
+        if (Mathf.Approximately(_currentRatio, _targetRatio))
+        {
+            _delayTimer = 0f;
+            return;
+        }
+
+        _delayTimer = _moveDelay;
     }
 
     private void ReleaseGrab()

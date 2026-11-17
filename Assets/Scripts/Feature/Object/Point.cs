@@ -26,6 +26,6 @@ public class Point : MonoBehaviour, IInteractable
         }
 
         Debug.Log("포인트 접촉");
-        UIManager.Instance.OpenUI(UIRootType.PopupUI, UIType.PointUI);
+        UIManager.Instance.OpenPointUI(_pointId);
     }
 }
