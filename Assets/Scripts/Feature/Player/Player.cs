@@ -54,12 +54,19 @@ public class Player : MonoBehaviour
     public bool IsGrounded => _isGrounded;
     public int JumpCount => _jumpCount;
 
-    [Header("Jump Feel")] // 헤더 추가 - 김동혁, 숏~롱 점프나 코요테 타임 등을 구현하기 위함
+    // 헤더 추가 - 김동혁, 숏~롱 점프나 코요테 타임 등을 구현하기 위함
+    [Header("Jump Feel")]
     [SerializeField, Range(0f, 1f)] private float _jumpCutMultiplier = 0.5f;
     [SerializeField] private float _coyoteTime = 0.1f;
     private float _coyoteTimer;
     [SerializeField] private float _fallGravityMultiplier = 2f;
     [SerializeField] private float _maxFallSpeed = 20f;
+    [SerializeField] private float _snapMinDistance = 0.03f;
+    [SerializeField] private float _riseIgnoreSpeed = 0.1f;
+    private float _lastVelocityY;
+    private bool _isJumpImpulse;
+    [SerializeField] private float _airRiseTolerance = 0.01f;
+    // -----
 
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
@@ -173,8 +180,14 @@ public class Player : MonoBehaviour
         UpdateTimer();
         UpdateGround();
         UpdateCoyote(); // 추가 - 김동혁, 코요테 타이머 메서드
+        LimitAirRise(); // 추가 - 김동혁, 공중 가속도 제어 메서드
+
         _currentState.FixedUpdate();
-        ApplyFallGravity(); // 추가 - 김동혁, 낙하 속도 메서드
+
+        // 추가 - 김동혁, 낙하 속도 메서드
+        ApplyFallGravity();
+        _lastVelocityY = _rigid.linearVelocityY;
+        // -----
     }
     #endregion
 
@@ -271,7 +284,9 @@ public class Player : MonoBehaviour
             // 바닥 위: 경사면을 따라가는 방향으로 이동 (평지면 slopeDir = (1, 0) → y = 0)
             // 멈추면 xOffset = 0 → 속도 (0, 0) 이라 튀거나 미끄러지지 않음
             Vector2 slopeDir = -Vector2.Perpendicular(_groundHit.normal).normalized;
-            _rigid.linearVelocity = slopeDir * xOffset;
+
+            // 수정 - 김동혁, 이번 물리 계산에서 더해질 중력을 미리 상쇄해서 경사면에서 미끄러지지 않게
+            _rigid.linearVelocity = slopeDir * xOffset - Physics2D.gravity * _rigid.gravityScale * Time.fixedDeltaTime;
         }
         else
         {
@@ -291,6 +306,8 @@ public class Player : MonoBehaviour
         _rigid.AddForce(Vector2.up * CurrentShadow.JumpPower, ForceMode2D.Impulse);
         _jumpCount++;
         _groundLockTimer = _groundLockTime;
+
+        _isJumpImpulse = true; // 추가 - 김동혁
     }
 
     private void CutJump() // 추가 - 김동혁, 숏~롱점프 구현을 위한 점프 끊기 메서드
@@ -358,6 +375,7 @@ public class Player : MonoBehaviour
     public void TeleportTo(Vector2 dest)
     {
         _rigid.linearVelocity = Vector2.zero;
+        _lastVelocityY = 0f; // 추가 - 김동혁, 순간이동 전 속도가 LimitAirRise에 남지 않도록
         _rigid.position = dest;
         transform.position = dest;
         _rigid.rotation = 0f;
@@ -441,15 +459,24 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (found && _currentStateType == PlayerState.Jump && _rigid.linearVelocityY > _riseIgnoreSpeed) // 추가 - 김동혁, 점프로 올라가는 중에는 앞의 경사에 닿아도 착지로 보지 않음
+        {
+            found = false;
+        }
+
         _isGrounded = found;
 
-        if (_isGrounded && Mathf.Abs(Rigid.linearVelocity.y) <= 0.01f)
+        if (_isGrounded) // 수정 - 김동혁, 조건 간략화
         {
             _jumpCount = 0;
         }
+
+        SnapToGround();
+        // -----
     }
 
-    private void UpdateCoyote() // 추가 - 김동혁, 코요테 타이머 메서드
+    // 추가 - 김동혁
+    private void UpdateCoyote()
     {
         if (_isGrounded) // 땅에 있으면 타이머 초기화
         {
@@ -481,6 +508,40 @@ public class Player : MonoBehaviour
 
         _rigid.linearVelocityY = Mathf.Max(_rigid.linearVelocityY + extraVelocity, -_maxFallSpeed);
     }
+
+    private void SnapToGround()
+    {
+        if (!_isGrounded || IsDead) return;
+
+        if (_currentStateType == PlayerState.Jump || _currentStateType == PlayerState.Dash) return;
+
+        // 아래로 쏜 거리를 경사에 수직인 실제 간격으로 교체
+        float gap = _groundHit.distance * _groundHit.normal.y;
+        if (gap <= _snapMinDistance) return;
+
+        // 경사에 수직으로 붙여서 옆으로 밀리는 성분이 생기지 않게끔
+        _rigid.position -= _groundHit.normal * gap;
+    }
+
+    private void LimitAirRise()
+    {
+        if (_isJumpImpulse)
+        {
+            _isJumpImpulse = false;
+            return;
+        }
+
+        if (_isGrounded || IsDead || _currentStateType == PlayerState.Dash)
+        {
+            return;
+        }
+
+        if (_rigid.linearVelocityY > _lastVelocityY + _airRiseTolerance)
+        {
+            _rigid.linearVelocityY = _lastVelocityY;
+        }
+    }
+    // -----
     #endregion
 
     #region Player Input

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class JumpState : PlayerStateBase
 {
@@ -35,7 +35,8 @@ public class JumpState : PlayerStateBase
         bool jumpGraceOver = Time.time - _jumpStartTime > 0.1f;                         // 점프 직후 바로 착지 판정 방지
         bool movingAwayFromGround = Vector2.Dot(velocity, _player.GroundHit.normal) > 0.1f;  // 바닥에서 멀어지는 중인가
 
-        if (_player.IsGrounded && jumpGraceOver && !movingAwayFromGround)
+        bool isRising = velocity.y > 0.1f; // 추가 - 김동혁
+        if (_player.IsGrounded && jumpGraceOver && !(isRising && movingAwayFromGround)) // 변경 - 김동혁, 조건 추가
         {
             _player.Animator.Play("Land");
             ChangeToLocomotion();
