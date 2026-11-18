@@ -53,5 +53,45 @@
     "Id": "Tutorial_Jump_02",
     "Dialog": "Space를 눌러 점프를 할 수 있어.",
     "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Grab_01",
+    "Dialog": "아무리 너라도 가벼운 물건 정도는 옮길 수 있겠지.",
+    "NextId": "Tutorial_Grab_02"
+  },
+  {
+    "Id": "Tutorial_Grab_02",
+    "Dialog": "F를 눌러 물체를 힘껏 밀어봐",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Teleport_01",
+    "Dialog": "이것은 텔레포터다",
+    "NextId": "Tutorial_Teleport_02"
+  },
+  {
+    "Id": "Tutorial_Teleport_02",
+    "Dialog": "그림자는 이곳에서 가능성을 확장할 수 있지.",
+    "NextId": "Tutorial_Teleport_03"
+  },
+  {
+    "Id": "Tutorial_Teleport_03",
+    "Dialog": "너에겐 어떤 가능성이 있는지 시험해봐.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Mouse_01",
+    "Dialog": "쥐인가?",
+    "NextId": "Tutorial_Mouse_02"
+  }
+  {
+    "Id": "Tutorial_Mouse_02",
+    "Dialog": "쥐는 어디든 갈 수 있지.",
+    "NextId": "Tutorial_Mouse_03"
+  },
+  {
+    "Id": "Tutorial_Mouse_03",
+    "Dialog": "아주 작은 구멍만 있따면 말이야.",
+    "NextId": "-1"
   }
 ]
