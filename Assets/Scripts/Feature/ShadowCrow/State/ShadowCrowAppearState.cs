@@ -12,6 +12,7 @@ public class ShadowCrowAppearState : ShadowCrowStateBase
     {
         _crow.SetVisible(true);
         _crow.PlayAnimation(_animationHash);
+        _crow.StartAppearDirecting();
     }
 
     public override void Update()

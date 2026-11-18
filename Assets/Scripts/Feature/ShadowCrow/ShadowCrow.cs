@@ -70,6 +70,9 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         _currentState?.Exit();
         _currentState = null;
         _currentStateType = ShadowCrowState.None;
+
+        // 등장 중(대사 시작 전)에 꺼져도 줌과 이동 막기가 남지 않도록 정리한다.
+        EndTalkDirecting();
     }
 
     private void Update()
@@ -177,13 +180,29 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         if (string.IsNullOrWhiteSpace(_dialogId))
         {
             Debug.LogError($"[ShadowCrow] {name}: 자동 대화에 사용할 대사 ID(_dialogId)를 입력하세요.");
+            // 등장 때 시작한 줌·이동 막기가 풀리지 않는 일이 없도록 되돌린다.
+            EndTalkDirecting();
             return;
         }
 
         if (StartDialog(_dialogId))
         {
             OnStartAutoTalk?.Invoke();
+            return;
         }
+
+        EndTalkDirecting();
+    }
+
+    // Appear 상태 진입 시 호출. 자동 대화가 이어질 등장이면 등장 애니메이션부터 줌·이동 막기를 시작한다.
+    public void StartAppearDirecting()
+    {
+        if (_isAutoTalk == false || _isAutoTalked)
+        {
+            return;
+        }
+
+        StartTalkDirecting();
     }
 
     public void BindTalkInput()
@@ -237,6 +256,12 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     public void StartTalkDirecting()
     {
         if (_isDirectOnTalk == false)
+        {
+            return;
+        }
+
+        // 등장 때 이미 시작했다면 대사가 시작돼도 다시 줌하지 않고 그대로 이어간다.
+        if (_cameraController != null)
         {
             return;
         }
