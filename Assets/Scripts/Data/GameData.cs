@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 [System.Serializable]
@@ -62,4 +62,7 @@ public class SaveData
     public List<ShadowType> UnlockedShadowIds = new List<ShadowType>();
     public List<string> ActivatedTeleportIds = new List<string>();
     public string LastSaveTeleportId;
+    // 추가 - 김동혁, 맵 진행 기록
+    public List<string> CollectedRewardIds = new List<string>();
+    public List<string> DiscoveredHiddenIds = new List<string>();
 }

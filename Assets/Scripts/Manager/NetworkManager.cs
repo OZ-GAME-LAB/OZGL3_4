@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class NetworkManager : SingletonBase<NetworkManager>
 {
@@ -43,6 +43,11 @@ public class NetworkManager : SingletonBase<NetworkManager>
         var unlockedShadowList = PlayerService.GetUnlockedShadows();
         saveData.UnlockedShadowIds = unlockedShadowList;
 
+        // 추가 - 김동혁, 수집품과 비밀방 발견 기록 저장
+        saveData.CollectedRewardIds = MapService.GetAllCollectedRewardIds();
+        saveData.DiscoveredHiddenIds = MapService.GetAllDiscoveredHiddenIds();
+        // -----
+
         // 저장한 텔레포트 위치
         saveData.LastSaveTeleportId = teleportId;
 
@@ -52,7 +57,7 @@ public class NetworkManager : SingletonBase<NetworkManager>
 
     public void LoadGame(out string lastSaveTeleportId)
     {
-        if (_saveRepository.TryLoad(out SaveData data) == false) 
+        if (_saveRepository.TryLoad(out SaveData data) == false)
         {
             Debug.LogWarning("[NetworkManager] 저장된 데이터가 없습니다.");
             lastSaveTeleportId = string.Empty;
@@ -68,9 +73,14 @@ public class NetworkManager : SingletonBase<NetworkManager>
         }
 
         var teleportList = data.ActivatedTeleportIds;
-        foreach(var teleportId in teleportList)
+        foreach (var teleportId in teleportList)
         {
             TeleportService.RequestActivateTeleport(teleportId);
         }
+
+        // 추가 - 김동혁, 수집품과 비밀방 발견 기록 복원
+        MapService.RestoreCollectedRewards(data.CollectedRewardIds);
+        MapService.RestoreDiscoveredHiddens(data.DiscoveredHiddenIds);
+        // -----
     }
 }
