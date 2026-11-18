@@ -218,6 +218,13 @@ MonoBehaviour:
     Controller: {fileID: 22100000, guid: 1fc0c24f69956b440976c2baf69bde39, type: 2}
   - Type: 3
     Controller: {fileID: 22100000, guid: d0e5b781db866914395b01d1d3a4cefe, type: 2}
+  _jumpCutMultiplier: 0.5
+  _coyoteTime: 0.1
+  _fallGravityMultiplier: 2
+  _maxFallSpeed: 20
+  _snapMinDistance: 0.03
+  _riseIgnoreSpeed: 0.1
+  _airRiseTolerance: 0.01
   _groundCheck: {fileID: 589328654951346915}
   _groundLayer:
     serializedVersion: 2
@@ -249,7 +256,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!50 &8158507263626246517
