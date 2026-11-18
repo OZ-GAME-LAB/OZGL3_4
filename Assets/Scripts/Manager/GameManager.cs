@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,6 +16,15 @@ public class GameManager : SingletonBase<GameManager>
     private const string _playerPath = "Player";
 
     private PlayerInput _playerInput;
+
+    // Cutscene 등 Playing이 아닐 때 막는 플레이어 입력 (액션맵/액션 이름)
+    private readonly List<string> _blockActionNames = new List<string>
+    {
+        "Player/Move",
+        "Player/Jump",
+        "Player/Dash",
+        "Player/Ability",
+    };
 
     public bool IsPlaying { get; private set; }
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
@@ -96,13 +106,24 @@ public class GameManager : SingletonBase<GameManager>
             }
         }
 
-        if (isEnable)
+        // 이동 관련 액션만 켜고 끈다. Interaction(F)은 연출 중에도 대사 넘기기에 쓰므로 그대로 둔다.
+        for (int i = 0; i < _blockActionNames.Count; i++)
         {
-            _playerInput.ActivateInput();
-        }
-        else
-        {
-            _playerInput.DeactivateInput();
+            InputAction action = _playerInput.actions.FindAction(_blockActionNames[i]);
+            if (action == null)
+            {
+                Debug.LogWarning($"[GameManager] 입력 액션을 찾을 수 없습니다: {_blockActionNames[i]}");
+                continue;
+            }
+
+            if (isEnable)
+            {
+                action.Enable();
+            }
+            else
+            {
+                action.Disable();
+            }
         }
     }
 }
