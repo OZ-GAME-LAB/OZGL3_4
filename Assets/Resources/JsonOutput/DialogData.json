@@ -83,7 +83,7 @@
     "Id": "Tutorial_Mouse_01",
     "Dialog": "쥐인가?",
     "NextId": "Tutorial_Mouse_02"
-  }
+  },
   {
     "Id": "Tutorial_Mouse_02",
     "Dialog": "쥐는 어디든 갈 수 있지.",
