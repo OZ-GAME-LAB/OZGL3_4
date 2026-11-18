@@ -254,6 +254,10 @@ MonoBehaviour:
   _leftShadowType: 2
   _centerShadowType: 1
   _rightShadowType: 3
+  Sprite_LeftInactive: {fileID: 2399835086399505201, guid: 4d94d6bfdf60b4c4d9bf1ea208b0c236, type: 3}
+  Sprite_CenterInactive: {fileID: 0}
+  Sprite_RightInactive: {fileID: 5015204723936971773, guid: 0187ce45a0af93a4eabceefe82f23a19, type: 3}
+  _inactiveColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   _moveDuration: 0.35
   _moveEase: 4
 --- !u!1 &7426905087789003247
