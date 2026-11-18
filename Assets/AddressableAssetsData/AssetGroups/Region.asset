@@ -26,7 +26,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b92071eafdf335849b2aa430710fbc31
-    m_Address: Assets/Prefabs/Tile/Region_01/Region_01 2.prefab
+    m_Address: Region_01_Test
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

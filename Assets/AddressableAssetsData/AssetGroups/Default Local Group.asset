@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3dbe7c61e793f4d4ea0b25d40460acb8
-    m_Address: Assets/Prefabs/ShadowCrow.prefab
+    m_Address: ShadowCrow
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
