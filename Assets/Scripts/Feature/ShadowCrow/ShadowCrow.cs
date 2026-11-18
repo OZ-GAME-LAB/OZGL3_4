@@ -1,5 +1,7 @@
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum ShadowCrowState
 {
@@ -19,6 +21,20 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     [SerializeField] private float _appearDistance = 4f;
     [SerializeField] private string _dialogId;
 
+    [Header("대화 연출")]
+    [SerializeField] private bool _isAutoTalk = true;                 
+    [SerializeField] private bool _isDirectOnTalk = true;             
+    [SerializeField, Min(0.1f)] private float _talkZoomSize = 4f;    
+    [SerializeField, Min(0f)] private float _talkZoomTime = 0.5f;
+    [SerializeField] private bool _isBlockInputOnTalk = true;         
+
+    private const string _talkInputActionName = "Player/Interaction";
+
+    private bool _isAutoTalked;
+    private int _talkStartFrame = -1;
+    private InputAction _talkInputAction;
+    private CameraController _cameraController;
+
     private ShadowCrowStateBase _currentState;
     private ShadowCrowState _currentStateType = ShadowCrowState.None;
     private Dictionary<ShadowCrowState, ShadowCrowStateBase> _stateList = new Dictionary<ShadowCrowState, ShadowCrowStateBase>();
@@ -27,6 +43,8 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     public Vector2 Position => transform.position;
 
     public bool IsDialogPlaying => SpeechBubble_Crow != null && SpeechBubble_Crow.IsPlaying;
+
+    public event Action OnStartAutoTalk;
 
     #region 수명
     private void Awake()
@@ -44,7 +62,6 @@ public class ShadowCrow : MonoBehaviour, IInteractable
 
     private void OnEnable()
     {
-        // 풀에서 다시 꺼내져도 항상 숨김 상태부터 시작한다.
         ChangeState(ShadowCrowState.Hidden);
     }
 
@@ -96,7 +113,10 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     {
         if (_currentStateType == ShadowCrowState.Talk)
         {
-            SpeechBubble_Crow.ShowNextDialog();
+            if (_talkInputAction == null)
+            {
+                SpeechBubble_Crow.ShowNextDialog();
+            }
             return;
         }
 
@@ -133,8 +153,120 @@ public class ShadowCrow : MonoBehaviour, IInteractable
             return false;
         }
 
+        _talkStartFrame = Time.frameCount;
         ChangeState(ShadowCrowState.Talk);
         return true;
+    }
+
+    public void SetSpawnData(string dialogId, bool isAutoTalk)
+    {
+        _dialogId = dialogId;
+        _isAutoTalk = isAutoTalk;
+        _isAutoTalked = false;
+    }
+
+    public void TryStartAutoTalk()
+    {
+        if (_isAutoTalk == false || _isAutoTalked)
+        {
+            return;
+        }
+
+        _isAutoTalked = true;
+
+        if (string.IsNullOrWhiteSpace(_dialogId))
+        {
+            Debug.LogError($"[ShadowCrow] {name}: 자동 대화에 사용할 대사 ID(_dialogId)를 입력하세요.");
+            return;
+        }
+
+        if (StartDialog(_dialogId))
+        {
+            OnStartAutoTalk?.Invoke();
+        }
+    }
+
+    public void BindTalkInput()
+    {
+        UnBindTalkInput();
+
+        if (GameObjectManager.Instance == null || GameObjectManager.Instance.CurrentPlayer == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: 플레이어를 찾을 수 없어 F 입력을 직접 연결하지 못했습니다.");
+            return;
+        }
+
+        PlayerInput playerInput = GameObjectManager.Instance.CurrentPlayer.GetComponent<PlayerInput>();
+        if (playerInput == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: 플레이어에 PlayerInput이 없습니다.");
+            return;
+        }
+
+        _talkInputAction = playerInput.actions.FindAction(_talkInputActionName);
+        if (_talkInputAction == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: 입력 액션 {_talkInputActionName}을 찾을 수 없습니다.");
+            return;
+        }
+
+        _talkInputAction.performed += OnPerformTalkInput;
+    }
+
+    public void UnBindTalkInput()
+    {
+        if (_talkInputAction == null)
+        {
+            return;
+        }
+
+        _talkInputAction.performed -= OnPerformTalkInput;
+        _talkInputAction = null;
+    }
+
+    private void OnPerformTalkInput(InputAction.CallbackContext context)
+    {
+        if (Time.frameCount == _talkStartFrame)
+        {
+            return;
+        }
+
+        SpeechBubble_Crow.ShowNextDialog();
+    }
+
+    public void StartTalkDirecting()
+    {
+        if (_isDirectOnTalk == false)
+        {
+            return;
+        }
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: MainCamera가 없어 대화 연출을 생략합니다.");
+            return;
+        }
+
+        _cameraController = mainCamera.GetComponent<CameraController>();
+        if (_cameraController == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: Main Camera에 CameraController가 없어 대화 연출을 생략합니다.");
+            return;
+        }
+
+        _cameraController.ZoomIn(_talkZoomSize, _talkZoomTime, _isBlockInputOnTalk);
+    }
+
+    public void EndTalkDirecting()
+    {
+        if (_cameraController == null)
+        {
+            return;
+        }
+
+        _cameraController.ZoomOut(_talkZoomTime);
+        _cameraController = null;
     }
 
     private void OnTriggerExit2D(Collider2D collision)

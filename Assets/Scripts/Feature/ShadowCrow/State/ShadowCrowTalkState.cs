@@ -11,6 +11,8 @@ public class ShadowCrowTalkState : ShadowCrowStateBase
     public override void Enter()
     {
         _crow.PlayAnimation(_animationHash);
+        _crow.BindTalkInput();
+        _crow.StartTalkDirecting();
     }
 
     public override void Update()
@@ -19,5 +21,11 @@ public class ShadowCrowTalkState : ShadowCrowStateBase
         {
             _crow.ChangeState(ShadowCrowState.Idle);
         }
+    }
+
+    public override void Exit()
+    {
+        _crow.UnBindTalkInput();
+        _crow.EndTalkDirecting();
     }
 }
