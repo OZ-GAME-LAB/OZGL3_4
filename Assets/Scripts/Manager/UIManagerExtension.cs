@@ -19,6 +19,8 @@ public enum UIType
     FadeUI,
     SettingUI,
     ChangeCardUI,
+    MenuUI,
+    HudUI,
 }
 
 public static class UIManagerExtension

@@ -47,7 +47,7 @@ public class GameManager : SingletonBase<GameManager>
             return;
         }
 
-        UIManager.Instance.OpenUI(UIRootType.ContentUI, UIType.ChangeCardUI);
+        UIManager.Instance.OpenUI(UIRootType.ContentUI, UIType.HudUI);
         OnStartGame?.Invoke();
     }
 }
