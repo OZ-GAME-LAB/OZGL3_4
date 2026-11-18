@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -6,7 +7,16 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
     [SerializeField] private GameObject GameObject_Bubble;
     [SerializeField] private TextMeshProUGUI Text_Dialog;
 
+    [Header("다음 대사 안내")]
+    [SerializeField] private TextMeshProUGUI Text_NextHint;
+    [SerializeField] private string _nextHintText = "F 다음";
+    [SerializeField] private string _endHintText = "F 닫기";
+    [SerializeField, Min(0f)] private float _hintMoveDistance = 6f;
+    [SerializeField, Min(0.05f)] private float _hintMoveTime = 0.5f;
+
     private DialogData _currentDialogData;
+    private Vector3 _hintBasePosition;
+    private Tween _hintTween;
 
     public bool IsPlaying => _currentDialogData != null;
     public string CurrentId => IsPlaying ? _currentDialogData.Id : string.Empty;
@@ -17,6 +27,11 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
         {
             Debug.LogError($"[ShadowCrowSpeechBubble] {name}: GameObject_Bubble과 Text_Dialog를 연결하세요.");
             return;
+        }
+
+        if (Text_NextHint != null)
+        {
+            _hintBasePosition = Text_NextHint.transform.localPosition;
         }
 
         StopDialog();
@@ -60,6 +75,7 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
 
         Text_Dialog.text = string.Empty;
         GameObject_Bubble.SetActive(false);
+        HideNextHint();
     }
 
     private bool SetDialog(string dialogId)
@@ -103,5 +119,44 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
     {
         Text_Dialog.text = _currentDialogData.Dialog;
         GameObject_Bubble.SetActive(true);
+        ShowNextHint();
+    }
+
+    // 다음 대사가 있으면 "F 다음", 마지막 대사면 "F 닫기"를 보여주고 위아래로 살짝 움직인다.
+    private void ShowNextHint()
+    {
+        if (Text_NextHint == null)
+        {
+            return;
+        }
+
+        bool isLastDialog = _currentDialogData.NextId == "-1";
+        Text_NextHint.text = isLastDialog ? _endHintText : _nextHintText;
+        Text_NextHint.gameObject.SetActive(true);
+
+        if (_hintTween != null && _hintTween.IsActive())
+        {
+            return;
+        }
+
+        Text_NextHint.transform.localPosition = _hintBasePosition;
+        _hintTween = Text_NextHint.transform
+            .DOLocalMoveY(_hintBasePosition.y + _hintMoveDistance, _hintMoveTime)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void HideNextHint()
+    {
+        _hintTween?.Kill();
+        _hintTween = null;
+
+        if (Text_NextHint == null)
+        {
+            return;
+        }
+
+        Text_NextHint.transform.localPosition = _hintBasePosition;
+        Text_NextHint.gameObject.SetActive(false);
     }
 }
