@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3dbe7c61e793f4d4ea0b25d40460acb8
+    m_Address: Assets/Prefabs/ShadowCrow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 47c61c7ebada464468cb15c6bf33dd1a
     m_Address: "Assets/ThirdParty/UI/\uC824\uB9AC_\uBAA8\uB4DC_\uCE74\uB4DC_\uC678\uACFD\uD22C\uBA85.png"
     m_ReadOnly: 0
