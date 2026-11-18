@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 26.13456, y: 48.88942, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2830721637959366177}
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 100
+  m_SortingOrder: 500
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 04437e6691e34b8eba26dcac94cc467c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -172,6 +172,11 @@ MonoBehaviour:
   SpeechBubble_Crow: {fileID: 3157358413613587013}
   _appearDistance: 4
   _dialogId: 
+  _isAutoTalk: 1
+  _isDirectOnTalk: 1
+  _talkZoomSize: 4
+  _talkZoomTime: 0.5
+  _isBlockInputOnTalk: 1
 --- !u!114 &9193661684770761720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,7 +250,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 110
+  m_SortingOrder: 330
   m_TargetDisplay: 0
 --- !u!114 &3157358413613587013
 MonoBehaviour:

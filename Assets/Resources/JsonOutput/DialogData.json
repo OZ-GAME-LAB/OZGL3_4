@@ -1,19 +1,57 @@
 [
   {
-    "Id": "Tutorial_Move_01",
-    "Dialog": "w a s d 로 움직입니다.",
-    "NextId": "Tutorial_Move_02"
+    "Id": "FirstScene_01",
+    "Dialog": "새로운 그림자인가?",
+    "NextId": "FirstScene_02"
   },
   {
-    "Id": "Tutorial_Move_02",
-    "Dialog": "스페이스바를 누르면 점프합니다.",
-    "NextId": "Tutorial_Move_03"
+    "Id": "FirstScene_02",
+    "Dialog": "새로운 그림자는 오랜만에 보는데",
+    "NextId": "FirstScene_03"
   },
   {
-    "Id": "Tutorial_Move_03",
-    "Dialog": "e키를 눌러 상호작용 가능합니다.",
+    "Id": "FirstScene_03",
+    "Dialog": "이번 그림자는 어떤 가능성을 품고 있을지",
+    "NextId": "FirstScene_04"
+  },
+  {
+    "Id": "FirstScene_04",
+    "Dialog": "움직이는 방법도 모르겠다고?",
+    "NextId": "FirstScene_05"
+  },
+  {
+    "Id": "FirstScene_05",
+    "Dialog": "A와 D를 이용해 움직여봐",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Light_01",
+    "Dialog": "저기 빛이 보이나?",
+    "NextId": "Tutorial_Light_02"
+  },
+  {
+    "Id": "Tutorial_Light_02",
+    "Dialog": "우리 그림자들은 빛에 닿으면 소멸하지",
+    "NextId": "Tutorial_Light_03"
+  },
+  {
+    "Id": "Tutorial_Light_03",
+    "Dialog": "그러니 저 빛을 잘 피해서 지나가",
+    "NextId": "Tutorial_Light_04"
+  },
+  {
+    "Id": "Tutorial_Light_04",
+    "Dialog": "하지만, 그렇게 굼떠서는 못 피할 테니 Shift를 써봐.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Jump_01",
+    "Dialog": "이번엔 바닥에 빛이 보이나?",
+    "NextId": "Tutorial_Jump_02"
+  },
+  {
+    "Id": "Tutorial_Jump_02",
+    "Dialog": "Space를 눌러 점프를 할 수 있어.",
     "NextId": "-1"
   }
 ]
-
-
