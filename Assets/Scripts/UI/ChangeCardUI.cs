@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +16,15 @@ public class ChangeCardUI : UIBase
     [SerializeField] private ShadowType _centerShadowType = ShadowType.Default;
     [SerializeField] private ShadowType _rightShadowType = ShadowType.Rabbit;
 
+    // 추가 - 김동혁
+    [Header("비활성 카드 이미지 (시작할 때 각 자리 기준)")]
+    [SerializeField] private Sprite Sprite_LeftInactive;
+    [SerializeField] private Sprite Sprite_CenterInactive;
+    [SerializeField] private Sprite Sprite_RightInactive;
+    [Tooltip("비활성 이미지가 없을 때 대신 쓰는 색입니다.")]
+    [SerializeField] private Color _inactiveColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+    // -----
+
     [Header("이동 연출")]
     [SerializeField, Min(0.01f)] private float _moveDuration = 0.35f;
     [SerializeField] private Ease _moveEase = Ease.InOutSine;
@@ -29,10 +38,15 @@ public class ChangeCardUI : UIBase
     private ShadowType[] _cardShadowTypes;
     private NetworkPlayerService _playerService;
     private PlayerViewModel _playerViewModel;
+    // 추가 - 김동혁
+    private Image[] _cardImages;
+    private Sprite[] _activeSprites;
+    private Sprite[] _inactiveSprites;
+    // -----
 
     public void Awake()
     {
-        if(Init() == false)
+        if (Init() == false)
         {
             enabled = false;
         }
@@ -45,6 +59,7 @@ public class ChangeCardUI : UIBase
 
         Bind();
         UpdateView(false);
+        UpdateUnlockView(); // 추가 - 김동혁
     }
 
     private void Start()
@@ -60,6 +75,7 @@ public class ChangeCardUI : UIBase
         _playerViewModel = _playerService.GetPlayerViewModel();
         Bind();
         UpdateView(false);
+        UpdateUnlockView(); // 추가 - 김동혁
     }
 
     private void OnDisable()
@@ -70,7 +86,7 @@ public class ChangeCardUI : UIBase
 
     private bool Init()
     {
-        if(RectTransform_LeftCard == null || RectTransform_CenterCard == null || RectTransform_RightCard == null || Button_ChangeCard == null)
+        if (RectTransform_LeftCard == null || RectTransform_CenterCard == null || RectTransform_RightCard == null || Button_ChangeCard == null)
         {
             Debug.LogError("[ChangeCardUI]: 왼쪽, 중앙, 오른쪽 카드와 버튼을 연결하세요.", this);
             return false;
@@ -89,6 +105,24 @@ public class ChangeCardUI : UIBase
         _cards = new[] { RectTransform_LeftCard, RectTransform_CenterCard, RectTransform_RightCard };
         _cardShadowTypes = new[] { _leftShadowType, _centerShadowType, _rightShadowType };
 
+        // 추가 - 김동혁
+        _cardImages = new Image[3];
+        _activeSprites = new Sprite[3];
+        _inactiveSprites = new[] { Sprite_LeftInactive, Sprite_CenterInactive, Sprite_RightInactive };
+        for (int i = 0; i < _cards.Length; i++)
+        {
+            _cardImages[i] = _cards[i].GetComponent<Image>();
+
+            if (_cardImages[i] == null)
+            {
+                Debug.LogWarning($"[ChangeCardUI] (Init) - 카드에 Image 없음, 활성 표시 생략: {_cards[i].name}");
+                continue;
+            }
+
+            _activeSprites[i] = _cardImages[i].sprite;
+        }
+        // -----
+
         _leftPosition = RectTransform_LeftCard.localPosition;
         _centerPosition = RectTransform_CenterCard.localPosition;
         _rightPosition = RectTransform_RightCard.localPosition;
@@ -104,6 +138,10 @@ public class ChangeCardUI : UIBase
         Button_ChangeCard.onClick.AddListener(OnClickChangeCard);
         _playerViewModel.PropertyChanged -= OnChangePlayerProperty;
         _playerViewModel.PropertyChanged += OnChangePlayerProperty;
+        // 추가 - 김동혁
+        _playerViewModel.ContainerPropertyChanged -= OnChangePlayerContainer;
+        _playerViewModel.ContainerPropertyChanged += OnChangePlayerContainer;
+        // -----
     }
 
     private void UnBind()
@@ -111,9 +149,10 @@ public class ChangeCardUI : UIBase
         if (_playerViewModel != null)
         {
             _playerViewModel.PropertyChanged -= OnChangePlayerProperty;
+            _playerViewModel.ContainerPropertyChanged -= OnChangePlayerContainer; // 추가 - 김동혁
         }
 
-        if(Button_ChangeCard != null)
+        if (Button_ChangeCard != null)
         {
             Button_ChangeCard.onClick.RemoveListener(OnClickChangeCard);
         }
@@ -137,6 +176,52 @@ public class ChangeCardUI : UIBase
             UpdateView(true);
         }
     }
+
+    // 추가 - 김동혁, 그림자 해금 목록이 바뀌면 카드 활성/비활성 표시 갱신
+    private void OnChangePlayerContainer(string containerName, ContainerEventType eventType, ShadowType shadowType)
+    {
+        if (containerName == nameof(PlayerViewModel.OwnerShadowType))
+        {
+            UpdateUnlockView();
+        }
+    }
+
+    // 추가 - 김동혁, 해금 여부에 따라 카드 이미지를 활성/비활성으로 표시
+    private void UpdateUnlockView()
+    {
+        if (_playerViewModel == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _cards.Length; i++)
+        {
+            if (_cardImages[i] == null)
+            {
+                continue;
+            }
+
+            bool isUnlocked = _playerViewModel.OwnerShadowType.Contains(_cardShadowTypes[i]);
+
+            if (isUnlocked)
+            {
+                _cardImages[i].sprite = _activeSprites[i];
+                _cardImages[i].color = Color.white;
+            }
+            else if (_inactiveSprites[i] != null)
+            {
+                _cardImages[i].sprite = _inactiveSprites[i];
+                _cardImages[i].color = Color.white;
+            }
+            else
+            {
+                // 비활성 이미지가 없으면 활성 이미지를 어둡게 표시합니다.
+                _cardImages[i].sprite = _activeSprites[i];
+                _cardImages[i].color = _inactiveColor;
+            }
+        }
+    }
+    // -----
 
     private void UpdateView(bool animate)
     {

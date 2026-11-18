@@ -20,13 +20,13 @@ public class TileBakeTool : EditorWindow
     private const string GroundName = "Ground";
     private const string RoomPrefix = "Room_";
     private const string NullRoomName = "Room_null";
-    private const string DefaultTemplatePath = "Assets/Prefabs/Develop_DH/Tile_Prefab/DevTile/Tile n, n.prefab";
+    private const string DefaultTemplatePath = "Assets/Prefabs/Tile/DevTile/Tile n, n.prefab";
 
     [SerializeField] private Transform Transform_RegionRoot;
     [SerializeField] private Tilemap Tilemap_SourceGround;
     [SerializeField] private Tilemap Tilemap_SourceRoomArea;
     [SerializeField] private GameObject GameObject_ChunkTemplate;
-    [SerializeField] private string _bakedTileFolder = "Assets/Prefabs/Develop_DH/Tiles_Baked";
+    [SerializeField] private string _bakedTileFolder = "Assets/Prefabs/Tile/Tiles_Baked";
     [SerializeField] private int _chunkSize = 32;
     [SerializeField] private bool _isRelocateExisting = false;
 

@@ -205,6 +205,88 @@ public class MapService
 
         return roomViewModel.DiscoveredHiddenIds.Contains(hiddenId);
     }
+
+    public List<string> GetAllCollectedRewardIds()
+    {
+        List<string> result = new List<string>();
+
+        foreach (MapRoomViewModel room in GetMapViewModel().Rooms)
+        {
+            result.AddRange(room.CollectedRewardIds);
+        }
+
+        return result;
+    }
+
+    public List<string> GetAllDiscoveredHiddenIds()
+    {
+        List<string> result = new List<string>();
+
+        foreach (MapRoomViewModel room in GetMapViewModel().Rooms)
+        {
+            result.AddRange(room.DiscoveredHiddenIds);
+        }
+
+        return result;
+    }
+
+    public void RestoreCollectedRewards(IReadOnlyList<string> rewardIds)
+    {
+        if (rewardIds == null)
+        {
+            return;
+        }
+
+        IReadOnlyList<MapRoomViewModel> rooms = GetMapViewModel().Rooms;
+
+        foreach (string rewardId in rewardIds)
+        {
+            bool isRestored = false;
+
+            foreach (MapRoomViewModel room in rooms)
+            {
+                if (room.TryCollectReward(rewardId))
+                {
+                    isRestored = true;
+                    break;
+                }
+            }
+
+            if (!isRestored)
+            {
+                Debug.LogWarning($"[MapService] (RestoreCollectedRewards) - 등록된 방 없음(데이터에서 삭제됐거나 ID 변경): {rewardId}");
+            }
+        }
+    }
+
+    public void RestoreDiscoveredHiddens(IReadOnlyList<string> hiddenIds)
+    {
+        if (hiddenIds == null)
+        {
+            return;
+        }
+
+        IReadOnlyList<MapRoomViewModel> rooms = GetMapViewModel().Rooms;
+
+        foreach (string hiddenId in hiddenIds)
+        {
+            bool isRestored = false;
+
+            foreach (MapRoomViewModel room in rooms)
+            {
+                if (room.TryDiscoverHidden(hiddenId))
+                {
+                    isRestored = true;
+                    break;
+                }
+            }
+
+            if (!isRestored)
+            {
+                Debug.LogWarning($"[MapService] (RestoreDiscoveredHiddens) - 등록된 방 없음(데이터에서 삭제됐거나 ID 변경): {hiddenId}");
+            }
+        }
+    }
     // -----
 }
 
