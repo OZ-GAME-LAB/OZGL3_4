@@ -594,6 +594,28 @@ public class Player : MonoBehaviour
             _playerInteractor.TryInteract();
         }
     }
+
+    private void OnChangeShadowLeft(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            if (_currentStateType is PlayerState.Change)
+                return;
+
+            _viewModel.ChangeShadow(-1);
+        }
+    }
+
+    private void OnChangeShadowRight(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            if (_currentStateType is PlayerState.Change)
+                return;
+
+            _viewModel.ChangeShadow(1);
+        }
+    }
     #endregion
 
     private void OnDrawGizmos()

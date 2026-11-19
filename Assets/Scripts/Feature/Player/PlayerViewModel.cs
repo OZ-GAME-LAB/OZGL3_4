@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerViewModel : ViewModelBase, IContainerPropertyChanged<ShadowType>
 {
@@ -74,6 +75,17 @@ public static class PlayerViewModelExtention
             return;
 
         playerViewModel.CurrentShadowType = type;
+    }
+
+    public static void ChangeShadow(this PlayerViewModel playerViewModel, int dir)
+    {
+        var shadowTypes = playerViewModel.OwnerShadowType.ToList<ShadowType>();
+        if (shadowTypes.Count <= 1)
+            return;
+
+        shadowTypes.Sort();
+        int index = shadowTypes.IndexOf(playerViewModel.CurrentShadowType);
+        playerViewModel.CurrentShadowType = shadowTypes[(index + dir + shadowTypes.Count) % shadowTypes.Count];
     }
 
     public static void AddShadow(this PlayerViewModel playerViewModel, ShadowType newShadow)
