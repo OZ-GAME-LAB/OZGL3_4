@@ -368740,6 +368740,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Collectible
       objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.y
+      value: 1.7666667
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 1.7666667
+      objectReference: {fileID: 0}
     - target: {fileID: 6833847231010184284, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
       propertyPath: _rewardId
       value: Room_A07_Reward_01
@@ -411946,6 +411962,22 @@ PrefabInstance:
     - target: {fileID: 2967482432776968044, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
       propertyPath: m_Name
       value: Collectible
+      objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.y
+      value: 1.7666667
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 1.7666667
       objectReference: {fileID: 0}
     - target: {fileID: 6833847231010184284, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
       propertyPath: _rewardId
@@ -464484,6 +464516,22 @@ PrefabInstance:
     - target: {fileID: 2967482432776968044, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
       propertyPath: m_Name
       value: Collectible
+      objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 4568061891552099809, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_Size.y
+      value: 1.7666667
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 1.9216666
+      objectReference: {fileID: 0}
+    - target: {fileID: 5794754505445778090, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 1.7666667
       objectReference: {fileID: 0}
     - target: {fileID: 6833847231010184284, guid: 81c471be4c0089848a364b81d58ea74e, type: 3}
       propertyPath: _rewardId

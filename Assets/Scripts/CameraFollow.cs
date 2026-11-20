@@ -24,6 +24,12 @@ public class CameraFollow : MonoBehaviour
     private float _lookAheadVelocity;
     private float _lastTargetX;
 
+    // 화면 고정: 켜져 있으면 플레이어 대신 고정 좌표를 바라본다
+    private bool _isFixed;
+    private Vector2 _fixedPosition;
+
+    public bool IsFixed => _isFixed;
+
     private void Awake()
     {
         _camera = GetComponent<Camera>();
@@ -73,8 +79,32 @@ public class CameraFollow : MonoBehaviour
         SnapToTarget();
     }
 
+    /// <summary>
+    /// 카메라를 지정한 좌표에 고정한다. 플레이어를 따라가지 않고 그 좌표로 부드럽게 이동한 뒤 머문다.
+    /// ClearFixedPosition을 호출하면 다시 플레이어를 따라간다.
+    /// </summary>
+    public void SetFixedPosition(Vector2 position)
+    {
+        _isFixed = true;
+        _fixedPosition = position;
+    }
+
+    /// <summary>
+    /// 화면 고정을 풀고 다시 플레이어를 따라간다.
+    /// </summary>
+    public void ClearFixedPosition()
+    {
+        _isFixed = false;
+    }
+
     private Vector3 GetDesiredPosition()
     {
+        // 고정 중에는 오프셋, 미리 보기, 맵 경계를 적용하지 않고 지정한 좌표를 그대로 본다
+        if (_isFixed)
+        {
+            return new Vector3(_fixedPosition.x, _fixedPosition.y, transform.position.z);
+        }
+
         Vector3 desired = new Vector3(
             Target.position.x + _offset.x + _lookAheadX,
             Target.position.y + _offset.y,

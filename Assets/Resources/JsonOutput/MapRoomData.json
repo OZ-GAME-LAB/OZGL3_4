@@ -235,7 +235,10 @@
                     "Y": -1
                 }
             ],
-            "RewardIds": [],
+            "RewardIds": [
+                "Room_B03_Reward_01",
+                "Room_B03_Reward_02"
+            ],
             "HiddenIds": [],
             "Exits": [
                 {
@@ -266,7 +269,9 @@
                     "Y": -2
                 }
             ],
-            "RewardIds": [],
+            "RewardIds": [
+                "Room_B04_Reward_01"
+            ],
             "HiddenIds": [],
             "Exits": [
                 {
