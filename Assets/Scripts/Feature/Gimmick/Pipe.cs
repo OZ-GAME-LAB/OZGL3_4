@@ -49,6 +49,19 @@ public class Pipe : MonoBehaviour, IInteractable
     [SerializeField] private Color _bodyColor = new Color(0.22f, 0.24f, 0.27f, 1f);
     [SerializeField] private int _bodySortingOrder = 690;
 
+    // 민형 추가
+    // --------------
+    [Header("Body Sprite")]
+    [SerializeField] private SpriteRenderer SpriteRenderer_Visual;   // 배관 그림 (재질, 정렬 기준)
+    [SerializeField] private Sprite Sprite_BodyHorizontal;
+    [SerializeField] private Sprite Sprite_BodyVertical;
+    [SerializeField] private Sprite Sprite_BodyCorner;               // ┌ 모양 기준
+
+    private readonly List<SpriteRenderer> _bodyPieces = new List<SpriteRenderer>();
+    private readonly List<Vector2> _builtBodyPath = new List<Vector2>();
+    private bool _isBodyDirty;
+    // --------------
+
     private readonly List<Vector3> _travelPath = new List<Vector3>();
     private readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
     private float _lockUntilTime;
@@ -113,9 +126,17 @@ public class Pipe : MonoBehaviour, IInteractable
 
     private void OnValidate()
     {
-        // 인스펙터에서 값을 바꾸면 에디터에서도 몸통 선을 다시 그립니다. (컴포넌트 추가는 플레이 중에만)
-        if (LineRenderer_Body != null)
+        if (Application.isPlaying)
         {
+            _isBodyDirty = true;   // 다음 Update에서 다시 그림
+        }
+    }
+
+    private void Update()
+    {
+        if (_isBodyDirty)
+        {
+            _isBodyDirty = false;
             RefreshBodyLine();
         }
     }
@@ -135,6 +156,7 @@ public class Pipe : MonoBehaviour, IInteractable
                 LineRenderer_Body.enabled = false;
             }
 
+            ClearBody();    // 민형 추가
             return;
         }
 
@@ -149,6 +171,7 @@ public class Pipe : MonoBehaviour, IInteractable
                 LineRenderer_Body.enabled = false;
             }
 
+            ClearBody();    // 민형 추가
             return;
         }
 
@@ -178,6 +201,139 @@ public class Pipe : MonoBehaviour, IInteractable
         LineRenderer_Body.numCornerVertices = 6;
         LineRenderer_Body.numCapVertices = 4;
         LineRenderer_Body.sortingOrder = _bodySortingOrder;
+
+        LineRenderer_Body.forceRenderingOff = true;          // 민형 추가
+        BuildBodySprites(SimplifyPath(_travelPath));         // 민형 추가
+    }
+
+    private List<Vector2> SimplifyPath(List<Vector3> path)
+    {
+        List<Vector2> result = new List<Vector2>();
+        for (int i = 0; i < path.Count; i++)
+        {
+            Vector2 point = path[i];
+            int last = result.Count - 1;
+
+            if (last >= 0 && Vector2.Distance(result[last], point) < 0.001f)
+                continue;
+
+            if (last >= 1)
+            {
+                Vector2 prevDir = (result[last] - result[last - 1]).normalized;
+                Vector2 nextDir = (point - result[last]).normalized;
+                if (Vector2.Dot(prevDir, nextDir) > 0.999f)
+                {
+                    result[last] = point;
+                    continue;
+                }
+            }
+            result.Add(point);
+        }
+        return result;
+    }
+
+    private void BuildBodySprites(List<Vector2> points)
+    {
+        if (IsSameBodyPath(points))
+            return;
+
+        ClearBody();
+        if (points.Count < 2 || Sprite_BodyHorizontal == null || Sprite_BodyVertical == null || Sprite_BodyCorner == null)
+            return;
+
+        float half = _bodyWidth * 0.5f;
+        float z = transform.position.z;
+
+        // 직선 구간
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            Vector2 a = points[i];
+            Vector2 b = points[i + 1];
+            Vector2 dir = (b - a).normalized;
+            bool isHorizontal = Mathf.Abs(dir.x) > Mathf.Abs(dir.y);
+
+            if (Mathf.Abs(dir.x) > 0.01f && Mathf.Abs(dir.y) > 0.01f)
+            {
+                Debug.LogWarning($"[Pipe] {name}: 대각선 구간이 있습니다. PathPoint 위치를 가로/세로로 맞춰 주세요. {a} → {b}", this);
+            }
+
+            Vector2 start = i > 0 ? a + dir * half : a;
+            Vector2 end = i < points.Count - 2 ? b - dir * half : b;
+            float length = Vector2.Distance(start, end);
+            if (length < 0.001f)
+                continue;
+
+            SpriteRenderer piece = CreateBodyPiece("Body_Straight", isHorizontal ? Sprite_BodyHorizontal : Sprite_BodyVertical);
+            piece.drawMode = SpriteDrawMode.Tiled;
+            piece.size = isHorizontal ? new Vector2(length, _bodyWidth) : new Vector2(_bodyWidth, length);
+            Vector2 center = (start + end) * 0.5f;
+            piece.transform.position = new Vector3(center.x, center.y, z);
+        }
+
+        // 꺾이는 점
+        for (int i = 1; i < points.Count - 1; i++)
+        {
+            Vector2 inDir = (points[i] - points[i - 1]).normalized;
+            Vector2 outDir = (points[i + 1] - points[i]).normalized;
+
+            SpriteRenderer corner = CreateBodyPiece("Body_Corner", Sprite_BodyCorner);
+            Vector2 spriteSize = Sprite_BodyCorner.bounds.size;
+            corner.transform.localScale = new Vector3(_bodyWidth / spriteSize.x, _bodyWidth / spriteSize.y, 1f);
+            corner.transform.position = new Vector3(points[i].x, points[i].y, z);
+
+            // 모서리가 잇는 두 방향으로 ┌ 그림을 뒤집어서 ┐ └ ┘ 를 만듭니다.
+            Vector2 connects = -inDir + outDir;
+            corner.flipX = connects.x < 0;
+            corner.flipY = connects.y > 0;
+        }
+
+        _builtBodyPath.Clear();
+        _builtBodyPath.AddRange(points);
+    }
+
+    private SpriteRenderer CreateBodyPiece(string pieceName, Sprite sprite)
+    {
+        GameObject pieceObject = new GameObject(pieceName);
+        pieceObject.transform.SetParent(transform, false);
+
+        SpriteRenderer renderer = pieceObject.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = _bodyColor;
+        renderer.sortingOrder = _bodySortingOrder;
+        if (SpriteRenderer_Visual != null)
+        {
+            renderer.sharedMaterial = SpriteRenderer_Visual.sharedMaterial;   // 2D 조명을 똑같이 받게 합니다.
+            renderer.sortingLayerID = SpriteRenderer_Visual.sortingLayerID;
+        }
+
+        _bodyPieces.Add(renderer);
+        return renderer;
+    }
+
+    private bool IsSameBodyPath(List<Vector2> points)
+    {
+        if (_bodyPieces.Count == 0 || points.Count != _builtBodyPath.Count)
+            return false;
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (Vector2.Distance(points[i], _builtBodyPath[i]) > 0.001f)
+                return false;
+        }
+        return true;
+    }
+
+    private void ClearBody()
+    {
+        for (int i = 0; i < _bodyPieces.Count; i++)
+        {
+            if (_bodyPieces[i] != null)
+            {
+                Destroy(_bodyPieces[i].gameObject);
+            }
+        }
+        _bodyPieces.Clear();
+        _builtBodyPath.Clear();
     }
 
     private LineRenderer CreateBodyLine()
