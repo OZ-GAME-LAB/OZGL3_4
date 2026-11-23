@@ -93,5 +93,20 @@
     "Id": "Tutorial_Mouse_03",
     "Dialog": "아주 작은 구멍만 있따면 말이야.",
     "NextId": "-1"
+  },
+    {
+    "Id": "Tutorial_LightRoom_01",
+    "Dialog": "이곳은 빛이 정말 강하게 내려쬐는군.",
+    "NextId": "Tutorial_LightRoom_02"
+  },
+  {
+    "Id": "Tutorial_LightRoom_02",
+    "Dialog": "너도 알겠지만, 저긴 그냥은 못 지나가.",
+    "NextId": "Tutorial_LightRoom_03"
+  },
+  {
+    "Id": "Tutorial_LightRoom_03",
+    "Dialog": "때마침 몸을 숨길만한 것이 있으니, 잘 이용해 보라고.",
+    "NextId": "-1"
   }
 ]
