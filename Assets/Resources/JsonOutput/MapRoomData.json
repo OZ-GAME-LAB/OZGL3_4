@@ -418,7 +418,10 @@
                     "Y": -1
                 }
             ],
-            "RewardIds": [],
+            "RewardIds": [
+                "Room_B09_Reward_01",
+                "Room_B09_Reward_02"
+            ],
             "HiddenIds": [],
             "Exits": [
                 {
