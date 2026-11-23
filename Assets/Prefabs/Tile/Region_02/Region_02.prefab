@@ -267486,6 +267486,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6634926177982688684}
+  - {fileID: 4787884294313940076}
   m_Father: {fileID: 3913076129769247589}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4687916934003361969
@@ -592008,6 +592009,72 @@ MonoBehaviour:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1705157907806058205, guid: 3e4fcedb3a84d444cad1849c0d3aef93, type: 3}
   m_PrefabInstance: {fileID: 2827335198579632284}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2842880873392293424
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2320865350817786279}
+    m_Modifications:
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -47.17978
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -13.134
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8564978900825587768, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: m_Name
+      value: CrowSpawnSpot
+      objectReference: {fileID: 0}
+    - target: {fileID: 9054001347614502683, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: _dialogId
+      value: Tutorial_LightRoom_01
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+--- !u!4 &4787884294313940076 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7278391434289205852, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+  m_PrefabInstance: {fileID: 2842880873392293424}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2898687914345954787
 PrefabInstance:
