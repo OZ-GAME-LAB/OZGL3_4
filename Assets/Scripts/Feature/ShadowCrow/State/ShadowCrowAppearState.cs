@@ -1,8 +1,6 @@
-using UnityEngine;
-
 public class ShadowCrowAppearState : ShadowCrowStateBase
 {
-    private readonly int _animationHash = Animator.StringToHash("CrowAppear");
+    private int _animationHash;
 
     public ShadowCrowAppearState(ShadowCrow crow) : base(crow)
     {
@@ -10,9 +8,12 @@ public class ShadowCrowAppearState : ShadowCrowStateBase
 
     public override void Enter()
     {
+        _animationHash = _crow.AppearAnimationHash;
+
         _crow.SetVisible(true);
         _crow.PlayAnimation(_animationHash);
         _crow.StartAppearDirecting();
+        _crow.NotifyStartAppear();
     }
 
     public override void Update()

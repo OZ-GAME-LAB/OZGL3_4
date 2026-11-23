@@ -10,8 +10,16 @@ public class ShadowCrowSpot : MonoBehaviour
     [SerializeField] private string _dialogId;                      
     [SerializeField] private bool _isAutoTalk = true;               
 
+    [Header("등장 연출")]
+    [SerializeField] private string _appearAnimationName = "CrowAppear";   // 까마귀 Animator 상태 이름. 비석은 CrowSummon
+    [SerializeField] private Animator Animator_Feather;                    // 비석 깃털. 없으면 생략
+    [SerializeField] private Transform Transform_SpawnPoint;               // 까마귀 발 위치(비석 위). 없으면 이 오브젝트 위치
+
     [Header("에디터 표시")]
     [SerializeField] private Color _gizmoColor = new Color(0.4f, 0.2f, 0.8f, 0.8f);
+
+    private const float _crowHeight = 1f;   // 까마귀 키(유닛). Gizmo 표시용
+    private readonly int _featherSummonHash = Animator.StringToHash("FeatherSummon");
 
     private ShadowCrow _crow;
     private bool _isAutoTalked;
@@ -51,7 +59,7 @@ public class ShadowCrowSpot : MonoBehaviour
             return;
         }
 
-        GameObject crowObject = await GameObjectManager.Instance.CreateObjectAsync(_crowAddress, transform.position);
+        GameObject crowObject = await GameObjectManager.Instance.CreateObjectAsync(_crowAddress, GetSpawnPosition());
         if (crowObject == null)
         {
             Debug.LogError($"[ShadowCrowSpot] {name}: 까마귀 생성 실패. Addressables 주소를 확인하세요: {_crowAddress}", this);
@@ -74,8 +82,12 @@ public class ShadowCrowSpot : MonoBehaviour
 
         _crow = crow;
         _crow.SetSpawnData(_dialogId, _isAutoTalk && _isAutoTalked == false);
+        // 풀에서 다른 지점의 까마귀를 재사용해도 이 지점의 등장 애니메이션으로 덮어쓴다.
+        _crow.SetAppearAnimation(_appearAnimationName);
         _crow.OnStartAutoTalk -= OnStartCrowAutoTalk;
         _crow.OnStartAutoTalk += OnStartCrowAutoTalk;
+        _crow.OnStartAppear -= OnStartCrowAppear;
+        _crow.OnStartAppear += OnStartCrowAppear;
     }
 
     private void ReturnCrow()
@@ -86,6 +98,7 @@ public class ShadowCrowSpot : MonoBehaviour
         }
 
         _crow.OnStartAutoTalk -= OnStartCrowAutoTalk;
+        _crow.OnStartAppear -= OnStartCrowAppear;
 
         if (GameObjectManager.Instance != null)
         {
@@ -99,10 +112,33 @@ public class ShadowCrowSpot : MonoBehaviour
         _isAutoTalked = true;
     }
 
+    // 까마귀가 등장을 시작한 순간 깃털이 부서지는 연출을 함께 시작한다.
+    // CrowSummon 클립 앞부분이 비어 있어서 까마귀는 깃털 Summon 5번 프레임쯤 보이기 시작한다.
+    private void OnStartCrowAppear()
+    {
+        if (Animator_Feather == null)
+        {
+            return;
+        }
+
+        Animator_Feather.Play(_featherSummonHash, 0, 0f);
+    }
+
+    private Vector3 GetSpawnPosition()
+    {
+        if (Transform_SpawnPoint == null)
+        {
+            return transform.position;
+        }
+
+        return Transform_SpawnPoint.position;
+    }
+
     private void OnDrawGizmos()
     {
+        Vector3 spawnPosition = GetSpawnPosition();
         Gizmos.color = _gizmoColor;
-        Gizmos.DrawWireSphere(transform.position, 0.5f);
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.up * 3.7f);
+        Gizmos.DrawWireSphere(spawnPosition, 0.5f);
+        Gizmos.DrawLine(spawnPosition, spawnPosition + Vector3.up * _crowHeight);
     }
 }

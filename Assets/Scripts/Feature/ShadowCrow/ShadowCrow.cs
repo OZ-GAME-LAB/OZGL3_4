@@ -29,6 +29,7 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     [SerializeField] private bool _isBlockInputOnTalk = true;         
 
     private const string _talkInputActionName = "Player/Interaction";
+    private const string _defaultAppearAnimationName = "CrowAppear";
 
     private bool _isAutoTalked;
     private int _talkStartFrame = -1;
@@ -44,7 +45,11 @@ public class ShadowCrow : MonoBehaviour, IInteractable
 
     public bool IsDialogPlaying => SpeechBubble_Crow != null && SpeechBubble_Crow.IsPlaying;
 
+    // Appear 상태에서 재생할 Animator 상태. 기본은 CrowAppear(웅덩이에서 등장), 비석 스폰은 CrowSummon.
+    public int AppearAnimationHash { get; private set; } = Animator.StringToHash(_defaultAppearAnimationName);
+
     public event Action OnStartAutoTalk;
+    public event Action OnStartAppear;
 
     #region 수명
     private void Awake()
@@ -166,6 +171,23 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         _dialogId = dialogId;
         _isAutoTalk = isAutoTalk;
         _isAutoTalked = false;
+    }
+
+    // 등장 애니메이션(Animator 상태 이름)을 바꾼다. 비어 있으면 기본 CrowAppear.
+    public void SetAppearAnimation(string stateName)
+    {
+        if (string.IsNullOrWhiteSpace(stateName))
+        {
+            stateName = _defaultAppearAnimationName;
+        }
+
+        AppearAnimationHash = Animator.StringToHash(stateName);
+    }
+
+    // Appear 상태 진입 시 호출. 스폰 지점이 깃털 연출 등을 같은 순간에 시작할 수 있게 알린다.
+    public void NotifyStartAppear()
+    {
+        OnStartAppear?.Invoke();
     }
 
     public void TryStartAutoTalk()
