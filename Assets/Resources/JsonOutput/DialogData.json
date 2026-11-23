@@ -61,7 +61,7 @@
   },
   {
     "Id": "Tutorial_Grab_02",
-    "Dialog": "F를 눌러 물체를 힘껏 밀어봐",
+    "Dialog": "Mouse Left를 눌러 물체를 힘껏 밀어봐",
     "NextId": "-1"
   },
   {
