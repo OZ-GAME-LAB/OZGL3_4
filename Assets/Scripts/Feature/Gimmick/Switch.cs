@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// 스위치 기믹입니다. 플레이어가 상호작용 키를 누르면 연결된 기믹에 신호를 보냅니다.
@@ -19,6 +20,7 @@ using UnityEngine;
 /// 외형 표현
 /// - Sprite_On, Sprite_Off를 둘 다 넣으면 상태에 따라 그림이 바뀌고, 비워 두면 색으로 표시합니다.
 /// - 누를 때마다 Visual이 살짝 내려갔다 올라오는 눌림 연출이 재생됩니다.
+/// - Is Important 를 켜면(보상 스위치 등) 켜져 있는 동안 버튼 그림과 조명이 강조 색(파란색)으로 바뀝니다.
 /// </summary>
 public class Switch : SignalSender, IInteractable
 {
@@ -44,12 +46,22 @@ public class Switch : SignalSender, IInteractable
     [SerializeField] private Color _onColor = Color.yellow;
     [SerializeField] private Color _offColor = Color.gray;
 
+    [Header("Important (보상 스위치 등 강조)")]
+    [SerializeField] private Light2D Light2D_Switch;                                        // 스위치를 비추는 조명
+    [SerializeField] private bool _isImportant = false;                                      // 켜면 눌린 동안 그림과 조명 색이 바뀜
+    [SerializeField] private Color _importantOnVisualColor = new Color(0.25f, 0.6f, 1f, 1f); // 눌렸을 때 버튼 그림 색
+    [SerializeField] private Color _importantOnColor = new Color(0.25f, 0.6f, 1f, 1f);       // 눌렸을 때 조명 색
+    [SerializeField, Min(0f)] private float _importantOnIntensity = 8f;                      // 눌렸을 때 조명 세기
+
     [Header("Press Animation")]
     [SerializeField] private float _pressDepth = 0.1f;
     [SerializeField] private float _pressDuration = 0.06f;
 
     private bool _isUsed;
     private Vector3 _visualDefaultPosition;
+    private Color _visualDefaultColor = Color.white;
+    private Color _lightDefaultColor;
+    private float _lightDefaultIntensity;
 
     /// <summary>
     /// 토글 방식이면 시작할 때 문 상태를 덮어쓰지 않습니다. (문은 자기 시작 상태를 유지)
@@ -70,6 +82,13 @@ public class Switch : SignalSender, IInteractable
         if (SpriteRenderer_Switch != null)
         {
             _visualDefaultPosition = SpriteRenderer_Switch.transform.localPosition;
+            _visualDefaultColor = SpriteRenderer_Switch.color;
+        }
+
+        if (Light2D_Switch != null)
+        {
+            _lightDefaultColor = Light2D_Switch.color;
+            _lightDefaultIntensity = Light2D_Switch.intensity;
         }
     }
 
@@ -128,6 +147,8 @@ public class Switch : SignalSender, IInteractable
 
     protected override void HandleSignalSent(bool isOn)
     {
+        RefreshImportantLight(isOn);
+
         if (SpriteRenderer_Switch == null)
             return;
 
@@ -135,11 +156,29 @@ public class Switch : SignalSender, IInteractable
         if (Sprite_On != null && Sprite_Off != null)
         {
             SpriteRenderer_Switch.sprite = isOn ? Sprite_On : Sprite_Off;
+
+            // 중요한 스위치는 그림을 바꾸는 방식이어도 켜진 동안 강조 색을 입힙니다.
+            if (_isImportant)
+            {
+                SpriteRenderer_Switch.color = isOn ? _importantOnVisualColor : _visualDefaultColor;
+            }
         }
         else
         {
-            SpriteRenderer_Switch.color = isOn ? _onColor : _offColor;
+            // 중요한 스위치는 켜졌을 때 노란색 대신 강조 색(파란색)으로 표시합니다.
+            Color onColor = _isImportant ? _importantOnVisualColor : _onColor;
+            SpriteRenderer_Switch.color = isOn ? onColor : _offColor;
         }
+    }
+
+    // 중요한 스위치는 켜져 있는 동안 조명을 강조 색으로 바꿔서 눌렸다는 것을 알려 줍니다.
+    private void RefreshImportantLight(bool isOn)
+    {
+        if (_isImportant == false || Light2D_Switch == null)
+            return;
+
+        Light2D_Switch.color = isOn ? _importantOnColor : _lightDefaultColor;
+        Light2D_Switch.intensity = isOn ? _importantOnIntensity : _lightDefaultIntensity;
     }
 
     private void PlayPressAnimation()
