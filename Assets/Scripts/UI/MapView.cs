@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -9,6 +10,7 @@ public class MapView : UIBase
 {
     [SerializeField] private RectTransform Transform_MapContent;
     [SerializeField] private RectTransform Transform_MapOrigin;
+    [SerializeField] private TextMeshProUGUI Text_RewardCount;
     [SerializeField] private Vector2 _chunkSize = new Vector2(250f, 250f);
     [SerializeField] private string _roomSpriteFolder = "UI/MapRooms";
     [SerializeField, Range(0.01f, 1f)] private float _displayScale = 0.5f;
@@ -30,6 +32,7 @@ public class MapView : UIBase
         if (_mapViewModel == mapViewModel)
         {
             RefreshMapLayout();
+            UpdateRewardCount();
             return;
         }
 
@@ -61,6 +64,7 @@ public class MapView : UIBase
         if (_roomViews.Count == 0) Debug.LogWarning("[MapView] 표시할 방 이미지가 없습니다: Resources/" + _roomSpriteFolder);
         if (isActiveAndEnabled) Bind();
         RefreshMapLayout();
+        UpdateRewardCount();
     }
 
     public static string GetRoomIdFromImageName(string imageName)
@@ -116,6 +120,7 @@ public class MapView : UIBase
         _zoomAction.Enable();
         Bind();
         RefreshMapLayout();
+        UpdateRewardCount();
     }
 
     private void OnDisable()
@@ -159,6 +164,17 @@ public class MapView : UIBase
     private void OnChangeMapProperty(object sender, PropertyChangedEventArgs args)
     {
         if (args.PropertyName == nameof(MapViewModel.CurrentRegionId)) RefreshMapLayout();
+        if (args.PropertyName == nameof(MapViewModel.RegionTotalRewardCount)
+            || args.PropertyName == nameof(MapViewModel.RegionCollectedRewardCount))
+        {
+            UpdateRewardCount();
+        }
+    }
+
+    private void UpdateRewardCount()
+    {
+        if (_mapViewModel == null || Text_RewardCount == null) return;
+        Text_RewardCount.text = _mapViewModel.RegionCollectedRewardCount + " / " + _mapViewModel.RegionTotalRewardCount;
     }
 
     private void OnRectTransformDimensionsChange()

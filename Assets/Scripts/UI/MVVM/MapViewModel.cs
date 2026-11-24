@@ -74,6 +74,22 @@ public class MapViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public int RegionTotalRewardCount
+    {
+        get
+        {
+            return GetRegionRewardCount(CurrentRegionId, false);
+        }
+    }
+
+    public int RegionCollectedRewardCount
+    {
+        get
+        {
+            return GetRegionRewardCount(CurrentRegionId, true);
+        }
+    }
+
     // 추가 - 김동혁
     public int TotalRewardCount
     {
@@ -264,6 +280,27 @@ public class MapViewModel : ViewModelBase, IDisposable
         return count;
     }
 
+    private int GetRegionRewardCount(string regionId, bool isCollectedOnly)
+    {
+        int count = 0;
+        foreach (MapRoomViewModel room in _rooms)
+        {
+            if (room.RegionId != regionId)
+            {
+                continue;
+            }
+            if (isCollectedOnly)
+            {
+                count = count + room.CollectedRewardCount;
+            }
+            else
+            {
+                count = count + room.TotalRewardCount;
+            }
+        }
+        return count;
+    }
+
     private bool GetCanShowExplorationRate(string regionId)
     {
         int total = GetTeleportCount(regionId, false);
@@ -308,6 +345,10 @@ public class MapViewModel : ViewModelBase, IDisposable
         if (changedRoom.RegionId != CurrentRegionId)
         {
             return;
+        }
+        if (args.PropertyName == nameof(MapRoomViewModel.CollectedRewardCount))
+        {
+            OnPropertyChanged(nameof(RegionCollectedRewardCount));
         }
         if (args.PropertyName == nameof(MapRoomViewModel.CollectedRewardCount)
             || args.PropertyName == nameof(MapRoomViewModel.DiscoveredHiddenCount)
@@ -359,6 +400,8 @@ public class MapViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(TeleportActivationRate));
         OnPropertyChanged(nameof(CanShowExplorationRate));
         OnPropertyChanged(nameof(DisplayedExplorationRate));
+        OnPropertyChanged(nameof(RegionTotalRewardCount));
+        OnPropertyChanged(nameof(RegionCollectedRewardCount));
     }
 
     public void Dispose()
