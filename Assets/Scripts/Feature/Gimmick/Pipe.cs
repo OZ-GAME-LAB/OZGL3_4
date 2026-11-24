@@ -24,8 +24,7 @@ using UnityEngine;
 /// - _requiredShadowType이 None이면 모든 형태가 이용할 수 있습니다.
 /// - 이동하는 동안 플레이어는 보이지 않고 물리가 멈추며, 위치는 불빛을 따라갑니다. (카메라도 따라감)
 /// - 오브젝트를 선택하면 씬 뷰에 이동 경로가 분홍 선으로 표시됩니다.
-/// - _isZoomOnTravel을 켜면 이 배관으로 들어갈 때 카메라가 줌인하고, 나오면 원래대로 돌아옵니다.
-///   들어간 배관의 설정을 따르므로 왕복 모두 줌하려면 양쪽 배관에 켜 주세요. (Main Camera에 CameraController 필요)
+/// - _isZoomOnTravel을 켜면 이 배관 통로를 지나는 동안 카메라가 줌인하고, 나오면 원래대로 돌아옵니다. (Main Camera에 CameraController 필요)
 /// </summary>
 public class Pipe : MonoBehaviour, IInteractable
 {
@@ -44,7 +43,7 @@ public class Pipe : MonoBehaviour, IInteractable
     [SerializeField] private float _enterDelay = 0.15f;
     [SerializeField] private float _exitDelay = 0.15f;
 
-    [Header("Zoom (이 배관으로 들어갈 때 줌인)")]
+    [Header("Zoom (이 배관 통로 이동 중 줌인, 한쪽만 켜도 양방향)")]
     [SerializeField] private bool _isZoomOnTravel = false;
     [SerializeField, Min(0.1f)] private float _zoomSize = 4f;         // 카메라 orthographicSize. 기본 6, 작을수록 확대
     [SerializeField, Min(0f)] private float _zoomInTime = 0.4f;
@@ -75,6 +74,7 @@ public class Pipe : MonoBehaviour, IInteractable
     private readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
     private float _lockUntilTime;
     private CameraController _cameraController;
+    private float _zoomOutTimeOnEnd;
 
     // 플레이어가 배관 안에 있는 동안 다른 배관이 동시에 반응하지 않도록 막습니다.
     private static bool s_isAnyTraveling;
@@ -552,12 +552,10 @@ public class Pipe : MonoBehaviour, IInteractable
         _travelPath.Add(Pipe_Exit.transform.position);
     }
 
-    /// <summary>
-    /// _isZoomOnTravel이 켜져 있으면 메인 카메라를 줌인합니다. 나올 때 EndTravelZoom으로 되돌립니다.
-    /// </summary>
     private void StartTravelZoom()
     {
-        if (_isZoomOnTravel == false)
+        Pipe zoomPipe = GetZoomPipe();
+        if (zoomPipe == null)
             return;
 
         Camera mainCamera = Camera.main;
@@ -574,7 +572,19 @@ public class Pipe : MonoBehaviour, IInteractable
             return;
         }
 
-        _cameraController.ZoomIn(_zoomSize, _zoomInTime, _isBlockInputOnZoom);
+        _zoomOutTimeOnEnd = zoomPipe._zoomOutTime;
+        _cameraController.ZoomIn(zoomPipe._zoomSize, zoomPipe._zoomInTime, zoomPipe._isBlockInputOnZoom);
+    }
+
+    private Pipe GetZoomPipe()
+    {
+        if (_isZoomOnTravel)
+            return this;
+
+        if (Pipe_Exit != null && Pipe_Exit._isZoomOnTravel)
+            return Pipe_Exit;
+
+        return null;
     }
 
     private void EndTravelZoom()
@@ -582,7 +592,7 @@ public class Pipe : MonoBehaviour, IInteractable
         if (_cameraController == null)
             return;
 
-        _cameraController.ZoomOut(_zoomOutTime);
+        _cameraController.ZoomOut(_zoomOutTimeOnEnd);
         _cameraController = null;
     }
 
