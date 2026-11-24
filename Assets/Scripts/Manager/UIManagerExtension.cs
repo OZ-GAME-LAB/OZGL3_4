@@ -21,6 +21,7 @@ public enum UIType
     ChangeCardUI,
     MenuUI,
     HudUI,
+    SaveCompleteText,
 }
 
 public static class UIManagerExtension

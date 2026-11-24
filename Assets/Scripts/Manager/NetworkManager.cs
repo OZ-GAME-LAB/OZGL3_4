@@ -53,6 +53,7 @@ public class NetworkManager : SingletonBase<NetworkManager>
 
         _saveRepository.Save(saveData);
         Debug.Log("[NetworkManager] 데이터 저장 완료");
+        UIManager.Instance.OpenUI(UIRootType.PopupUI, UIType.SaveCompleteText);
     }
 
     public void LoadGame(out string lastSaveTeleportId)
