@@ -586852,15 +586852,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -587878,15 +587886,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -588090,7 +588106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -588142,7 +588158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -588915,7 +588931,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -588967,7 +588983,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -589078,7 +589094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -589134,7 +589150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -589284,9 +589300,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gimmick_LightZone_RayCast_Sky_14_0
       objectReference: {fileID: 0}
+    - target: {fileID: 565730849259400260, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1676978474560843736, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 4112808661142884037, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: _range
@@ -589502,7 +589522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -589554,7 +589574,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -589661,7 +589681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -589713,7 +589733,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -589922,9 +589942,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gimmick_LightZone_RayCast_Sky_13_0
       objectReference: {fileID: 0}
+    - target: {fileID: 565730849259400260, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1676978474560843736, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 4112808661142884037, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: _range
@@ -590134,15 +590158,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -590836,7 +590868,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -590892,7 +590924,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -592937,7 +592969,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -592989,7 +593021,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -593328,15 +593360,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -594072,7 +594112,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -594121,6 +594161,10 @@ PrefabInstance:
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_ShapePath.Array.data[3].y
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4922663431695659190, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Size.x
@@ -594210,15 +594254,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -594546,15 +594598,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -595136,7 +595196,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -595192,7 +595252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -595941,7 +596001,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -595993,7 +596053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -596986,7 +597046,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -597038,7 +597098,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -597853,7 +597913,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -597902,6 +597962,10 @@ PrefabInstance:
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_ShapePath.Array.data[3].y
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4922663431695659190, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Size.x
@@ -600735,6 +600799,10 @@ PrefabInstance:
       propertyPath: _isStartOn
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4381504975640845002, guid: 525bc0a86465cba4197662712811c868, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4617841092966777715, guid: 525bc0a86465cba4197662712811c868, type: 3}
       propertyPath: m_Name
       value: Gimmick_MovingLight_B04_Chase
@@ -600760,8 +600828,16 @@ PrefabInstance:
       value: 700
       objectReference: {fileID: 0}
     - target: {fileID: 6467875018489903468, guid: 525bc0a86465cba4197662712811c868, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6467875018489903468, guid: 525bc0a86465cba4197662712811c868, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 6467875018489903468, guid: 525bc0a86465cba4197662712811c868, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 6467875018489903468, guid: 525bc0a86465cba4197662712811c868, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -601515,7 +601591,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -601571,7 +601647,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -602147,15 +602223,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2342891369587743654, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: _isOverrideIntensity
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5012267557458049024, guid: da66529d15ada3a4c88c88f8c7168fb1, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -603947,7 +604031,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -603996,6 +604080,10 @@ PrefabInstance:
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_ShapePath.Array.data[3].y
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4922663431695659190, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Size.x
@@ -614840,9 +614928,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gimmick_LightZone_RayCast_Sky_15_0
       objectReference: {fileID: 0}
+    - target: {fileID: 565730849259400260, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
+      propertyPath: _lightIntensity
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1676978474560843736, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 4112808661142884037, guid: a0e7bcf738abb244b9c0597abe0e4ef2, type: 3}
       propertyPath: _range
@@ -615377,7 +615469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -615429,7 +615521,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -615907,7 +615999,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -615959,7 +616051,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -616426,7 +616518,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -616478,7 +616570,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -641046,7 +641138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -641098,7 +641190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
@@ -641613,7 +641705,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_Intensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3758964668790176202, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: m_LocalBounds.m_Center.x
@@ -641665,7 +641757,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _lightIntensity
-      value: 20
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4557157093700337750, guid: 23cbd5ac1f9a0ec4ca9233afc6e957b3, type: 3}
       propertyPath: _isOverrideIntensity
