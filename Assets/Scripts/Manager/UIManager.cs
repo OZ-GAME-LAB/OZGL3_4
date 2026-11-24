@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class UIManager : SingletonBase<UIManager>
 {
@@ -101,5 +102,15 @@ public class UIManager : SingletonBase<UIManager>
     public bool IsOpenUI(UIType uiType)
     {
         return _opendUIList.Contains(uiType);
+    }
+
+    private void OnCancel(InputValue value)
+    {
+        if (IsOpenUI(UIType.MenuUI))
+        {
+            CloseUI(UIRootType.PopupUI, UIType.MenuUI);
+            return;
+        }
+        OpenUI(UIRootType.PopupUI, UIType.MenuUI);
     }
 }
