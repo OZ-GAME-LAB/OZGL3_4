@@ -489,6 +489,7 @@ MonoBehaviour:
   _canvasContentRoot: {fileID: 4824478839083076765}
   _canvasPopupRoot: {fileID: 6696728147772210582}
   _canvasVeryFrontRoot: {fileID: 5696493720864581944}
+  _mapInputPrefab: {fileID: 100002, guid: 7bf7f4a8125a42f2b2206fcae087720d, type: 3}
 --- !u!1 &5880196218459614062
 GameObject:
   m_ObjectHideFlags: 0
