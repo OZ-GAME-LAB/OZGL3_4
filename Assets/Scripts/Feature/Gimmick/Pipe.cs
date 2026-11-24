@@ -24,6 +24,8 @@ using UnityEngine;
 /// - _requiredShadowType이 None이면 모든 형태가 이용할 수 있습니다.
 /// - 이동하는 동안 플레이어는 보이지 않고 물리가 멈추며, 위치는 불빛을 따라갑니다. (카메라도 따라감)
 /// - 오브젝트를 선택하면 씬 뷰에 이동 경로가 분홍 선으로 표시됩니다.
+/// - _isZoomOnTravel을 켜면 이 배관으로 들어갈 때 카메라가 줌인하고, 나오면 원래대로 돌아옵니다.
+///   들어간 배관의 설정을 따르므로 왕복 모두 줌하려면 양쪽 배관에 켜 주세요. (Main Camera에 CameraController 필요)
 /// </summary>
 public class Pipe : MonoBehaviour, IInteractable
 {
@@ -41,6 +43,13 @@ public class Pipe : MonoBehaviour, IInteractable
     [SerializeField] private float _travelSpeed = 8f;
     [SerializeField] private float _enterDelay = 0.15f;
     [SerializeField] private float _exitDelay = 0.15f;
+
+    [Header("Zoom (이 배관으로 들어갈 때 줌인)")]
+    [SerializeField] private bool _isZoomOnTravel = false;
+    [SerializeField, Min(0.1f)] private float _zoomSize = 4f;         // 카메라 orthographicSize. 기본 6, 작을수록 확대
+    [SerializeField, Min(0f)] private float _zoomInTime = 0.4f;
+    [SerializeField, Min(0f)] private float _zoomOutTime = 0.4f;
+    [SerializeField] private bool _isBlockInputOnZoom = false;        // 켜면 줌아웃이 끝날 때까지 이동 입력을 막습니다.
 
     [Header("Body (배관 몸통 선)")]
     [SerializeField] private LineRenderer LineRenderer_Body;
@@ -65,6 +74,7 @@ public class Pipe : MonoBehaviour, IInteractable
     private readonly List<Vector3> _travelPath = new List<Vector3>();
     private readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
     private float _lockUntilTime;
+    private CameraController _cameraController;
 
     // 플레이어가 배관 안에 있는 동안 다른 배관이 동시에 반응하지 않도록 막습니다.
     private static bool s_isAnyTraveling;
@@ -434,6 +444,7 @@ public class Pipe : MonoBehaviour, IInteractable
         // 플레이어를 숨기고 물리를 멈춥니다.
         HidePlayer(player);
         BuildTravelPath();
+        StartTravelZoom();
 
         bool isCanceled = await WaitAsync(_enterDelay, cancellationToken);
 
@@ -461,6 +472,7 @@ public class Pipe : MonoBehaviour, IInteractable
         }
 
         Lock(_reenterDelay);
+        EndTravelZoom();
 
         IsTraveling = false;
         s_isAnyTraveling = false;
@@ -538,6 +550,40 @@ public class Pipe : MonoBehaviour, IInteractable
         }
 
         _travelPath.Add(Pipe_Exit.transform.position);
+    }
+
+    /// <summary>
+    /// _isZoomOnTravel이 켜져 있으면 메인 카메라를 줌인합니다. 나올 때 EndTravelZoom으로 되돌립니다.
+    /// </summary>
+    private void StartTravelZoom()
+    {
+        if (_isZoomOnTravel == false)
+            return;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogWarning($"[Pipe] {name}: MainCamera가 없어 줌을 생략합니다.", this);
+            return;
+        }
+
+        _cameraController = mainCamera.GetComponent<CameraController>();
+        if (_cameraController == null)
+        {
+            Debug.LogWarning($"[Pipe] {name}: Main Camera에 CameraController가 없어 줌을 생략합니다.", this);
+            return;
+        }
+
+        _cameraController.ZoomIn(_zoomSize, _zoomInTime, _isBlockInputOnZoom);
+    }
+
+    private void EndTravelZoom()
+    {
+        if (_cameraController == null)
+            return;
+
+        _cameraController.ZoomOut(_zoomOutTime);
+        _cameraController = null;
     }
 
     private void HidePlayer(Rigidbody2D player)
