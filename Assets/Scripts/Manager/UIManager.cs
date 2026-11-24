@@ -9,13 +9,39 @@ public class UIManager : SingletonBase<UIManager>
     [SerializeField] private Canvas _canvasContentRoot;
     [SerializeField] private Canvas _canvasPopupRoot;
     [SerializeField] private Canvas _canvasVeryFrontRoot;
+    [SerializeField] private MapUIInput _mapInputPrefab;
 
     private Dictionary<UIType, UIBase> _createdUIList = new Dictionary<UIType, UIBase>();
     private HashSet<UIType> _opendUIList = new HashSet<UIType>();
 
+    private GameManager _gameManager;
+    private MapUIInput _mapInput;
+
     private void Start()
     {
+        _gameManager = GameManager.Instance;
+        if (_gameManager != null)
+        {
+            _gameManager.OnStartGame += CreateMapInput;
+        }
+
         OpenUI(UIRootType.MainUI, UIType.LobbyUI);
+    }
+
+    private void OnDestroy()
+    {
+        if (_gameManager != null)
+        {
+            _gameManager.OnStartGame -= CreateMapInput;
+        }
+    }
+
+    private void CreateMapInput()
+    {
+        if (_mapInput == null && _mapInputPrefab != null)
+        {
+            _mapInput = Instantiate(_mapInputPrefab, transform);
+        }
     }
 
     public UIBase OpenUI(UIRootType uiRootType, UIType uiType, bool isInitialHide = false)
