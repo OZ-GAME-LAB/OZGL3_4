@@ -17,6 +17,7 @@ public enum PlayerState
     Dash,
     Grab,
     Change,
+    Spawn,
 }
 
 [Serializable]
@@ -91,6 +92,9 @@ public class Player : MonoBehaviour
     [Header("Grab")]
     public Grabbable GrabTarget { get; private set; }
 
+    // 처음 생성 연출(SpawnState) 중이면 true. 까마귀 등장처럼 연출이 겹치면 안 되는 쪽에서 확인한다.
+    public bool IsSpawning => _currentStateType == PlayerState.Spawn;
+
     public bool IsDead { get; private set; }
     public event Action Died;
 
@@ -121,6 +125,7 @@ public class Player : MonoBehaviour
         _stateList.Add(PlayerState.Dash, new DashState(this));
         _stateList.Add(PlayerState.Grab, new GrabState(this));
         _stateList.Add(PlayerState.Change, new ChangeState(this));
+        _stateList.Add(PlayerState.Spawn, new SpawnState(this));
 
         // 洹몃┝??珥덇린??
         _shadowList.Add(ShadowType.Default, new DefaultShadow(this));
@@ -162,8 +167,8 @@ public class Player : MonoBehaviour
         // 초기 그림자 설정
         _viewModel.AddShadow(ShadowType.Default);
         _viewModel.CurrentShadowType = ShadowType.Default;
-        // 초기 상태 설정
-        ChangeState(PlayerState.Idle);
+        // 초기 상태 설정: 처음 생성될 때 Spawn 연출 후 Idle로 넘어간다.
+        ChangeState(PlayerState.Spawn);
 
 
         MapManager.Instance.Transform_Target = transform;
@@ -599,7 +604,7 @@ public class Player : MonoBehaviour
     {
         if (value.isPressed)
         {
-            if (_currentStateType is PlayerState.Change)
+            if (_currentStateType is PlayerState.Change or PlayerState.Spawn)
                 return;
 
             _viewModel.ChangeShadow(-1);
@@ -610,7 +615,7 @@ public class Player : MonoBehaviour
     {
         if (value.isPressed)
         {
-            if (_currentStateType is PlayerState.Change)
+            if (_currentStateType is PlayerState.Change or PlayerState.Spawn)
                 return;
 
             _viewModel.ChangeShadow(1);
