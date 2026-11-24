@@ -15,7 +15,11 @@ public class SpawnState : PlayerStateBase
 
     public override void Enter()
     {
+        // 같은 프레임에 컨트롤러가 교체되므로(ShadowBase.Enter) 즉시 갱신해 Spawn 첫 프레임을 확정한 뒤 보인다.
+        _player.Animator.Update(0f);
         _player.Animator.Play(_spawnAnimName, 0, 0f);
+        _player.Animator.Update(0f);
+        _player.SetSpriteVisible(true);
         StartDirecting();
     }
 

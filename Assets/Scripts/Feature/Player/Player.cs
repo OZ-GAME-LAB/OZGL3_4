@@ -118,6 +118,9 @@ public class Player : MonoBehaviour
         _sprite = GetComponentInChildren<SpriteRenderer>();
         _defaultGravity = _rigid.gravityScale;
 
+        // Start(SpawnState)보다 먼저 그려지는 첫 프레임에 기본 모습이 보이지 않도록 숨긴다.
+        SetSpriteVisible(false);
+
         // 상태들 초기화
         _stateList.Add(PlayerState.Idle, new IdleState(this));
         _stateList.Add(PlayerState.Walk, new WalkState(this));
@@ -278,6 +281,11 @@ public class Player : MonoBehaviour
         }
 
         _shadowList.Add(type, newShadow);
+    }
+
+    public void SetSpriteVisible(bool isVisible)
+    {
+        _sprite.enabled = isVisible;
     }
 
     public void SetVelocity(float speed, bool isFixed = false)
