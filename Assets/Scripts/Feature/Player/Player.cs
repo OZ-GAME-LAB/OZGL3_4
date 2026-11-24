@@ -85,7 +85,7 @@ public class Player : MonoBehaviour
     private float _dashCooldownTimer;
     private float _defaultGravity;
     private float _facing = 1f;
-    public bool CanDash => _dashCooldownTimer <= 0f;
+    public bool CanDash => _dashCooldownTimer <= 0f && _currentStateType is not PlayerState.Change;
     public float DefaultGravity => _defaultGravity;
     public float Facing => _facing;
 
