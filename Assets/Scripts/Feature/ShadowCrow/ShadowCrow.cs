@@ -350,6 +350,24 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         return offset.sqrMagnitude <= _appearDistance * _appearDistance;
     }
 
+    // 플레이어가 처음 생성 연출(SpawnState) 중이면 true.
+    // 생성 연출도 CameraController로 줌·입력 막기를 하므로, 끝난 뒤에 등장해야 서로 덮어쓰지 않는다.
+    public bool IsPlayerSpawning()
+    {
+        if (GameObjectManager.Instance == null)
+        {
+            return false;
+        }
+
+        Player player = GameObjectManager.Instance.CurrentPlayer;
+        if (player == null)
+        {
+            return false;
+        }
+
+        return player.IsSpawning;
+    }
+
     public void SetVisible(bool isVisible)
     {
         if (SpriteRenderer_Crow == null)
