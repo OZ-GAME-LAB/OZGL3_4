@@ -358,6 +358,10 @@
                 {
                     "X": 12,
                     "Y": -1
+                },
+                {
+                    "X": 12,
+                    "Y": 0
                 }
             ],
             "RewardIds": [],
@@ -378,10 +382,6 @@
             "Description": "방 B08",
             "RegionId": "Region_02",
             "OccupiedChunks": [
-                {
-                    "X": 12,
-                    "Y": 0
-                },
                 {
                     "X": 13,
                     "Y": 0
