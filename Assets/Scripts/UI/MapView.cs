@@ -57,7 +57,7 @@ public class MapView : UIBase
             Dictionary<string, Sprite> hiddenSprites = new Dictionary<string, Sprite>();
             foreach (string hiddenId in room.HiddenIds)
             {
-                Sprite hiddenSprite = GetRoomSprite(sprites, hiddenId, layout);
+                Sprite hiddenSprite = GetRoomSprite(sprites, hiddenId, layout, true);
                 if (hiddenSprite != null)
                 {
                     hiddenSprites.Add(hiddenId, hiddenSprite);
@@ -97,11 +97,16 @@ public class MapView : UIBase
             ((long)maxX - minX + 1) * chunkSize, ((long)maxY - minY + 1) * chunkSize);
     }
 
-    private static Sprite GetRoomSprite(Dictionary<string, Sprite> sprites, string id, Rect layout)
+    private static Sprite GetRoomSprite(Dictionary<string, Sprite> sprites, string id, Rect layout,
+        bool isHidden = false)
     {
         if (!sprites.TryGetValue(id, out Sprite sprite))
         {
             return null;
+        }
+        if (isHidden && HasOffsetPivot(sprite))
+        {
+            return sprite;
         }
         if (!Mathf.Approximately(sprite.rect.width / sprite.rect.height, layout.width / layout.height))
         {
@@ -109,6 +114,11 @@ public class MapView : UIBase
             return null;
         }
         return sprite;
+    }
+
+    private static bool HasOffsetPivot(Sprite sprite)
+    {
+        return sprite.pivot != sprite.rect.size * 0.5f;
     }
 
     private void CreateRoomView(MapRoomViewModel room, Sprite terrain, Dictionary<string, Sprite> hiddenSprites, Rect layout)
@@ -126,7 +136,18 @@ public class MapView : UIBase
         Dictionary<string, Image> hiddenImages = new Dictionary<string, Image>();
         foreach (KeyValuePair<string, Sprite> hidden in hiddenSprites)
         {
-            hiddenImages.Add(hidden.Key, CreateRoomImage(roomTransform, hidden.Value, hidden.Key));
+            Image hiddenImage = CreateRoomImage(roomTransform, hidden.Value, hidden.Key);
+            Sprite sprite = hidden.Value;
+            if (HasOffsetPivot(sprite))
+            {
+                // 청크 경계를 넘는 비밀 구역은 스프라이트 피벗을 방의 왼쪽 아래에 맞춘다.
+                RectTransform hiddenTransform = hiddenImage.rectTransform;
+                hiddenTransform.anchorMin = hiddenTransform.anchorMax = Vector2.zero;
+                hiddenTransform.pivot = sprite.pivot / sprite.rect.size;
+                hiddenTransform.anchoredPosition = Vector2.zero;
+                hiddenTransform.sizeDelta = sprite.rect.size * (_chunkSize.x / sprite.pixelsPerUnit);
+            }
+            hiddenImages.Add(hidden.Key, hiddenImage);
         }
 
         MapRoomView roomView = roomObject.GetComponent<MapRoomView>();
