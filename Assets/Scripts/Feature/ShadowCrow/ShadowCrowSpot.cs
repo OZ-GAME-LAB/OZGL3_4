@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class ShadowCrowSpot : MonoBehaviour
+public class ShadowCrowSpot : MonoBehaviour, ISaveableGimmick
 {
     [Header("까마귀")]
     [SerializeField] private string _crowAddress = "ShadowCrow";    
@@ -25,6 +25,14 @@ public class ShadowCrowSpot : MonoBehaviour
     private bool _isAutoTalked;
     private int _spawnVersion;
 
+    private void Awake()
+    {
+        if (_isAutoTalk)
+        {
+            GimmickSaveRegistry.Register(this, this);
+        }
+    }
+
     private void Start()
     {
         if (GetComponentInParent<MapChunk>() == null)
@@ -43,6 +51,31 @@ public class ShadowCrowSpot : MonoBehaviour
     {
         _spawnVersion++;
         ReturnCrow();
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    void ISaveableGimmick.CaptureState(GimmickSaveState state)
+    {
+        state.IsUsed = _isAutoTalked;
+    }
+
+    void ISaveableGimmick.RestoreState(GimmickSaveState state)
+    {
+        _isAutoTalked = state.IsUsed;
+        if (_crow == null)
+        {
+            return;
+        }
+
+        _crow.SetSpawnData(_dialogId, _isAutoTalk && !_isAutoTalked);
+        if (_isAutoTalked && _crow.CurrentStateType == ShadowCrowState.Appear)
+        {
+            _crow.EndTalkDirecting();
+        }
     }
 
     private async UniTaskVoid SpawnCrowAsync(int spawnVersion)
