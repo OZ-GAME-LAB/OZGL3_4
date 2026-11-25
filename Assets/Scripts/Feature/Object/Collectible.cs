@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 
 public class Collectible : MonoBehaviour, IInteractable
@@ -7,6 +9,7 @@ public class Collectible : MonoBehaviour, IInteractable
 
 
     public Vector2 Position => transform.position;
+    private MapRoomViewModel _roomViewModel;
 
 
     private void Start()
@@ -22,7 +25,44 @@ public class Collectible : MonoBehaviour, IInteractable
 
         if (!MapUtil.TryGetMapService(this, nameof(Start), out MapService mapService)) return;
 
-        if (mapService.IsRewardCollected(roomId, _rewardId))
+        _roomViewModel = mapService.GetMapViewModel().GetRoomViewModel(roomId);
+        if (_roomViewModel == null)
+        {
+            Debug.LogError($"[Collectible] (Start) - 방 데이터를 찾을 수 없음: {roomId} / {_rewardId}");
+            return;
+        }
+
+        _roomViewModel.PropertyChanged += OnRoomPropertyChanged;
+        RefreshCollected();
+    }
+
+    private void OnDestroy()
+    {
+        if (_roomViewModel != null)
+        {
+            _roomViewModel.PropertyChanged -= OnRoomPropertyChanged;
+            _roomViewModel = null;
+        }
+    }
+
+
+    private void OnRoomPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(MapRoomViewModel.CollectedRewardIds))
+        {
+            return;
+        }
+        RefreshCollected();
+    }
+
+
+    private void RefreshCollected()
+    {
+        if (_roomViewModel == null)
+        {
+            return;
+        }
+        if (_roomViewModel.CollectedRewardIds.Contains(_rewardId))
         {
             gameObject.SetActive(false);
         }
