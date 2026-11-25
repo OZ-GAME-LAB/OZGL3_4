@@ -365,7 +365,9 @@
                 }
             ],
             "RewardIds": [],
-            "HiddenIds": [],
+            "HiddenIds": [
+                "Room_B07_Hidden_01"
+            ],
             "Exits": [
                 {
                     "Id": "Room_B07_Exit_01",

@@ -596434,6 +596434,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1172357773417457403}
     m_Modifications:
+    - target: {fileID: 804211410515283182, guid: e051b784459a1f045bc77a4c6b28d566, type: 3}
+      propertyPath: _hiddenId
+      value: Room_B07_Hidden_01
+      objectReference: {fileID: 0}
     - target: {fileID: 2325854996266171015, guid: e051b784459a1f045bc77a4c6b28d566, type: 3}
       propertyPath: m_Name
       value: Room_B07
