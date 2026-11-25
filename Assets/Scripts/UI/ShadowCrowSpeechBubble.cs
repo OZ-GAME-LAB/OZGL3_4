@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,9 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
 
     public bool IsPlaying => _currentDialogData != null;
     public string CurrentId => IsPlaying ? _currentDialogData.Id : string.Empty;
+
+    // 마지막 대사(NextId "-1")까지 넘겨서 정상 종료했을 때만 발생한다. 범위를 벗어나 끊긴 경우(StopDialog)는 발생하지 않는다.
+    public event Action OnEndDialog;
 
     private void Awake()
     {
@@ -58,6 +62,7 @@ public class ShadowCrowSpeechBubble : MonoBehaviour
         if (nextId == "-1")
         {
             StopDialog();
+            OnEndDialog?.Invoke();
             return;
         }
 

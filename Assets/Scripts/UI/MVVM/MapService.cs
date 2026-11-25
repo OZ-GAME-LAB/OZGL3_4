@@ -180,6 +180,22 @@ public class MapService
         return roomViewModel.CollectedRewardIds.Contains(rewardId);
     }
 
+    // 엔딩 갈래 판정용. 전체 맵에 등록된 수집품(RewardIds)을 모두 모았으면 true.
+    // 등록된 수집품이 하나도 없으면 데이터 오류로 보고 false를 반환한다.
+    public bool IsAllRewardsCollected()
+    {
+        MapViewModel viewModel = GetMapViewModel();
+        int totalCount = viewModel.TotalRewardCount;
+        if (totalCount <= 0)
+        {
+            Debug.LogWarning("[MapService] (IsAllRewardsCollected) - 등록된 수집품이 없습니다. MapRoomData의 RewardIds를 확인하세요.");
+
+            return false;
+        }
+
+        return viewModel.CollectedRewardCount >= totalCount;
+    }
+
     public bool RequestDiscoverHidden(string roomId, string hiddenId)
     {
         MapRoomViewModel roomViewModel = GetMapViewModel().GetRoomViewModel(roomId);
