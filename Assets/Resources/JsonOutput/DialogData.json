@@ -94,7 +94,7 @@
     "Dialog": "아주 작은 구멍만 있따면 말이야.",
     "NextId": "-1"
   },
-    {
+  {
     "Id": "Tutorial_LightRoom_01",
     "Dialog": "이곳은 빛이 정말 강하게 내려쬐는군.",
     "NextId": "Tutorial_LightRoom_02"
@@ -107,6 +107,56 @@
   {
     "Id": "Tutorial_LightRoom_03",
     "Dialog": "때마침 몸을 숨길만한 것이 있으니, 잘 이용해 보라고.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Reward_01",
+    "Dialog": "이건 우리들의 그림자이자 양식이지.",
+    "NextId": "Tutorial_Reward_02"
+  },
+  {
+    "Id": "Tutorial_Reward_02",
+    "Dialog": "이걸 다 모아온다면, 내가 언젠가 보상해주지",
+    "NextId": "Tutorial_Reward_03"
+  },
+  {
+    "Id": "Tutorial_Reward_03",
+    "Dialog": "M을 누르면 지도와 함께 얼마나 모았는지 볼 수 있어.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "Tutorial_Hidden_01",
+    "Dialog": "여길 찾았나?",
+    "NextId": "Tutorial_Hidden_02"
+  },
+  {
+    "Id": "Tutorial_Hidden_02",
+    "Dialog": "이처럼 숨겨진 곳에 그림자가 있을지도 모르지",
+    "NextId": "Tutorial_Hidden_03"
+  },
+  {
+    "Id": "Tutorial_Hidden_03",
+    "Dialog": "잊지말고 다 모아 오도록.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "End_A_01",
+    "Dialog": "정말로 다 모았군.",
+    "NextId": "End_A_02"
+  },
+  {
+    "Id": "End_A_02",
+    "Dialog": "이제 너의 쓸모는 다 했다.",
+    "NextId": "-1"
+  },
+  {
+    "Id": "End_B_01",
+    "Dialog": "그것 하나 다 못 모으다니.",
+    "NextId": "End_B_02"
+  },
+  {
+    "Id": "End_B_02",
+    "Dialog": "기대하지 않았지만, 실망스럽군.",
     "NextId": "-1"
   }
 ]
