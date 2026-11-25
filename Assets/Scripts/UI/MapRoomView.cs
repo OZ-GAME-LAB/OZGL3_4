@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,16 +8,19 @@ public class MapRoomView : MonoBehaviour
 {
     private MapViewModel _mapViewModel;
     private MapRoomViewModel _roomViewModel;
-    private Image[] _images;
-    private bool _preserveSpriteColors;
+    private Image _terrainImage;
+    private IReadOnlyDictionary<string, Image> _hiddenImages;
 
-    public void Init(MapViewModel mapViewModel, MapRoomViewModel roomViewModel, bool preserveSpriteColors = false)
+    public bool HasTerrainImage => _terrainImage != null;
+
+    public void Init(MapViewModel mapViewModel, MapRoomViewModel roomViewModel, Image terrainImage,
+        IReadOnlyDictionary<string, Image> hiddenImages)
     {
         UnBind();
         _mapViewModel = mapViewModel;
         _roomViewModel = roomViewModel;
-        _preserveSpriteColors = preserveSpriteColors;
-        _images = GetComponentsInChildren<Image>(true);
+        _terrainImage = terrainImage;
+        _hiddenImages = hiddenImages;
         if (isActiveAndEnabled)
         {
             Bind();
@@ -68,7 +73,8 @@ public class MapRoomView : MonoBehaviour
 
     private void OnChangeRoomProperty(object sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(MapRoomViewModel.IsVisited))
+        if (args.PropertyName == nameof(MapRoomViewModel.IsVisited)
+            || args.PropertyName == nameof(MapRoomViewModel.DiscoveredHiddenIds))
         {
             UpdateView();
         }
@@ -76,26 +82,22 @@ public class MapRoomView : MonoBehaviour
 
     private void UpdateView()
     {
-        if (_mapViewModel == null || _roomViewModel == null || _images == null)
+        if (_mapViewModel == null || _roomViewModel == null)
         {
             return;
         }
-        Color color = _preserveSpriteColors ? Color.white : Color.red;
-        if (_mapViewModel.CurrentRoomId == _roomViewModel.RoomId)
+
+        if (_terrainImage != null)
         {
-            color = _preserveSpriteColors ? new Color(0.8f, 1f, 0.85f) : Color.green;
+            _terrainImage.enabled = _roomViewModel.IsVisited;
+            _terrainImage.color = _mapViewModel.CurrentRoomId == _roomViewModel.RoomId
+                ? new Color(0.8f, 1f, 0.85f)
+                : Color.white;
         }
-        else if (_roomViewModel.IsVisited)
+
+        foreach (KeyValuePair<string, Image> hidden in _hiddenImages)
         {
-            color = _preserveSpriteColors ? Color.white : Color.blue;
-        }
-        foreach (Image image in _images)
-        {
-            if (image != null)
-            {
-                image.enabled = _roomViewModel.IsVisited;
-                image.color = color;
-            }
+            hidden.Value.enabled = _roomViewModel.DiscoveredHiddenIds.Contains(hidden.Key);
         }
     }
 }
