@@ -41,6 +41,10 @@ public abstract class SignalSender : MonoBehaviour, ISaveableGimmick
 
         if (IsSyncReceiversOnEnable == false)
         {
+            // 토글 방식은 연결된 기믹에 신호를 보내지 않지만, 자기 상태와 외형(버튼 색 등)은 시작 상태로 되돌립니다.
+            // (사망 초기화로 꺼졌다 켜졌을 때 버튼 색이 눌린 상태로 남지 않도록)
+            IsOn = GetStartState();
+            HandleSignalSent(IsOn);
             return;
         }
 
