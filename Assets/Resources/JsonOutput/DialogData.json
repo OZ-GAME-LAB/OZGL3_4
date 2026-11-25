@@ -91,7 +91,12 @@
   },
   {
     "Id": "Tutorial_Mouse_03",
-    "Dialog": "아주 작은 구멍만 있따면 말이야.",
+    "Dialog": "아주 작은 구멍만 있다면 말이야.",
+    "NextId": "Tutorial_Mouse_04"
+  },
+  {
+    "Id": "Tutorial_Mouse_04",
+    "Dialog": "Q 혹은 E를 이용해 모습을 변할 수 있을거다.",
     "NextId": "-1"
   },
   {
