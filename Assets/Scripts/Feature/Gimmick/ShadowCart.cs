@@ -6,7 +6,7 @@ using UnityEngine;
 // - 벽이나 낮은 턱과의 충돌은 그대로라서, 수레가 지형을 뚫고 지나가지는 않는다.
 // - Grabbable이 잡을 때/놓을 때 고정 설정을 다시 쓰기 때문에, 물리 계산 직전(FixedUpdate)마다 세로 고정을 다시 건다.
 [RequireComponent(typeof(Rigidbody2D))]
-public class ShadowCart : MonoBehaviour
+public class ShadowCart : MonoBehaviour, ISaveableGimmick
 {
     private Rigidbody2D _rigid;
     private float _fixedLocalY;
@@ -37,5 +37,33 @@ public class ShadowCart : MonoBehaviour
             localPosition.y = _fixedLocalY;
             transform.localPosition = localPosition;
         }
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    private void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.ValueA = transform.localPosition.x;
+    }
+
+    // 저장된 가로 위치로 옮깁니다. 세로 위치는 처음 높이로 고정되어 있습니다.
+    public void RestoreState(GimmickSaveState state)
+    {
+        Vector3 localPosition = transform.localPosition;
+        localPosition.x = state.ValueA;
+        localPosition.y = _fixedLocalY;
+        transform.localPosition = localPosition;
+
+        _rigid.linearVelocity = Vector2.zero;
+        _rigid.position = transform.position;
     }
 }

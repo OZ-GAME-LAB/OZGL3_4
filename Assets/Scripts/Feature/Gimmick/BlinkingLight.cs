@@ -15,7 +15,7 @@ using UnityEngine;
 /// - 스위치의 List_Receiver에는 LightZone이 아니라 이 BlinkingLight를 넣으세요.
 ///   신호 켜짐 → 점멸 시작, 신호 꺼짐 → 점멸 정지(빛 꺼짐)
 /// </summary>
-public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
+public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver, ISaveableGimmick
 {
     [Header("Reference")]
     [SerializeField] private LightZone LightZone_Target;
@@ -187,6 +187,35 @@ public class BlinkingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         if (_warningDuration > _offDuration)
         {
             Debug.LogWarning($"[{name}] 예고 시간(_warningDuration)이 꺼져 있는 시간(_offDuration)보다 깁니다. 예고는 꺼져 있는 시간 안에서만 표시됩니다.", this);
+        }
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    private void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.IsOn = IsBlinking;
+    }
+
+    // 깜빡이는 중이었는지만 되돌립니다. (깜빡임 박자는 저장하지 않고 처음부터 다시 시작)
+    public void RestoreState(GimmickSaveState state)
+    {
+        if (state.IsOn)
+        {
+            StartBlinking();
+        }
+        else
+        {
+            StopBlinking();
         }
     }
 }

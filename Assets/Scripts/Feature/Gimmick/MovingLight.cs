@@ -19,7 +19,7 @@ using UnityEngine;
 /// - 신호를 받으면 켜짐 → 레일 끝(End), 꺼짐 → 레일 시작(Start)으로 스스로 이동합니다.
 /// - Move Delay를 주면 신호를 받은 뒤 그 시간만큼 기다렸다가 움직이기 시작합니다. (플레이어가 잡고 끌 때는 적용되지 않음)
 /// </summary>
-public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
+public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver, ISaveableGimmick
 {
     [Header("Reference")]
     [SerializeField] private Transform Transform_Carriage;
@@ -254,5 +254,32 @@ public class MovingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         Gizmos.DrawLine(railStartWorld, railEndWorld);
         Gizmos.DrawWireSphere(railStartWorld, 0.15f);
         Gizmos.DrawWireSphere(railEndWorld, 0.15f);
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    private void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.ValueA = _currentRatio;
+        state.ValueB = _targetRatio;
+    }
+
+    // 저장된 레일 위 위치와 목표 위치로 즉시 맞춥니다.
+    public void RestoreState(GimmickSaveState state)
+    {
+        _grabbingPlayer = null;
+        _delayTimer = 0f;
+        _currentRatio = Mathf.Clamp01(state.ValueA);
+        _targetRatio = Mathf.Clamp01(state.ValueB);
+        ApplyCarriagePosition();
     }
 }

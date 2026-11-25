@@ -65,4 +65,6 @@ public class SaveData
     // 추가 - 김동혁, 맵 진행 기록
     public List<string> CollectedRewardIds = new List<string>();
     public List<string> DiscoveredHiddenIds = new List<string>();
+    // 추가 - 기믹 상태(스위치, 문, 빛, 수레 위치 등) 기록
+    public List<GimmickSaveState> GimmickStates = new List<GimmickSaveState>();
 }

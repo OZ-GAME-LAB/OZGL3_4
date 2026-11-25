@@ -17,7 +17,7 @@ using UnityEditor;
 /// 4. 컴포넌트 우클릭 → "빛 모양을 콜라이더에 맞추기"를 누르면 빛 모양이 콜라이더와 같아집니다.
 ///    (게임 실행 시에는 자동으로 맞춰집니다.)
 /// </summary>
-public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
+public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver, ISaveableGimmick
 {
     private const string LightZoneLayerName = "LightZone";
 
@@ -288,5 +288,29 @@ public class LightZone : MonoBehaviour, ISignalReceiver, IToggleReceiver
         {
             player.Die();
         }
+    }
+
+    // 세이브: 깜빡이는 빛(BlinkingLight)에 딸린 빛 영역은 깜빡임이 직접 켜고 끄므로 저장하지 않습니다.
+    private void Start()
+    {
+        if (GetComponentInParent<BlinkingLight>() != null)
+            return;
+
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.IsOn = IsOn;
+    }
+
+    public void RestoreState(GimmickSaveState state)
+    {
+        ApplyState(state.IsOn);
     }
 }

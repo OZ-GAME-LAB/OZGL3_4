@@ -246,4 +246,22 @@ public class Switch : SignalSender, IInteractable
         target.localPosition = to;
         return false;
     }
+
+    // 세이브: 한 번만 눌리는 스위치는 사용 여부도 함께 저장합니다.
+    public override void CaptureState(GimmickSaveState state)
+    {
+        base.CaptureState(state);
+        state.IsUsed = _isUsed;
+    }
+
+    public override void RestoreState(GimmickSaveState state)
+    {
+        _isUsed = state.IsUsed;
+        base.RestoreState(state);
+
+        if (_anim != null)
+        {
+            _anim.SetBool(_isOnHash, IsOn);
+        }
+    }
 }
