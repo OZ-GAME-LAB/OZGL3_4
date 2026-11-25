@@ -11,11 +11,14 @@ using UnityEngine;
 /// 예) 발판을 밟으면 빛이 꺼지게 하려면: 발판의 Invert Signal 켜기
 ///     (발판 자체는 밟힘 = 켜짐으로 동작하고, 빛에는 꺼짐 신호가 전달됩니다)
 /// </summary>
-public abstract class SignalSender : MonoBehaviour
+public abstract class SignalSender : MonoBehaviour, ISaveableGimmick
 {
     [SerializeField] private List<MonoBehaviour> List_Receiver = new List<MonoBehaviour>();
     [SerializeField] private bool _isStartOn = true;
     [SerializeField] private bool _isInvertSignal = false;
+
+    // 세이브에서 상태를 복원했는지 여부. 복원했다면 시작 상태 대신 복원한 상태를 연결된 기믹에 보냅니다.
+    private bool _isStateRestored;
 
     /// <summary>
     /// 이 기믹 자체의 상태입니다. (Invert Signal과 상관없이 스위치가 켜져 있는지, 발판이 눌려 있는지)
@@ -33,12 +36,47 @@ public abstract class SignalSender : MonoBehaviour
 
     protected virtual void OnEnable()
     {
+        // 꺼졌다 켜지면(사망 초기화 등) 시작 상태로 돌아갑니다.
+        _isStateRestored = false;
+
         if (IsSyncReceiversOnEnable == false)
         {
             return;
         }
 
         SyncReceiversAsync().Forget();
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    protected virtual void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public virtual void CaptureState(GimmickSaveState state)
+    {
+        state.IsOn = IsOn;
+    }
+
+    /// <summary>
+    /// 저장된 켜짐/꺼짐 상태로 되돌립니다. 외형을 맞추고, 토글 방식이 아니면 연결된 기믹에도 그 상태를 다시 보냅니다.
+    /// (토글 방식으로 연결된 문과 빛은 각자 자기 상태를 저장하고 복원합니다)
+    /// </summary>
+    public virtual void RestoreState(GimmickSaveState state)
+    {
+        _isStateRestored = true;
+        IsOn = state.IsOn;
+        HandleSignalSent(IsOn);
+
+        if (IsSyncReceiversOnEnable)
+        {
+            SyncReceiversAsync().Forget();
+        }
     }
 
     /// <summary>
@@ -111,7 +149,7 @@ public abstract class SignalSender : MonoBehaviour
     private async UniTaskVoid SyncReceiversAsync()
     {
         await UniTask.Yield(PlayerLoopTiming.Update, this.GetCancellationTokenOnDestroy());
-        SendSignal(GetStartState());
+        SendSignal(_isStateRestored ? IsOn : GetStartState());
     }
 
     private void OnValidate()

@@ -44,7 +44,7 @@ public class AngleStep
 ///   _isSnapToStepOnStop이 켜져 있으면 멈출 때 가장 가까운 단계 각도로 맞춰 들어가고 그 단계의 그림자가 켜집니다.
 ///   스위치와 연결할 때는 스위치의 Is Start On으로 시작 시 회전 여부를 정합니다. (꺼짐 = 멈춘 상태로 시작)
 /// </summary>
-public class RotatingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
+public class RotatingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver, ISaveableGimmick
 {
     public enum SignalMode
     {
@@ -369,6 +369,41 @@ public class RotatingLight : MonoBehaviour, ISignalReceiver, IToggleReceiver
         if (_signalMode == SignalMode.Advance && List_Step.Count < 2)
         {
             Debug.LogWarning($"[{name}] Advance 모드는 단계가 2개 이상이어야 회전합니다.", this);
+        }
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    private void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.IntValue = _currentStepIndex;
+        state.IsOn = IsContinuousRotating;
+    }
+
+    // 저장된 단계의 각도로 즉시 맞춥니다. 계속 회전 중이었다면 다시 회전을 시작합니다.
+    public void RestoreState(GimmickSaveState state)
+    {
+        if (Transform_Pivot == null || List_Step.Count == 0)
+            return;
+
+        IsRotating = false;
+        IsContinuousRotating = false;
+        _currentStepIndex = Mathf.Clamp(state.IntValue, 0, List_Step.Count - 1);
+        SetPivotAngle(List_Step[_currentStepIndex].Angle);
+        ApplyShadowObjects(_currentStepIndex);
+
+        if (state.IsOn)
+        {
+            StartContinuousRotation();
         }
     }
 }

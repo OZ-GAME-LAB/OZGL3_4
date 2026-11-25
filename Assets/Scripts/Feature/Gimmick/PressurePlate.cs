@@ -140,4 +140,21 @@ public class PressurePlate : SignalSender
         float depth = IsPressed ? _pressDepth : 0f;
         Transform_Visual.localPosition = _visualDefaultPosition + Vector3.down * depth;
     }
+
+    // 세이브: 눌림 고정(Latched) 여부를 저장합니다. 밟고 있던 것은 저장하지 않습니다.
+    public override void CaptureState(GimmickSaveState state)
+    {
+        base.CaptureState(state);
+        state.IsUsed = _isLatchedOn;
+    }
+
+    public override void RestoreState(GimmickSaveState state)
+    {
+        _isLatchedOn = state.IsUsed;
+        RefreshVisual();
+
+        // 불러온 직후에는 아무도 밟고 있지 않으므로, 실제 눌림 상태로 맞춥니다.
+        state.IsOn = IsPressed;
+        base.RestoreState(state);
+    }
 }

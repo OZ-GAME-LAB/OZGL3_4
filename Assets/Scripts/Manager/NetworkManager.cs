@@ -48,6 +48,10 @@ public class NetworkManager : SingletonBase<NetworkManager>
         saveData.DiscoveredHiddenIds = MapService.GetAllDiscoveredHiddenIds();
         // -----
 
+        // 추가 - 기믹 상태(스위치, 문, 빛, 수레 위치 등) 저장
+        saveData.GimmickStates = GimmickSaveRegistry.CollectStates();
+        // -----
+
         // 저장한 텔레포트 위치
         saveData.LastSaveTeleportId = teleportId;
 
@@ -82,6 +86,10 @@ public class NetworkManager : SingletonBase<NetworkManager>
         // 추가 - 김동혁, 수집품과 비밀방 발견 기록 복원
         MapService.RestoreCollectedRewards(data.CollectedRewardIds);
         MapService.RestoreDiscoveredHiddens(data.DiscoveredHiddenIds);
+        // -----
+
+        // 추가 - 기믹 상태 복원
+        GimmickSaveRegistry.ApplyLoadedStates(data.GimmickStates);
         // -----
     }
 }

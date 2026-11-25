@@ -14,7 +14,7 @@ using UnityEngine;
 /// - 스위치에 연결할 때는 스위치의 시작 상태와 문의 시작 상태(_isStartOpen)를 맞춰 주세요.
 ///   예) 스위치 Is Start On 켜짐 + Is Open When Signal On 켜짐 → 문 Is Start Open 켜짐
 /// </summary>
-public class Door : MonoBehaviour, ISignalReceiver, IToggleReceiver
+public class Door : MonoBehaviour, ISignalReceiver, IToggleReceiver, ISaveableGimmick
 {
     [Header("Reference")]
     [SerializeField] private Transform Transform_Body;
@@ -231,5 +231,29 @@ public class Door : MonoBehaviour, ISignalReceiver, IToggleReceiver
         {
             Debug.LogWarning($"[{name}] 문(Body)의 Rigidbody2D Body Type을 Kinematic으로 설정해 주세요.", this);
         }
+    }
+
+    // 세이브: 시작할 때 등록하고(저장된 상태가 있으면 복원), 사라질 때 해제합니다.
+    private void Start()
+    {
+        GimmickSaveRegistry.Register(this, this);
+    }
+
+    private void OnDestroy()
+    {
+        GimmickSaveRegistry.Unregister(this);
+    }
+
+    public void CaptureState(GimmickSaveState state)
+    {
+        state.IsOn = IsOpen;
+    }
+
+    // 저장된 열림/닫힘 상태로 즉시 맞춥니다. (움직이는 연출 없음)
+    public void RestoreState(GimmickSaveState state)
+    {
+        StopMove();
+        IsOpen = state.IsOn;
+        SnapBody(GetTargetLocalPosition(IsOpen));
     }
 }
