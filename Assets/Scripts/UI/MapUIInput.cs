@@ -6,7 +6,9 @@ public class MapUIInput : MonoBehaviour
     [SerializeField] private InputActionAsset InputActionAsset_Actions;
 
     private InputAction _mapAction;
+#if UNITY_EDITOR
     private InputAction _unlockMapAction;
+#endif
 
     private void Awake()
     {
@@ -25,7 +27,9 @@ public class MapUIInput : MonoBehaviour
 
     private void OnDestroy()
     {
+#if UNITY_EDITOR
         _unlockMapAction?.Dispose();
+#endif
         if (_mapAction != null)
         {
             _mapAction.Dispose();
@@ -48,7 +52,9 @@ public class MapUIInput : MonoBehaviour
         }
 
         _mapAction = mapAction.Clone();
+#if UNITY_EDITOR
         _unlockMapAction = new InputAction("UnlockMapCheat", InputActionType.Button, "<Keyboard>/q");
+#endif
     }
 
     private void Bind()
@@ -61,9 +67,11 @@ public class MapUIInput : MonoBehaviour
         _mapAction.performed -= OnToggleMap;
         _mapAction.performed += OnToggleMap;
         _mapAction.Enable();
+#if UNITY_EDITOR
         _unlockMapAction.performed -= OnUnlockMap;
         _unlockMapAction.performed += OnUnlockMap;
         _unlockMapAction.Enable();
+#endif
     }
 
     private void UnBind()
@@ -75,10 +83,13 @@ public class MapUIInput : MonoBehaviour
 
         _mapAction.performed -= OnToggleMap;
         _mapAction.Disable();
+#if UNITY_EDITOR
         _unlockMapAction.performed -= OnUnlockMap;
         _unlockMapAction.Disable();
+#endif
     }
 
+#if UNITY_EDITOR
     private void OnUnlockMap(InputAction.CallbackContext context)
     {
         NetworkManager networkManager = NetworkManager.Instance;
@@ -91,6 +102,7 @@ public class MapUIInput : MonoBehaviour
         networkManager.MapService.RequestUnlockAllRoomsForTesting();
         Debug.Log("[MapUIInput] 치트: 모든 리전의 미니맵을 해금했습니다.");
     }
+#endif
 
     private void OnToggleMap(InputAction.CallbackContext context)
     {
