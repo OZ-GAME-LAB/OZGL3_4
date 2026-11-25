@@ -101,7 +101,7 @@ MonoBehaviour:
   _isSyncShapeWithCollider: 1
   _warningIntensityRatio: 0.3
   _isOverrideIntensity: 0
-  _lightIntensity: 2.5
+  _lightIntensity: 4
   _playerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.96300405, g: 1, b: 0.41037738, a: 1}
-  m_Intensity: 1
+  m_Intensity: 4
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
