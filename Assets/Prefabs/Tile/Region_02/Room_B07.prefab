@@ -58612,6 +58612,10 @@ PrefabInstance:
       propertyPath: m_Tiles.Array.data[101].second.m_TileObjectToInstantiateIndex
       value: 65535
       objectReference: {fileID: 0}
+    - target: {fileID: 669249825668756198, guid: ef2dc5248aa609e48b09e1cfbe4546bb, type: 3}
+      propertyPath: _hiddenId
+      value: Room_B07_Hidden_01
+      objectReference: {fileID: 0}
     - target: {fileID: 2295808727464134206, guid: ef2dc5248aa609e48b09e1cfbe4546bb, type: 3}
       propertyPath: m_ColliderPaths.Array.size
       value: 1
