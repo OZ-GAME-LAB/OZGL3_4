@@ -46,6 +46,7 @@ public class NetworkManager : SingletonBase<NetworkManager>
         // 추가 - 김동혁, 수집품과 비밀방 발견 기록 저장
         saveData.CollectedRewardIds = MapService.GetAllCollectedRewardIds();
         saveData.DiscoveredHiddenIds = MapService.GetAllDiscoveredHiddenIds();
+        saveData.MapRoomProgress = MapService.CollectRoomProgress();
         // -----
 
         // 추가 - 기믹 상태(스위치, 문, 빛, 수레 위치 등) 저장
@@ -86,6 +87,7 @@ public class NetworkManager : SingletonBase<NetworkManager>
         // 추가 - 김동혁, 수집품과 비밀방 발견 기록 복원
         MapService.RestoreCollectedRewards(data.CollectedRewardIds);
         MapService.RestoreDiscoveredHiddens(data.DiscoveredHiddenIds);
+        MapService.RestoreRoomProgress(data.MapRoomProgress);
         // -----
 
         // 추가 - 기믹 상태 복원

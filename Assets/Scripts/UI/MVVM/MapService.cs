@@ -136,13 +136,13 @@ public class MapService
     }
 
 #if UNITY_EDITOR
-    // 테스트 치트: 현재 방/리전과 보상/히든 진행 상태는 유지한다.
+    // 테스트 치트: 화면에만 방을 표시하고 저장 진행도는 바꾸지 않는다.
     public bool RequestUnlockAllRoomsForTesting()
     {
         bool changed = false;
         foreach (MapRoomViewModel room in _mapViewModel.Rooms)
         {
-            if (RequestUnlockRoomByExploration(room.RoomId))
+            if (room.TryShowTerrainForTesting())
             {
                 changed = true;
             }
@@ -206,6 +206,49 @@ public class MapService
         }
 
         return roomViewModel.DiscoveredHiddenIds.Contains(hiddenId);
+    }
+
+    public List<MapRoomProgressData> CollectRoomProgress()
+    {
+        List<MapRoomProgressData> progress = new List<MapRoomProgressData>();
+        foreach (MapRoomViewModel room in _mapViewModel.Rooms)
+        {
+            if (room.IsVisited || room.IsTerrainRevealed || room.IsRewardInfoRevealed)
+            {
+                progress.Add(new MapRoomProgressData
+                {
+                    RoomId = room.RoomId,
+                    IsVisited = room.IsVisited,
+                    IsTerrainRevealed = room.IsTerrainRevealed,
+                    IsRewardInfoRevealed = room.IsRewardInfoRevealed,
+                });
+            }
+        }
+        return progress;
+    }
+
+    public void RestoreRoomProgress(IReadOnlyList<MapRoomProgressData> progress)
+    {
+        if (progress == null)
+        {
+            return;
+        }
+        foreach (MapRoomProgressData savedRoom in progress)
+        {
+            if (savedRoom == null || string.IsNullOrWhiteSpace(savedRoom.RoomId))
+            {
+                continue;
+            }
+            MapRoomViewModel room = _mapViewModel.GetRoomViewModel(savedRoom.RoomId);
+            if (room == null)
+            {
+                continue;
+            }
+
+            room.TrySetVisited(room.IsVisited || savedRoom.IsVisited);
+            room.TrySetTerrainRevealed(room.IsTerrainRevealed || savedRoom.IsTerrainRevealed);
+            room.TrySetRewardInfoRevealed(room.IsRewardInfoRevealed || savedRoom.IsRewardInfoRevealed);
+        }
     }
 
     public List<string> GetAllCollectedRewardIds()

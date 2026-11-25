@@ -73,7 +73,7 @@ public class MapRoomView : MonoBehaviour
 
     private void OnChangeRoomProperty(object sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(MapRoomViewModel.IsVisited)
+        if (args.PropertyName == nameof(MapRoomViewModel.IsTerrainVisible)
             || args.PropertyName == nameof(MapRoomViewModel.DiscoveredHiddenIds))
         {
             UpdateView();
@@ -89,7 +89,7 @@ public class MapRoomView : MonoBehaviour
 
         if (_terrainImage != null)
         {
-            _terrainImage.enabled = _roomViewModel.IsVisited;
+            _terrainImage.enabled = _roomViewModel.IsTerrainVisible;
             _terrainImage.color = _mapViewModel.CurrentRoomId == _roomViewModel.RoomId
                 ? new Color(0.8f, 1f, 0.85f)
                 : Color.white;

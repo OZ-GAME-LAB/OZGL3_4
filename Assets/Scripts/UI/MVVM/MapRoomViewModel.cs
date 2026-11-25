@@ -10,10 +10,25 @@ public class MapRoomViewModel : ViewModelBase
     private readonly List<MapRoomExitData> _exits;
     private readonly List<Vector2Int> _occupiedChunks = new List<Vector2Int>();
     private bool _canShowExplorationRate;
+#if UNITY_EDITOR
+    private bool _isTerrainShownForTesting;
+#endif
 
     public string RoomId { get; }
     public string RegionId { get; }
     public IReadOnlyList<Vector2Int> OccupiedChunks { get; }
+    public bool IsTerrainVisible
+    {
+        get
+        {
+#if UNITY_EDITOR
+            return IsVisited || _isTerrainShownForTesting;
+#else
+            return IsVisited;
+#endif
+        }
+    }
+
     public bool IsTerrainRevealed
     {
         get
@@ -135,6 +150,7 @@ public class MapRoomViewModel : ViewModelBase
             }
             _roomModel.IsVisited = value;
             OnPropertyChanged(nameof(IsVisited));
+            OnPropertyChanged(nameof(IsTerrainVisible));
             OnPropertyChanged(nameof(ExplorationRate));
             OnPropertyChanged(nameof(DisplayedExplorationRate));
         }
@@ -232,6 +248,20 @@ public class MapRoomViewModel : ViewModelBase
     {
         return _occupiedChunks.Contains(chunk);
     }
+#if UNITY_EDITOR
+    public bool TryShowTerrainForTesting()
+    {
+        if (IsTerrainVisible)
+        {
+            return false;
+        }
+
+        _isTerrainShownForTesting = true;
+        OnPropertyChanged(nameof(IsTerrainVisible));
+        return true;
+    }
+#endif
+
     public bool TrySetVisited(bool isVisited)
     {
         if (IsVisited == isVisited)
@@ -336,6 +366,7 @@ public class MapRoomViewModel : ViewModelBase
     public void InvokeOnceOnInit()
     {
         OnPropertyChanged(nameof(IsVisited));
+        OnPropertyChanged(nameof(IsTerrainVisible));
         OnPropertyChanged(nameof(IsRevealed));
         OnPropertyChanged(nameof(IsTerrainRevealed));
         OnPropertyChanged(nameof(IsRewardInfoRevealed));
