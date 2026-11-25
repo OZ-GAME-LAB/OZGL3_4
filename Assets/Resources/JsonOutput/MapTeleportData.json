@@ -12,10 +12,15 @@
     {
     "Id": "Teleport_2_2",
     "RegionId": "Region_02",
-    "RevealRoomIds": "Room_B06"
+    "RevealRoomIds": "Room_B03"
   },
     {
     "Id": "Teleport_2_3",
+    "RegionId": "Region_02",
+    "RevealRoomIds": "Room_B06"
+  },
+    {
+    "Id": "Teleport_2_4",
     "RegionId": "Region_02",
     "RevealRoomIds": "Room_B12"
   }
