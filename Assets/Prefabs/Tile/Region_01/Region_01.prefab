@@ -298941,6 +298941,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CrowSpawnSpot
       objectReference: {fileID: 0}
+    - target: {fileID: 9054001347614502683, guid: c08c54b3a60eac24e8e9ce87089c6cc2, type: 3}
+      propertyPath: _dialogId
+      value: Tutorial_Hidden_01
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
