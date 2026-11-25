@@ -462131,7 +462131,7 @@ MonoBehaviour:
   _canvasContentRoot: {fileID: 1590534290}
   _canvasPopupRoot: {fileID: 879322975}
   _canvasVeryFrontRoot: {fileID: 217092039}
-  _mapInputPrefab: {fileID: 0}
+  _mapInputPrefab: {fileID: 100002, guid: 7bf7f4a8125a42f2b2206fcae087720d, type: 3}
 --- !u!114 &756564044
 MonoBehaviour:
   m_ObjectHideFlags: 0
