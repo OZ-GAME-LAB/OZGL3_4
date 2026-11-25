@@ -66,6 +66,7 @@ public class MapRoomViewModel : ViewModelBase
     }
 
     public IReadOnlyList<MapRoomExitData> Exits { get; }
+    public IReadOnlyList<string> HiddenIds { get; }
     public IReadOnlyList<string> CollectedRewardIds { get; }
     public IReadOnlyList<string> DiscoveredHiddenIds { get; }
     public IReadOnlyList<string> UnlockedExitIds { get; }
@@ -195,6 +196,7 @@ public class MapRoomViewModel : ViewModelBase
         OccupiedChunks = _occupiedChunks.AsReadOnly();
         _rewardIds = GetUniqueIds(roomData.RewardIds);
         _hiddenIds = GetUniqueIds(roomData.HiddenIds);
+        HiddenIds = _hiddenIds.AsReadOnly();
         foreach (string hiddenId in _hiddenIds)
         {
             if (_rewardIds.Contains(hiddenId))
