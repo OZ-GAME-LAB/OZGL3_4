@@ -26,15 +26,23 @@ public class ShadowCrow : MonoBehaviour, IInteractable
     [SerializeField] private bool _isDirectOnTalk = true;             
     [SerializeField, Min(0.1f)] private float _talkZoomSize = 4f;    
     [SerializeField, Min(0f)] private float _talkZoomTime = 0.5f;
-    [SerializeField] private bool _isBlockInputOnTalk = true;         
+    [SerializeField] private bool _isBlockInputOnTalk = true;
+    [SerializeField] private bool _isFocusOnTalk = true;                       // 대화 연출 중 카메라가 플레이어 대신 까마귀를 비춤
+    [SerializeField] private Vector2 _talkFocusOffset = new Vector2(0f, 1f);   // 까마귀 발 기준. 말풍선까지 보이도록 위로
 
     private const string _talkInputActionName = "Player/Interaction";
     private const string _defaultAppearAnimationName = "CrowAppear";
 
     private bool _isAutoTalked;
+    private bool _isEnding;
+    private string _endingCompleteDialogId;
+    private string _endingIncompleteDialogId;
+    private bool _isEndingComplete;
+    private bool _isEndingFinished;
     private int _talkStartFrame = -1;
     private InputAction _talkInputAction;
     private CameraController _cameraController;
+    private CameraFollow _cameraFollow;   // 이 까마귀가 카메라 초점을 잡았을 때만 값이 있다
 
     private ShadowCrowStateBase _currentState;
     private ShadowCrowState _currentStateType = ShadowCrowState.None;
@@ -50,6 +58,9 @@ public class ShadowCrow : MonoBehaviour, IInteractable
 
     public event Action OnStartAutoTalk;
     public event Action OnStartAppear;
+
+    // 엔딩 대사를 마지막까지 넘겨 정상 종료했을 때 발생한다. true면 수집품을 모두 모은 갈래(A), false면 B.
+    public event Action<bool> OnEndEndingDialog;
 
     #region 수명
     private void Awake()
@@ -67,11 +78,22 @@ public class ShadowCrow : MonoBehaviour, IInteractable
 
     private void OnEnable()
     {
+        if (SpeechBubble_Crow != null)
+        {
+            SpeechBubble_Crow.OnEndDialog -= OnEndBubbleDialog;
+            SpeechBubble_Crow.OnEndDialog += OnEndBubbleDialog;
+        }
+
         ChangeState(ShadowCrowState.Hidden);
     }
 
     private void OnDisable()
     {
+        if (SpeechBubble_Crow != null)
+        {
+            SpeechBubble_Crow.OnEndDialog -= OnEndBubbleDialog;
+        }
+
         _currentState?.Exit();
         _currentState = null;
         _currentStateType = ShadowCrowState.None;
@@ -133,13 +155,58 @@ public class ShadowCrow : MonoBehaviour, IInteractable
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_dialogId))
+        // 엔딩 대사는 한 번만. 끝난 뒤에는 연출이 이어지므로 다시 말을 걸 수 없다.
+        if (_isEnding && _isEndingFinished)
         {
-            Debug.LogError($"[ShadowCrow] {name}: 대사 ID(_dialogId)를 입력하세요.");
             return;
         }
 
-        StartDialog(_dialogId);
+        string dialogId = GetInteractDialogId();
+        if (string.IsNullOrWhiteSpace(dialogId))
+        {
+            Debug.LogError($"[ShadowCrow] {name}: 상호작용 대사 ID가 비어 있습니다. 일반은 _dialogId, 엔딩은 ShadowCrowSpot의 엔딩 대사 ID를 입력하세요.");
+            return;
+        }
+
+        StartDialog(dialogId);
+    }
+
+    // F를 누른 순간의 대사 ID. 엔딩 까마귀는 이때 수집품 상태를 확인해서 A/B 대사를 고른다.
+    private string GetInteractDialogId()
+    {
+        if (_isEnding == false)
+        {
+            return _dialogId;
+        }
+
+        _isEndingComplete = IsAllRewardsCollected();
+        if (_isEndingComplete)
+        {
+            return _endingCompleteDialogId;
+        }
+
+        return _endingIncompleteDialogId;
+    }
+
+    private bool IsAllRewardsCollected()
+    {
+        if (MapUtil.TryGetMapService(this, nameof(IsAllRewardsCollected), out MapService mapService) == false)
+        {
+            return false;
+        }
+
+        return mapService.IsAllRewardsCollected();
+    }
+
+    private void OnEndBubbleDialog()
+    {
+        if (_isEnding == false)
+        {
+            return;
+        }
+
+        _isEndingFinished = true;
+        OnEndEndingDialog?.Invoke(_isEndingComplete);
     }
 
     public bool StartDialog(string dialogId)
@@ -166,11 +233,27 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         return true;
     }
 
+    // 풀에서 재사용될 수 있으므로 일반 스폰 데이터를 넣을 때 엔딩 설정도 함께 끈다.
     public void SetSpawnData(string dialogId, bool isAutoTalk)
     {
         _dialogId = dialogId;
         _isAutoTalk = isAutoTalk;
         _isAutoTalked = false;
+        _isEnding = false;
+        _endingCompleteDialogId = string.Empty;
+        _endingIncompleteDialogId = string.Empty;
+        _isEndingComplete = false;
+        _isEndingFinished = false;
+    }
+
+    // 엔딩 까마귀로 설정한다. 자동 대화 없이 F 상호작용으로만 대사를 시작한다.
+    // completeDialogId: 수집품을 모두 모았을 때(End_A_01), incompleteDialogId: 덜 모았을 때(End_B_01)
+    public void SetEndingData(string completeDialogId, string incompleteDialogId)
+    {
+        SetSpawnData(string.Empty, false);
+        _isEnding = true;
+        _endingCompleteDialogId = completeDialogId;
+        _endingIncompleteDialogId = incompleteDialogId;
     }
 
     // 등장 애니메이션(Animator 상태 이름)을 바꾼다. 비어 있으면 기본 CrowAppear.
@@ -303,10 +386,13 @@ public class ShadowCrow : MonoBehaviour, IInteractable
         }
 
         _cameraController.ZoomIn(_talkZoomSize, _talkZoomTime, _isBlockInputOnTalk);
+        StartTalkFocus(mainCamera);
     }
 
     public void EndTalkDirecting()
     {
+        EndTalkFocus();
+
         if (_cameraController == null)
         {
             return;
@@ -314,6 +400,43 @@ public class ShadowCrow : MonoBehaviour, IInteractable
 
         _cameraController.ZoomOut(_talkZoomTime);
         _cameraController = null;
+    }
+
+    // 카메라가 플레이어 대신 까마귀(+오프셋)를 비추게 한다. 지형·UI에 가려지는 위치에서도 까마귀와 말풍선이 보이도록.
+    private void StartTalkFocus(Camera mainCamera)
+    {
+        if (_isFocusOnTalk == false)
+        {
+            return;
+        }
+
+        CameraFollow cameraFollow = mainCamera.GetComponent<CameraFollow>();
+        if (cameraFollow == null)
+        {
+            Debug.LogWarning($"[ShadowCrow] {name}: Main Camera에 CameraFollow가 없어 까마귀 초점을 생략합니다.");
+            return;
+        }
+
+        // CameraFixedZone 등이 이미 화면을 고정 중이면 그 화면을 유지하고 건드리지 않는다(대화 후 그쪽 고정이 풀리지 않도록).
+        if (cameraFollow.IsFixed)
+        {
+            return;
+        }
+
+        cameraFollow.SetFixedPosition((Vector2)transform.position + _talkFocusOffset);
+        _cameraFollow = cameraFollow;
+    }
+
+    // 이 까마귀가 잡은 초점만 풀어 다시 플레이어를 따라가게 한다.
+    private void EndTalkFocus()
+    {
+        if (_cameraFollow == null)
+        {
+            return;
+        }
+
+        _cameraFollow.ClearFixedPosition();
+        _cameraFollow = null;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
