@@ -52404,12 +52404,12 @@ MonoBehaviour:
   List_PathPoint: []
   _requiredShadowType: 2
   _reenterDelay: 0.3
-  _travelSpeed: 7.5
+  _travelSpeed: 10
   _enterDelay: 0.15
   _exitDelay: 0.15
   _isZoomOnTravel: 1
-  _zoomSize: 9
-  _zoomInTime: 6.5
+  _zoomSize: 5
+  _zoomInTime: 1
   _zoomOutTime: 1
   _isBlockInputOnZoom: 0
   LineRenderer_Body: {fileID: 0}
