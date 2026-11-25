@@ -47,19 +47,26 @@ public class MapView : UIBase
         Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
         foreach (Sprite sprite in Resources.LoadAll<Sprite>(_roomSpriteFolder))
         {
-            string roomId = GetRoomIdFromImageName(sprite.name);
-            if (!sprites.TryAdd(roomId, sprite)) Debug.LogWarning("[MapView] 이미지 방 ID 중복: " + roomId);
+            string id = GetRoomIdFromImageName(sprite.name);
+            if (!sprites.TryAdd(id, sprite)) Debug.LogWarning("[MapView] 지도 이미지 ID 중복: " + id);
         }
         foreach (MapRoomViewModel room in _mapViewModel.Rooms)
         {
-            if (!sprites.TryGetValue(room.RoomId, out Sprite sprite)) continue;
             Rect layout = GetRoomLayout(room.OccupiedChunks, _chunkSize.x);
-            if (!Mathf.Approximately(sprite.rect.width / sprite.rect.height, layout.width / layout.height))
+            Sprite terrain = GetRoomSprite(sprites, room.RoomId, layout);
+            Dictionary<string, Sprite> hiddenSprites = new Dictionary<string, Sprite>();
+            foreach (string hiddenId in room.HiddenIds)
             {
-                Debug.LogError("[MapView] 이미지와 청크 영역의 가로세로 비율이 다릅니다: " + room.RoomId);
-                continue;
+                Sprite hiddenSprite = GetRoomSprite(sprites, hiddenId, layout);
+                if (hiddenSprite != null)
+                {
+                    hiddenSprites.Add(hiddenId, hiddenSprite);
+                }
             }
-            CreateRoomView(room, sprite, layout);
+            if (terrain != null || hiddenSprites.Count > 0)
+            {
+                CreateRoomView(room, terrain, hiddenSprites, layout);
+            }
         }
         if (_roomViews.Count == 0) Debug.LogWarning("[MapView] 표시할 방 이미지가 없습니다: Resources/" + _roomSpriteFolder);
         if (isActiveAndEnabled) Bind();
@@ -90,9 +97,23 @@ public class MapView : UIBase
             ((long)maxX - minX + 1) * chunkSize, ((long)maxY - minY + 1) * chunkSize);
     }
 
-    private void CreateRoomView(MapRoomViewModel room, Sprite sprite, Rect layout)
+    private static Sprite GetRoomSprite(Dictionary<string, Sprite> sprites, string id, Rect layout)
     {
-        GameObject roomObject = new GameObject(room.RoomId, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(MapRoomView));
+        if (!sprites.TryGetValue(id, out Sprite sprite))
+        {
+            return null;
+        }
+        if (!Mathf.Approximately(sprite.rect.width / sprite.rect.height, layout.width / layout.height))
+        {
+            Debug.LogError("[MapView] 이미지와 청크 영역의 가로세로 비율이 다릅니다: " + id);
+            return null;
+        }
+        return sprite;
+    }
+
+    private void CreateRoomView(MapRoomViewModel room, Sprite terrain, Dictionary<string, Sprite> hiddenSprites, Rect layout)
+    {
+        GameObject roomObject = new GameObject(room.RoomId, typeof(RectTransform), typeof(MapRoomView));
         roomObject.layer = gameObject.layer;
         RectTransform roomTransform = (RectTransform)roomObject.transform;
         roomTransform.SetParent(Transform_MapContent, false);
@@ -100,14 +121,33 @@ public class MapView : UIBase
         roomTransform.pivot = Vector2.zero;
         roomTransform.anchoredPosition = layout.position;
         roomTransform.sizeDelta = layout.size;
-        Image image = roomObject.GetComponent<Image>();
-        image.sprite = sprite;
-        image.type = Image.Type.Simple;
-        image.useSpriteMesh = false;
-        image.raycastTarget = false;
+
+        Image terrainImage = terrain != null ? CreateRoomImage(roomTransform, terrain, "Terrain") : null;
+        Dictionary<string, Image> hiddenImages = new Dictionary<string, Image>();
+        foreach (KeyValuePair<string, Sprite> hidden in hiddenSprites)
+        {
+            hiddenImages.Add(hidden.Key, CreateRoomImage(roomTransform, hidden.Value, hidden.Key));
+        }
+
         MapRoomView roomView = roomObject.GetComponent<MapRoomView>();
-        roomView.Init(_mapViewModel, room, true);
+        roomView.Init(_mapViewModel, room, terrainImage, hiddenImages);
         _roomViews.Add(room.RoomId, roomView);
+    }
+
+    private Image CreateRoomImage(RectTransform parent, Sprite sprite, string imageName)
+    {
+        GameObject imageObject = new GameObject(imageName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        imageObject.layer = gameObject.layer;
+        RectTransform imageTransform = (RectTransform)imageObject.transform;
+        imageTransform.SetParent(parent, false);
+        imageTransform.anchorMin = Vector2.zero;
+        imageTransform.anchorMax = Vector2.one;
+        imageTransform.offsetMin = imageTransform.offsetMax = Vector2.zero;
+
+        Image image = imageObject.GetComponent<Image>();
+        image.sprite = sprite;
+        image.raycastTarget = false;
+        return image;
     }
 
     private void OnEnable()
@@ -194,7 +234,8 @@ public class MapView : UIBase
             if (!_roomViews.TryGetValue(room.RoomId, out MapRoomView view)) continue;
             // 모든 리전의 상대 배치를 유지하고, 화면 바깥은 RectMask2D로 자른다.
             view.gameObject.SetActive(true);
-            if (room.RegionId == _mapViewModel.CurrentRegionId)
+            // 비밀방 전용 이미지는 리전의 기본 위치를 바꾸지 않는다.
+            if (view.HasTerrainImage && room.RegionId == _mapViewModel.CurrentRegionId)
             {
                 foreach (Vector2Int chunk in room.OccupiedChunks)
                 {
